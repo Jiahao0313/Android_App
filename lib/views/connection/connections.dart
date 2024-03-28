@@ -8,8 +8,6 @@ import "package:flutter/material.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
 import "package:babylon_app/views/chat/group_chat.dart";
 
-import "../../services/user/user_service.dart";
-
 // Define ConnectionsScreen as a StatefulWidget to manage dynamic content.
 class ConnectionsScreen extends StatefulWidget {
   const ConnectionsScreen({super.key});
@@ -443,7 +441,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
   // Constructs "Explore The World" tab with a search bar and search results.
   Widget _buildExploreWorldTab() {
     // Check if a search query has been entered.
-    bool hasSearchQuery = searchController.text.isNotEmpty;
+    final bool hasSearchQuery = searchController.text.isNotEmpty;
 
     return Column(
       children: [
@@ -526,7 +524,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
           SizedBox(
               height: 20), // Provides spacing between the icon and the text.
           Text(
-            'No people found with that name.',
+            "No people found with that name.",
             style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),

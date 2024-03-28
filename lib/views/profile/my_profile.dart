@@ -90,6 +90,8 @@ class _MyProfileState extends State<MyProfile> {
                               horizontal: 20, vertical: 12),
                         ),
                         onPressed: () {
+                          UserService.setUpConnectedBabylonUser(
+                              ConnectedBabylonUser().userUID);
                           Navigator.push(
                             context,
                             MaterialPageRoute(

@@ -3,6 +3,9 @@ import "package:babylon_app/models/babylon_user.dart";
 // Singleton class -> we can have only one user connected so we can manage the instance properly
 
 class ConnectedBabylonUser extends BabylonUser {
+  // Attributes
+  List<String> listedRequests = [];
+
   // Intern constructor
   ConnectedBabylonUser._internal() : super();
 
@@ -23,5 +26,9 @@ class ConnectedBabylonUser extends BabylonUser {
     _instance.listedEvents = babylonUser.listedEvents;
     _instance.userUID = babylonUser.userUID;
     _instance.listedConnections = babylonUser.listedConnections;
+  }
+
+  static Future<void> setRequests(final List<String> requests) async {
+    _instance.listedRequests = requests;
   }
 }

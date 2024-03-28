@@ -1,5 +1,6 @@
 // my_friends.dart
 import "package:babylon_app/models/babylon_user.dart";
+import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:flutter/material.dart";
 
@@ -11,14 +12,7 @@ class MyFriends extends StatefulWidget {
 }
 
 class MyFriendsState extends State<MyFriends> {
-  final List<Map<String, String>> joinRequests = List.generate(
-    3,
-    (final index) => {
-      "name": "Request ${index + 1}",
-      "profilePic": "assets/images/default_user_logo.png"
-    },
-  );
-
+  Future<List<BabylonUser?>> _requests = UserService.getRequests();
   Future<List<BabylonUser?>> _connections = UserService.getConnections();
 
   @override
@@ -33,7 +27,7 @@ class MyFriendsState extends State<MyFriends> {
         child: Column(
           children: [
             _buildSectionTitle("Friend Requests"),
-            _buildJoinRequestsList(),
+            _buildRequestsList(context),
             _buildSectionTitle("My Friends"),
             _buildConnectionsList(context),
           ],
@@ -58,33 +52,65 @@ class MyFriendsState extends State<MyFriends> {
     );
   }
 
-  Widget _buildJoinRequestsList() {
-    return Column(
-      children: joinRequests
-          .map((final request) => ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: AssetImage(request["profilePic"]!),
-                ),
-                title: Text(request["name"]!),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.check, color: Colors.green),
-                      onPressed: () {
-                        // Accept join request action
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.cancel, color: Colors.red),
-                      onPressed: () {
-                        // Cancel join request action
-                      },
-                    ),
-                  ],
-                ),
-              ))
-          .toList(),
+  Widget _buildRequestsList(final BuildContext context) {
+    return FutureBuilder(
+        future: _requests,
+        builder: (final BuildContext context,
+            final AsyncSnapshot<List<BabylonUser?>> snapshot) {
+          List<Widget> children;
+          if (snapshot.hasData &&
+              snapshot.data != null &&
+              snapshot.data!.isNotEmpty) {
+            children = <Widget>[
+              ...snapshot.data!.map((final babylonUser) =>
+                  _buildRequestTile(context, babylonUser))
+            ];
+          } else {
+            children = <Widget>[];
+          }
+          return Column(
+            children: children,
+          );
+        });
+  }
+
+  Widget _buildRequestTile(
+      final BuildContext context, final BabylonUser? request) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(request!.imagePath),
+      ),
+      title: Text(request.fullName),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(Icons.check, color: Colors.green),
+            onPressed: () {
+              // Accept join request action
+              setState(() {
+                UserService.addRequestConnection(request.userUID);
+                UserService.setUpConnectedBabylonUser(
+                    ConnectedBabylonUser().userUID);
+                _connections = UserService.getConnections();
+                _requests = UserService.getRequests();
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.cancel, color: Colors.red),
+            onPressed: () {
+              // Cancel join request action
+              setState(() {
+                UserService.removeRequestConnection(request.userUID);
+                UserService.setUpConnectedBabylonUser(
+                    ConnectedBabylonUser().userUID);
+                _requests = UserService.getRequests();
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -150,6 +176,8 @@ class MyFriendsState extends State<MyFriends> {
               onPressed: () {
                 setState(() {
                   UserService.removeConnection(connection.userUID);
+                  UserService.setUpConnectedBabylonUser(
+                      ConnectedBabylonUser().userUID);
                   _connections = UserService.getConnections();
                 });
                 Navigator.of(context).pop();
