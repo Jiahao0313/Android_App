@@ -40,7 +40,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     super.dispose();
   }
 
-  void _fetchUsers() async {
+  Future<void> _fetchUsers() async {
     final users = await UserService.getAllBabylonUsers();
     setState(() {
       // Convert BabylonUser instances to _Person instances, or directly use BabylonUser if you adjust the UI accordingly

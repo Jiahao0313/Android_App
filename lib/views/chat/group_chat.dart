@@ -1,3 +1,4 @@
+import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/message.dart";
@@ -24,6 +25,7 @@ class _GroupChatViewState extends State<GroupChatView> {
   @override
   void initState() {
     super.initState();
+    fetchUsersData();
   }
 
   @override
@@ -32,13 +34,20 @@ class _GroupChatViewState extends State<GroupChatView> {
     super.dispose();
   }
 
+  void fetchUsersData() async {
+    final users = await ChatService.getChatUsers(chatUID: chat.chatUID);
+    setState(() async {
+      chat.users = users;
+    });
+  }
+
   // Handles sending a message
   void _sendMessage() {
     ChatService.sendMessage(
         chatUID: chat.chatUID,
         message: Message(
             message: _messageController.text.trim(),
-            sender: ConnectedBabylonUser(),
+            senderUID: ConnectedBabylonUser().userUID,
             time: Timestamp.now()));
 
     if (_messageController.text.isNotEmpty) {
@@ -100,7 +109,9 @@ class _GroupChatViewState extends State<GroupChatView> {
 
   // Builds a single message tile with enhanced UI
   Widget _buildMessageTile(final Message message) {
-    final bool isCurrentUser = message.sender!.userUID ==
+    final BabylonUser user =
+        chat.users!.firstWhere((anUser) => anUser.userUID == message.senderUID);
+    final bool isCurrentUser = message.senderUID ==
         ConnectedBabylonUser()
             .userUID; // Check if the message is from the current user
     return Container(
@@ -110,7 +121,7 @@ class _GroupChatViewState extends State<GroupChatView> {
         children: [
           if (!isCurrentUser) // Only show profile picture for other users
             CircleAvatar(
-              backgroundImage: NetworkImage(message.sender!.imagePath),
+              backgroundImage: NetworkImage(user.imagePath),
             ),
           if (!isCurrentUser) // Add spacing only if the profile picture is displayed
             SizedBox(width: 10),
@@ -122,7 +133,7 @@ class _GroupChatViewState extends State<GroupChatView> {
               children: [
                 if (!isCurrentUser) // Only show the user's name for other users
                   Text(
-                    message.sender!.fullName,
+                    user.fullName,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 Container(

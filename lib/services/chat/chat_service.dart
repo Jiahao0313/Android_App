@@ -7,6 +7,8 @@ import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/message.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
+import "package:firebase_auth/firebase_auth.dart";
+import "package:firebase_core/firebase_core.dart";
 import "package:firebase_storage/firebase_storage.dart";
 
 class ChatService {
@@ -28,7 +30,7 @@ class ChatService {
             messageDocumentID: messageDoc.id,
             message: messageDoc["message"],
             time: messageDoc["time"],
-            sender: await UserService.getBabylonUser(messageDoc["sender"]),
+            senderUID: messageDoc["sender"],
           ));
         }
         streamController.add(messages);
@@ -50,14 +52,14 @@ class ChatService {
           .set({
         "message": message.message,
         "time": message.time,
-        "sender": message.sender!.userUID
+        "sender": message.senderUID
       });
 
       // update chat's last message
       await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
         "lastMessage": message.message,
         "lastMessageTime": message.time,
-        "lastSender": message.sender!.userUID
+        "lastSender": message.senderUID
       });
     } catch (e) {
       rethrow;
@@ -139,8 +141,7 @@ class ChatService {
                       chatData["lastMessageTime"] != ""
                   ? Message(
                       message: chatData["lastMessage"],
-                      sender: await UserService.getBabylonUser(
-                          chatData["lastSender"]),
+                      senderUID: chatData["lastSender"],
                       time: chatData["lastMessageTime"])
                   : null));
         } else {
@@ -160,11 +161,27 @@ class ChatService {
                       chatData["lastMessageTime"] != ""
                   ? Message(
                       message: chatData["lastMessage"],
-                      sender: await UserService.getBabylonUser(
-                          chatData["lastSender"]),
+                      senderUID: chatData["lastSender"],
                       time: chatData["lastMessageTime"])
                   : null));
         }
+      });
+      return res;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<List<BabylonUser>> getChatUsers(
+      {required final String chatUID}) async {
+    try {
+      final List<BabylonUser> res = List<BabylonUser>.empty(growable: true);
+      final db = FirebaseFirestore.instance;
+      final chatDoc = await db.collection("chats").doc(chatUID).get();
+      final chatData = chatDoc.data();
+      final List<String> userIDList = List<String>.from(chatData!["users"]);
+      await Future.forEach(userIDList, (userID) async {
+        res.add((await UserService.getBabylonUser(userID))!);
       });
       return res;
     } catch (e) {
