@@ -19,6 +19,7 @@ class GroupChatView extends StatefulWidget {
 
 class _GroupChatViewState extends State<GroupChatView> {
   final Chat chat;
+  bool hasUsersLoaded = false;
   _GroupChatViewState(this.chat);
   final TextEditingController _messageController = TextEditingController();
 
@@ -36,8 +37,9 @@ class _GroupChatViewState extends State<GroupChatView> {
 
   void fetchUsersData() async {
     final users = await ChatService.getChatUsers(chatUID: chat.chatUID);
-    setState(() async {
+    setState(() {
       chat.users = users;
+      hasUsersLoaded = true;
     });
   }
 
@@ -100,8 +102,9 @@ class _GroupChatViewState extends State<GroupChatView> {
           return ListView(
             reverse: true,
             children: [
-              ...snapshot.data!
-                  .map((final aMessage) => _buildMessageTile(aMessage))
+              if (hasUsersLoaded)
+                ...snapshot.data!
+                    .map((final aMessage) => _buildMessageTile(aMessage))
             ],
           );
         });
