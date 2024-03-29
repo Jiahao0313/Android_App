@@ -260,16 +260,15 @@ class UserService {
         final List<String> eventsLists = [];
         final List<String> connectionsLists = [];
         final user = BabylonUser.withData(
-          doc.id,
-          data["Name"] ?? "",
-          data["Email Address"] ?? "",
-          data["About"] ?? "",
-          data["Country of Origin"] ?? "",
-          data["Date of Birth"] ?? "",
-          data["ImageUrl"] ?? "",
-          eventsLists,
-          connectionsLists
-        );
+            doc.id,
+            data["Name"] ?? "",
+            data["Email Address"] ?? "",
+            data["About"] ?? "",
+            data["Country of Origin"] ?? "",
+            data["Date of Birth"] ?? "",
+            data["ImageUrl"] ?? "",
+            eventsLists,
+            connectionsLists);
         users.add(user);
       }
     } catch (e) {
@@ -278,32 +277,19 @@ class UserService {
     return users;
   }
 
-  static Future<List<String>> _getSubCollectionData(DocumentReference parentRef, String subCollection) async {
-    final List<String> subCollectionData = [];
-    try {
-      final snapshot = await parentRef.collection(subCollection).get();
-      for (final doc in snapshot.docs) {
-        subCollectionData.add(doc.id);
-      }
-    } catch (e) {
-      print("Error fetching sub collection data for $subCollection: $e");
-    }
-    return subCollectionData;
-  }
-  static Future<List<BabylonUser>> searchBabylonUsers(final String query) async {
+  static Future<List<BabylonUser>> searchBabylonUsers(
+      final String query) async {
     final List<BabylonUser> searchResults = [];
     try {
       final db = FirebaseFirestore.instance;
-      final querySnapshot = await db.collection("users")
+      final querySnapshot = await db
+          .collection("users")
           .where("Name", isGreaterThanOrEqualTo: query)
           .where("Name", isLessThanOrEqualTo: query + '\uf8ff')
           .get();
 
       for (final doc in querySnapshot.docs) {
         final data = doc.data();
-        final eventsList = await _getSubCollectionData(doc.reference, "events");
-        final connectionsList = await _getSubCollectionData(doc.reference, "connections");
-
         final user = BabylonUser.withData(
             doc.id,
             data["Name"] ?? "",
@@ -311,10 +297,7 @@ class UserService {
             data["About"] ?? "",
             data["Country of Origin"] ?? "",
             data["Date of Birth"] ?? "",
-            data["ImageUrl"] ?? "",
-            eventsList,
-            connectionsList
-        );
+            data["ImageUrl"] ?? "", [], []);
         searchResults.add(user);
       }
     } catch (e) {
