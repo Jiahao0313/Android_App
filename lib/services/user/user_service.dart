@@ -277,4 +277,49 @@ class UserService {
     }
     return users;
   }
+
+  static Future<List<String>> _getSubCollectionData(DocumentReference parentRef, String subCollection) async {
+    final List<String> subCollectionData = [];
+    try {
+      final snapshot = await parentRef.collection(subCollection).get();
+      for (final doc in snapshot.docs) {
+        subCollectionData.add(doc.id);
+      }
+    } catch (e) {
+      print("Error fetching sub collection data for $subCollection: $e");
+    }
+    return subCollectionData;
+  }
+  static Future<List<BabylonUser>> searchBabylonUsers(final String query) async {
+    final List<BabylonUser> searchResults = [];
+    try {
+      final db = FirebaseFirestore.instance;
+      final querySnapshot = await db.collection("users")
+          .where("Name", isGreaterThanOrEqualTo: query)
+          .where("Name", isLessThanOrEqualTo: query + '\uf8ff')
+          .get();
+
+      for (final doc in querySnapshot.docs) {
+        final data = doc.data();
+        final eventsList = await _getSubCollectionData(doc.reference, "events");
+        final connectionsList = await _getSubCollectionData(doc.reference, "connections");
+
+        final user = BabylonUser.withData(
+            doc.id,
+            data["Name"] ?? "",
+            data["Email Address"] ?? "",
+            data["About"] ?? "",
+            data["Country of Origin"] ?? "",
+            data["Date of Birth"] ?? "",
+            data["ImageUrl"] ?? "",
+            eventsList,
+            connectionsList
+        );
+        searchResults.add(user);
+      }
+    } catch (e) {
+      print("Error searching users: $e");
+    }
+    return searchResults;
+  }
 }

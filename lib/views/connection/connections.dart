@@ -49,18 +49,20 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
   }
 
   // Placeholder for search logic, currently updates searchResults based on query.
-  void _search(final String query) {
+  void _search(final String query) async {
     if (query.isEmpty) {
-      _fetchUsers();
-    } else {
+      final allUsers = await UserService.getAllBabylonUsers();
       setState(() {
-        searchResults = searchResults
-            .where((final person) =>
-                person.fullName.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+        searchResults = allUsers;
+      });
+    } else {
+      final searchResults = await UserService.searchBabylonUsers(query);
+      setState(() {
+        this.searchResults = searchResults;
       });
     }
   }
+
 
   @override
   Widget build(final BuildContext context) {
