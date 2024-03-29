@@ -44,9 +44,11 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
 
   Future<void> _fetchUsers() async {
     final users = await UserService.getAllBabylonUsers();
+    final currentUserUID = ConnectedBabylonUser().userUID;
+
     setState(() {
-      // Convert BabylonUser instances to _Person instances, or directly use BabylonUser if you adjust the UI accordingly
-      searchResults = users;
+
+      searchResults = users.where((final user) => user.userUID != currentUserUID).toList();
     });
   }
 
@@ -54,13 +56,19 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
   void _search(final String query) async {
     if (query.isEmpty) {
       final allUsers = await UserService.getAllBabylonUsers();
+      final currentUserUID = ConnectedBabylonUser().userUID;
+
       setState(() {
-        searchResults = allUsers;
+
+        searchResults = allUsers.where((final user) => user.userUID != currentUserUID).toList();
       });
     } else {
-      final searchResults = await UserService.searchBabylonUsers(query);
+      final searchResultsTemp = await UserService.searchBabylonUsers(query);
+      final currentUserUID = ConnectedBabylonUser().userUID;
+
       setState(() {
-        this.searchResults = searchResults;
+
+        searchResults = searchResultsTemp.where((final user) => user.userUID != currentUserUID).toList();
       });
     }
   }
