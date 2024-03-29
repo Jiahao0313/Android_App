@@ -1,4 +1,6 @@
+import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/models/chat.dart";
+import "package:babylon_app/services/chat/chat_service.dart";
 import "package:flutter/material.dart";
 
 class GroupChatInfoView extends StatefulWidget {
@@ -148,7 +150,7 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
                 icon: Icon(Icons.remove_circle_outline, color: Colors.red),
                 onPressed: () {
                   // Show confirmation dialog when removing a participant
-                  _showRemoveParticipantDialog(context, user.fullName);
+                  _showRemoveParticipantDialog(context, user, chat.chatUID);
                 },
               ),
             ],
@@ -158,15 +160,15 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
     );
   }
 
-  void _showRemoveParticipantDialog(
-      final BuildContext context, final String participantName) {
+  void _showRemoveParticipantDialog(final BuildContext context,
+      final BabylonUser participant, final String chatUID) {
     showDialog(
       context: context,
       builder: (final BuildContext context) {
         return AlertDialog(
           title: Text("Remove Participant"),
           content: Text(
-              "Are you sure you want to remove $participantName from the group?"),
+              "Are you sure you want to remove ${participant.fullName} from the group?"),
           actions: <Widget>[
             TextButton(
               child: Text("No"),
@@ -177,7 +179,8 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
             TextButton(
               child: Text("Yes"),
               onPressed: () {
-// Implement remove participant logic here
+                ChatService.addUserToGroupChatBanList(
+                    userUID: participant.userUID, chatUID: chatUID);
                 Navigator.of(context).pop(); // Close the dialog
               },
             ),

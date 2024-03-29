@@ -188,4 +188,26 @@ class ChatService {
       rethrow;
     }
   }
+
+  static Future<void> addUserToGroupChatBanList(
+      {required final String userUID, required final String chatUID}) async {
+    try {
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "bannedUsers": FieldValue.arrayUnion([userUID])
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> removeUserToGroupChatBanList(
+      {required final String userUID, required final String chatUID}) async {
+    try {
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "bannedUsers": FieldValue.arrayUnion([userUID])
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
