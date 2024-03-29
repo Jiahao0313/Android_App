@@ -26,6 +26,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
   final Future<List<Chat>> _myChats =
       ChatService.getUserChats(userUID: ConnectedBabylonUser().userUID);
 
+  Future<List<BabylonUser?>> _requests = UserService.getRequests();
+
   @override
   void initState() {
     super.initState();
@@ -133,92 +135,120 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
 
   // Constructs the "Friend Requests" widget with a horizontal list of profiles.
   Widget _buildFriendRequestsWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text("Friend Requests",
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontWeight: FontWeight.bold)),
-        ),
-        Container(
-          height:
-              200, // Fixed height for the horizontal list of friend request cards.
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 5, // Example: Five friend requests.
-            itemBuilder: (final context, final index) {
-              // Each item is a profile card with image, name, and action buttons for friend requests.
-              return Container(
-                width:
-                    240, // Adjusted width for each friend request card to accommodate horizontal buttons.
-                margin: EdgeInsets.only(
-                    left: 16.0,
-                    right: index == 4
-                        ? 16.0
-                        : 0), // Add right margin to the last card.
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment
-                        .spaceAround, // Space elements evenly within the card.
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: CircleAvatar(
-                          radius: 40,
-                          backgroundImage:
-                              AssetImage("assets/images/default_user_logo.png"),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text("_Person $index",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center),
-                      ),
-                      // Horizontal buttons for "View Profile", "Accept", and "Decline" actions.
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment
-                            .spaceEvenly, // Space buttons evenly.
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.remove_red_eye_outlined,
-                                color: Colors.blue),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (final context) => OtherProfile()),
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.check, color: Colors.green),
-                            onPressed: () {
-                              // Placeholder for "Accept" action.
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close, color: Colors.red),
-                            onPressed: () {
-                              // Placeholder for "Decline" action.
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+    return FutureBuilder(
+        future: _requests,
+        builder: (final BuildContext context,
+            final AsyncSnapshot<List<BabylonUser?>> snapshot) {
+          List<Widget> children = <Widget>[];
+          Widget result;
+          if (snapshot.hasData &&
+              snapshot.data != null &&
+              snapshot.data!.isNotEmpty) {
+            children = <Widget>[
+              ...snapshot.data!.map((final babylonUser) =>
+                  _buildFriendRequest(context, babylonUser))
+            ];
+          }
+
+          if (children.isNotEmpty) {
+            result =
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text("Friend Requests",
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+              ),
+              Container(
+                  height: 200,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: children.length,
+                    itemBuilder: (final context, final index) {
+                      return children[index];
+                    },
+                  )),
+            ]);
+          } else {
+            result = SizedBox.shrink();
+          }
+
+          return result;
+        });
+  }
+
+  Widget _buildFriendRequest(
+      final BuildContext context, final BabylonUser? request) {
+    return Container(
+      width:
+          240, // Adjusted width for each friend request card to accommodate horizontal buttons.
+      margin: EdgeInsets.only(
+          left: 16.0, right: 16.0), // Add right margin to the last card.
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment
+              .spaceAround, // Space elements evenly within the card.
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: CircleAvatar(
+                radius: 40,
+                backgroundImage: NetworkImage(request!.imagePath),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(request.fullName,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center),
+            ),
+            // Horizontal buttons for "View Profile", "Accept", and "Decline" actions.
+            Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceEvenly, // Space buttons evenly.
+              children: [
+                IconButton(
+                  icon: Icon(Icons.remove_red_eye_outlined, color: Colors.blue),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (final context) =>
+                              OtherProfile(babylonUser: request)),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
+                IconButton(
+                  icon: Icon(Icons.check, color: Colors.green),
+                  onPressed: () {
+                    setState(() {
+                      UserService.addRequestConnection(request.userUID);
+                      UserService.setUpConnectedBabylonUser(
+                          ConnectedBabylonUser().userUID);
+                      _requests = UserService.getRequests();
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.close, color: Colors.red),
+                  onPressed: () {
+                    // Placeholder for "Decline" action.
+                    setState(() {
+                      UserService.removeRequestConnection(request.userUID);
+                      UserService.setUpConnectedBabylonUser(
+                          ConnectedBabylonUser().userUID);
+                      _requests = UserService.getRequests();
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -277,8 +307,9 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (final context) =>
-                                              OtherProfile()),
+                                          builder: (final context) => OtherProfile(
+                                              babylonUser:
+                                                  BabylonUser())), // TODO(EnzoL): To fix by a real BabylonUser
                                     );
                                   },
                                 ),

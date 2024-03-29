@@ -1,38 +1,21 @@
+import "package:babylon_app/models/babylon_user.dart";
+import "package:babylon_app/models/connected_babylon_user.dart";
+import "package:babylon_app/services/user/user_service.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/views/profile/full_screen_image.dart";
-// Importa aquí el archivo FullScreenImage si se encuentra en otro archivo
-// import "path/to/full_screen_image.dart";
 
-// Define the UserProfile class to hold user information.
-class UserProfile {
-  final String profilePic;
-  final String name;
-  final int age;
-  final String country;
-  final String about;
+class OtherProfile extends StatefulWidget {
+  final BabylonUser babylonUser;
+  const OtherProfile({super.key, required this.babylonUser});
 
-  UserProfile(
-      {required this.profilePic,
-      required this.name,
-      required this.age,
-      required this.country,
-      required this.about});
+  @override
+  OtherProfileState createState() => OtherProfileState(babylonUser);
 }
 
-// Main widget for displaying user"s profile details.
-class OtherProfile extends StatelessWidget {
-  // Example user data.
-  final UserProfile user = UserProfile(
-    profilePic:
-        "assets/images/profilephoto2.jpg", // Placeholder for profile picture asset.
-    name: "Jane Doe",
-    age: 28,
-    country: "Canada",
-    about:
-        "Passionate traveler and photography enthusiast. Love to explore new cultures and meet new people.",
-  );
+class OtherProfileState extends State<OtherProfile> {
+  final BabylonUser babylonUser;
 
-  OtherProfile({super.key});
+  OtherProfileState(this.babylonUser);
 
   @override
   Widget build(final BuildContext context) {
@@ -51,27 +34,30 @@ class OtherProfile extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (final _) => FullScreenImage(
-                        imagePath: user.profilePic, name: user.name)),
+                        imagePath: babylonUser.imagePath,
+                        name: babylonUser.fullName)),
               ),
               child: CircleAvatar(
                 radius: 60,
-                backgroundImage: AssetImage(
-                    user.profilePic), // Display user"s profile picture.
+                backgroundImage: NetworkImage(widget
+                    .babylonUser.imagePath), // Display user"s profile picture.
               ),
             ),
             SizedBox(height: 10),
-            Text(user.name,
+            Text(babylonUser.fullName,
                 style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold)), // Display user"s name.
-            Text("${user.age} years old, from ${user.country}",
+            Text(
+                "${DateTime.now().year - DateTime.parse("${babylonUser.dateOfBirth}").year} years old, from ${babylonUser.originCountry}",
                 style: TextStyle(
                     fontSize: 18,
                     fontStyle:
                         FontStyle.italic)), // Display user"s age and country.
             Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Text(user.about,
+              child: Text(
+                  "${babylonUser.about}", // TODO(EnzoL): Make some fields like "about" mandatory to avoid display issues
                   textAlign: TextAlign.center,
                   style:
                       TextStyle(fontSize: 16)), // Display user"s about section.
@@ -84,7 +70,11 @@ class OtherProfile extends StatelessWidget {
                   icon: Icon(Icons.person_add),
                   label: Text("Add Friend"),
                   onPressed: () {
-                    // TODO(EnzoL): Implement functionality to send friend request.
+                    setState(() {
+                      UserService.addRequestConnection(babylonUser.userUID);
+                      UserService.setUpConnectedBabylonUser(
+                          ConnectedBabylonUser().userUID);
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
