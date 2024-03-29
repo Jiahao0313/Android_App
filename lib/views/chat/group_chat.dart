@@ -71,7 +71,9 @@ class _GroupChatViewState extends State<GroupChatView> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (final context) => GroupChatInfo()),
+                        builder: (final context) => GroupChatInfoView(
+                              chat: chat,
+                            )),
                   );
                 },
               )

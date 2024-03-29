@@ -1,6 +1,17 @@
+import "package:babylon_app/models/chat.dart";
 import "package:flutter/material.dart";
 
-class GroupChatInfo extends StatelessWidget {
+class GroupChatInfoView extends StatefulWidget {
+  final Chat chat;
+  const GroupChatInfoView({super.key, required this.chat});
+
+  @override
+  _GroupChatInfoViewState createState() => _GroupChatInfoViewState(chat: chat);
+}
+
+class _GroupChatInfoViewState extends State<GroupChatInfoView> {
+  final Chat chat;
+  _GroupChatInfoViewState({required this.chat});
   final List<Map<String, String>> joinRequests = List.generate(
     3,
     (final index) => {
@@ -8,16 +19,6 @@ class GroupChatInfo extends StatelessWidget {
       "profilePic": "assets/images/default_user_logo.png"
     },
   );
-
-  final List<Map<String, String>> participants = List.generate(
-    10,
-    (final index) => {
-      "name": "User ${index + 1}",
-      "profilePic": "assets/images/default_user_logo.png"
-    },
-  );
-
-  GroupChatInfo({super.key});
 
   @override
   Widget build(final BuildContext context) {
@@ -121,18 +122,15 @@ class GroupChatInfo extends StatelessWidget {
 
   Widget _buildParticipantsList(final BuildContext context) {
     return Column(
-      children: participants.asMap().entries.map((final entry) {
-        final int idx = entry.key;
-        final Map<String, String> participant = entry.value;
+      children: chat.users!.map((final user) {
         return ListTile(
-          leading: CircleAvatar(
-            backgroundImage: AssetImage(participant["profilePic"]!),
-          ),
-          title: Text(participant["name"]!),
+          leading: CircleAvatar(backgroundImage: NetworkImage(user.imagePath)),
+          title: Text(user.fullName),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (idx == 0) // Assuming the first user is the admin
+              if (user.userUID ==
+                  chat.adminUID) // Assuming the first user is the admin
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
@@ -150,7 +148,7 @@ class GroupChatInfo extends StatelessWidget {
                 icon: Icon(Icons.remove_circle_outline, color: Colors.red),
                 onPressed: () {
                   // Show confirmation dialog when removing a participant
-                  _showRemoveParticipantDialog(context, participant["name"]!);
+                  _showRemoveParticipantDialog(context, user.fullName);
                 },
               ),
             ],
