@@ -38,7 +38,9 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
   Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Group Chat Info"),
+        title: Text(chat.chatName != "" && chat.chatName != null
+            ? chat.chatName!
+            : "Chat info"),
         backgroundColor: Colors.green, // Updated color for a fresh look
       ),
       body: SingleChildScrollView(
@@ -50,7 +52,9 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
               child: Column(
                 children: [
                   Text(
-                    "Group Info",
+                    chat.chatName != "" && chat.chatName != null
+                        ? chat.chatName!
+                        : "Chat info",
                     style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -64,26 +68,27 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
                 ],
               ),
             ),
-            ElevatedButton.icon(
-              onPressed: () {
-                // Add participant action
-              },
-              icon: Icon(Icons.add, color: Colors.white),
-              label: Text("Add Participant",
-                  style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            if (isAdmin)
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Add participant action
+                },
+                icon: Icon(Icons.add, color: Colors.white),
+                label: Text("Add Participant",
+                    style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                ),
               ),
-            ),
-            _buildSectionTitle("Join Requests"),
-            _buildJoinRequestsList(),
+            if (isAdmin) _buildSectionTitle("Join Requests"),
+            if (isAdmin) _buildJoinRequestsList(),
             _buildSectionTitle("Participants"),
             _buildParticipantsList(context),
-            _buildSectionTitle("Banned participants"),
-            _buildBannedParticipantsList(context),
+            if (isAdmin) _buildSectionTitle("Banned participants"),
+            if (isAdmin) _buildBannedParticipantsList(context),
           ],
         ),
       ),
@@ -194,17 +199,16 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (isAdmin)
-                InkWell(
-                  onTap: () {
-                    // Show confirmation dialog when removing a participant
-                    _showUnanParticipantDialog(context, user, chat.chatUID);
-                  },
-                  child: Text(
-                    "Unban",
-                    style: TextStyle(color: Colors.green, fontSize: 16),
-                  ),
-                )
+              InkWell(
+                onTap: () {
+                  // Show confirmation dialog when removing a participant
+                  _showUnanParticipantDialog(context, user, chat.chatUID);
+                },
+                child: Text(
+                  "Unban",
+                  style: TextStyle(color: Colors.green, fontSize: 16),
+                ),
+              )
             ],
           ),
         );
