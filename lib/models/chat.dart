@@ -8,11 +8,13 @@ class Chat {
   String? iconPath;
   String? chatName;
   List<BabylonUser>? users;
+  List<String>? bannedUsersUID;
 
   Chat(
       {required this.chatUID,
       this.chatName,
       this.adminUID,
       this.lastMessage,
-      this.iconPath});
+      this.iconPath,
+      this.bannedUsersUID});
 }

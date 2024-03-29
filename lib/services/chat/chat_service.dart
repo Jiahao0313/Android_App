@@ -133,6 +133,9 @@ class ChatService {
               adminUID: chatData["admin"],
               chatName: chatData["chatName"],
               iconPath: imageUrl,
+              bannedUsersUID: chatData.containsKey("bannedUsers")
+                  ? List<String>.from(chatData["bannedUsers"])
+                  : [],
               lastMessage: chatData.containsKey("lastMessage") &&
                       chatData.containsKey("lastMessageTime") &&
                       chatData.containsKey("lastSender") &&
