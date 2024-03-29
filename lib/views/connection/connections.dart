@@ -65,7 +65,6 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     }
   }
 
-
   @override
   Widget build(final BuildContext context) {
     return Scaffold(
@@ -528,12 +527,20 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  _buttonOption("View Profile",
-                                      Icons.visibility, context, person),
-                                  _buttonOption("Send Request",
-                                      Icons.person_add, context, person),
                                   _buttonOption(
-                                      "Chat", Icons.chat, context, person),
+                                      "View Profile",
+                                      Icons.visibility,
+                                      context,
+                                      person,
+                                      pressedProfileButton),
+                                  _buttonOption(
+                                      "Send Request",
+                                      Icons.person_add,
+                                      context,
+                                      person,
+                                      pressedRequestButton),
+                                  _buttonOption("Chat", Icons.chat, context,
+                                      person, pressedChatButton),
                                 ],
                               ),
                             ),
@@ -566,14 +573,18 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     );
   }
 
-  Widget _buttonOption(final String title, final IconData icon,
-      final BuildContext context, final BabylonUser person) {
+  Widget _buttonOption(
+      final String title,
+      final IconData icon,
+      final BuildContext context,
+      final BabylonUser person,
+      final void Function(BabylonUser) pressedFunction) {
     // Function to create a small, styled button for each action.
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 2.0),
       child: ElevatedButton.icon(
         onPressed: () {
-          // Button functionality goes here, e.g., navigating to a profile page.
+          pressedFunction(person);
         },
         icon: Icon(icon, size: 18.0),
         label: Text(title, style: TextStyle(fontSize: 12.0)),
@@ -591,6 +602,22 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
         ),
       ),
     );
+  }
+
+  void pressedProfileButton(final BabylonUser babylonUser) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (final context) => OtherProfile(babylonUser: babylonUser)),
+    );
+  }
+
+  void pressedRequestButton(final BabylonUser babylonUser) {
+    UserService.createRequest(babylonUser.userUID);
+  }
+
+  void pressedChatButton(final BabylonUser babylonUser) {
+    // TODO(EnzoL): need to access the personal conversation and if it does not exist -> chat request
   }
 
 // Additional helper methods for building connection cards, handling accept/decline logic, etc., can be added here.
