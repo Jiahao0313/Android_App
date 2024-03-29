@@ -1,4 +1,3 @@
-import "package:babylon_app/models/babylon_user.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 
 class Message {

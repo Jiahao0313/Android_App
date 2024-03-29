@@ -198,7 +198,7 @@ class UserService {
   static void createRequest(final String requestUID) async {
     final db = FirebaseFirestore.instance;
     final userUID = ConnectedBabylonUser().userUID;
-     db
+    db
         .collection("users")
         .doc(requestUID)
         .collection("requests")

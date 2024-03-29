@@ -113,8 +113,8 @@ class _GroupChatViewState extends State<GroupChatView> {
 
   // Builds a single message tile with enhanced UI
   Widget _buildMessageTile(final Message message) {
-    final BabylonUser user =
-        chat.users!.firstWhere((anUser) => anUser.userUID == message.senderUID);
+    final BabylonUser user = chat.users!
+        .firstWhere((final anUser) => anUser.userUID == message.senderUID);
     final bool isCurrentUser = message.senderUID ==
         ConnectedBabylonUser()
             .userUID; // Check if the message is from the current user

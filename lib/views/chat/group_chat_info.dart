@@ -1,5 +1,6 @@
 import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/models/chat.dart";
+import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
 import "package:flutter/material.dart";
 
@@ -13,7 +14,18 @@ class GroupChatInfoView extends StatefulWidget {
 
 class _GroupChatInfoViewState extends State<GroupChatInfoView> {
   final Chat chat;
+  bool isAdmin = false;
   _GroupChatInfoViewState({required this.chat});
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      isAdmin = chat.adminUID == ConnectedBabylonUser().userUID;
+    });
+  }
+
   final List<Map<String, String>> joinRequests = List.generate(
     3,
     (final index) => {
@@ -70,6 +82,8 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
             _buildJoinRequestsList(),
             _buildSectionTitle("Participants"),
             _buildParticipantsList(context),
+            _buildSectionTitle("Banned participants"),
+            _buildBannedParticipantsList(context),
           ],
         ),
       ),
@@ -103,18 +117,20 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(
-                      icon: Icon(Icons.check, color: Colors.green),
-                      onPressed: () {
-                        // Accept join request action
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.cancel, color: Colors.red),
-                      onPressed: () {
-                        // Cancel join request action
-                      },
-                    ),
+                    if (isAdmin)
+                      IconButton(
+                        icon: Icon(Icons.check, color: Colors.green),
+                        onPressed: () {
+                          // Accept join request action
+                        },
+                      ),
+                    if (isAdmin)
+                      IconButton(
+                        icon: Icon(Icons.cancel, color: Colors.red),
+                        onPressed: () {
+                          // Cancel join request action
+                        },
+                      ),
                   ],
                 ),
               ))
@@ -135,6 +151,7 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
                   chat.adminUID) // Assuming the first user is the admin
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  margin: EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
                     color: Colors.teal.shade100,
                     borderRadius: BorderRadius.circular(15),
@@ -146,13 +163,17 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
                         fontWeight: FontWeight.bold),
                   ),
                 ),
-              IconButton(
-                icon: Icon(Icons.remove_circle_outline, color: Colors.red),
-                onPressed: () {
-                  // Show confirmation dialog when removing a participant
-                  _showRemoveParticipantDialog(context, user, chat.chatUID);
-                },
-              ),
+              if (isAdmin)
+                InkWell(
+                  onTap: () {
+                    // Show confirmation dialog when removing a participant
+                    _showBanParticipantDialog(context, user, chat.chatUID);
+                  },
+                  child: Text(
+                    "Ban",
+                    style: TextStyle(color: Colors.red, fontSize: 16),
+                  ),
+                )
             ],
           ),
         );
@@ -160,15 +181,46 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
     );
   }
 
-  void _showRemoveParticipantDialog(final BuildContext context,
+  Widget _buildBannedParticipantsList(final BuildContext context) {
+    final List<BabylonUser> bannedUsers = chat.bannedUsersUID!
+        .map((final aBannedUserUID) => chat.users!
+            .firstWhere((final aUser) => aUser.userUID == aBannedUserUID))
+        .toList();
+    return Column(
+      children: bannedUsers.map((final user) {
+        return ListTile(
+          leading: CircleAvatar(backgroundImage: NetworkImage(user.imagePath)),
+          title: Text(user.fullName),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isAdmin)
+                InkWell(
+                  onTap: () {
+                    // Show confirmation dialog when removing a participant
+                    _showUnanParticipantDialog(context, user, chat.chatUID);
+                  },
+                  child: Text(
+                    "Unban",
+                    style: TextStyle(color: Colors.green, fontSize: 16),
+                  ),
+                )
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  void _showBanParticipantDialog(final BuildContext context,
       final BabylonUser participant, final String chatUID) {
     showDialog(
       context: context,
       builder: (final BuildContext context) {
         return AlertDialog(
-          title: Text("Remove Participant"),
+          title: Text("Ban Participant"),
           content: Text(
-              "Are you sure you want to remove ${participant.fullName} from the group?"),
+              "Are you sure you want to ban ${participant.fullName} from the group?"),
           actions: <Widget>[
             TextButton(
               child: Text("No"),
@@ -181,6 +233,50 @@ class _GroupChatInfoViewState extends State<GroupChatInfoView> {
               onPressed: () {
                 ChatService.addUserToGroupChatBanList(
                     userUID: participant.userUID, chatUID: chatUID);
+                if (!chat.bannedUsersUID!.contains(participant.userUID)) {
+                  setState(() {
+                    chat.bannedUsersUID = [
+                      ...chat.bannedUsersUID!,
+                      participant.userUID
+                    ];
+                  });
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showUnanParticipantDialog(final BuildContext context,
+      final BabylonUser participant, final String chatUID) {
+    showDialog(
+      context: context,
+      builder: (final BuildContext context) {
+        return AlertDialog(
+          title: Text("Unnan Participant"),
+          content: Text(
+              "Are you sure you want to unban ${participant.fullName} from the group?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text("Yes"),
+              onPressed: () {
+                ChatService.removeUserOfGroupChatBanList(
+                    userUID: participant.userUID, chatUID: chatUID);
+                setState(() {
+                  chat.bannedUsersUID = chat.bannedUsersUID!
+                      .where((final aBannedUID) =>
+                          aBannedUID != participant.userUID)
+                      .toList();
+                });
                 Navigator.of(context).pop(); // Close the dialog
               },
             ),

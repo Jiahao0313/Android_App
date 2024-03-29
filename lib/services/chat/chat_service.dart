@@ -7,8 +7,6 @@ import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/message.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
-import "package:firebase_auth/firebase_auth.dart";
-import "package:firebase_core/firebase_core.dart";
 import "package:firebase_storage/firebase_storage.dart";
 
 class ChatService {
@@ -183,7 +181,7 @@ class ChatService {
       final chatDoc = await db.collection("chats").doc(chatUID).get();
       final chatData = chatDoc.data();
       final List<String> userIDList = List<String>.from(chatData!["users"]);
-      await Future.forEach(userIDList, (userID) async {
+      await Future.forEach(userIDList, (final userID) async {
         res.add((await UserService.getBabylonUser(userID))!);
       });
       return res;
@@ -203,11 +201,11 @@ class ChatService {
     }
   }
 
-  static Future<void> removeUserToGroupChatBanList(
+  static Future<void> removeUserOfGroupChatBanList(
       {required final String userUID, required final String chatUID}) async {
     try {
       await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
-        "bannedUsers": FieldValue.arrayUnion([userUID])
+        "bannedUsers": FieldValue.arrayRemove([userUID])
       });
     } catch (e) {
       rethrow;

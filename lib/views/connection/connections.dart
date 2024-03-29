@@ -371,8 +371,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                       ? snapshot.data!
                           .where((final aChat) =>
                               aChat.adminUID != "" && aChat.adminUID != null)
-                          .where((aChat) => !aChat.bannedUsersUID!.any(
-                              (aBannedUserUID) =>
+                          .where((final aChat) => !aChat.bannedUsersUID!.any(
+                              (final aBannedUserUID) =>
                                   aBannedUserUID ==
                                   ConnectedBabylonUser().userUID))
                           .toList()
