@@ -45,12 +45,14 @@ class _GroupChatViewState extends State<GroupChatView> {
 
   // Handles sending a message
   void _sendMessage() {
-    ChatService.sendMessage(
-        chatUID: chat.chatUID,
-        message: Message(
-            message: _messageController.text.trim(),
-            senderUID: ConnectedBabylonUser().userUID,
-            time: Timestamp.now()));
+    if (_messageController.text.isNotEmpty) {
+      ChatService.sendMessage(
+          chatUID: chat.chatUID,
+          message: Message(
+              message: _messageController.text.trim(),
+              senderUID: ConnectedBabylonUser().userUID,
+              time: Timestamp.now()));
+    }
 
     if (_messageController.text.isNotEmpty) {
       setState(() {
