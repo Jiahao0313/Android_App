@@ -197,11 +197,18 @@ class UserService {
 
   static void removeConnection(final String connectionUID) async {
     final db = FirebaseFirestore.instance;
+    final userUID = ConnectedBabylonUser().userUID;
     db
         .collection("users")
-        .doc(ConnectedBabylonUser().userUID)
+        .doc(userUID)
         .collection("connections")
         .doc(connectionUID)
+        .delete();
+    db
+        .collection("users")
+        .doc(connectionUID)
+        .collection("connections")
+        .doc(userUID)
         .delete();
     ConnectedBabylonUser().listedConnections.remove(connectionUID);
   }
@@ -214,6 +221,12 @@ class UserService {
         .doc(userUID)
         .collection("connections")
         .doc(requestUID)
+        .set({});
+    db
+        .collection("users")
+        .doc(requestUID)
+        .collection("connections")
+        .doc(userUID)
         .set({});
     db
         .collection("users")
