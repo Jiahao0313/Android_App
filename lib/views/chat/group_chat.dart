@@ -45,7 +45,7 @@ class _GroupChatViewState extends State<GroupChatView> {
 
   // Handles sending a message
   void _sendMessage() {
-    if (_messageController.text.isNotEmpty) {
+    if (_messageController.text.trim().isNotEmpty) {
       ChatService.sendMessage(
           chatUID: chat.chatUID,
           message: Message(
