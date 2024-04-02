@@ -77,12 +77,15 @@ class ChatService {
       final newChatData = <String, dynamic>{};
       final BabylonUser curr = ConnectedBabylonUser();
       if (otherUser != null) {
-        newChatData["users"] =
-            FieldValue.arrayUnion([curr.userUID, otherUser.userUID]);
-        final String chatDocID = curr.userUID.compareTo(otherUser.userUID) == -1
-            ? "${curr.userUID}_${otherUser.userUID}"
-            : "${otherUser.userUID}_${curr.userUID}";
-        await db.collection("chats").doc(chatDocID).set(newChatData);
+        if (otherUser.userUID != ConnectedBabylonUser().userUID) {
+          newChatData["users"] =
+              FieldValue.arrayUnion([curr.userUID, otherUser.userUID]);
+          final String chatDocID =
+              curr.userUID.compareTo(otherUser.userUID) == -1
+                  ? "${curr.userUID}_${otherUser.userUID}"
+                  : "${otherUser.userUID}_${curr.userUID}";
+          await db.collection("chats").doc(chatDocID).set(newChatData);
+        }
       } else {
         newChatData["chatName"] = chatName;
         newChatData["admin"] = adminUID;
