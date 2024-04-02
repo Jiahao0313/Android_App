@@ -8,14 +8,14 @@ import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:image_picker/image_picker.dart";
 
-class CreateNewGroupChat extends StatefulWidget {
-  const CreateNewGroupChat({super.key});
+class GroupChat extends StatefulWidget {
+  const GroupChat({super.key});
 
   @override
-  _CreateNewGroupChatState createState() => _CreateNewGroupChatState();
+  _GroupChatState createState() => _GroupChatState();
 }
 
-class _CreateNewGroupChatState extends State<CreateNewGroupChat> {
+class _GroupChatState extends State<GroupChat> {
   final TextEditingController _groupNameController = TextEditingController();
   final TextEditingController _groupDescriptionController =
       TextEditingController();

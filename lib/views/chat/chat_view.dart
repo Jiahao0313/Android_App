@@ -3,24 +3,24 @@ import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/message.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
-import "package:babylon_app/views/chat/group_chat_info.dart";
+import "package:babylon_app/views/chat/chat_info.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 
 // Main widget for the group chat, enhanced for better UI and UX
-class GroupChatView extends StatefulWidget {
+class ChatView extends StatefulWidget {
   final Chat chat;
-  const GroupChatView({super.key, required this.chat});
+  const ChatView({super.key, required this.chat});
 
   @override
-  _GroupChatViewState createState() => _GroupChatViewState(chat);
+  _ChatViewState createState() => _ChatViewState(chat);
 }
 
-class _GroupChatViewState extends State<GroupChatView> {
+class _ChatViewState extends State<ChatView> {
   final Chat chat;
   bool hasUsersLoaded = false;
-  _GroupChatViewState(this.chat);
+  _ChatViewState(this.chat);
   final TextEditingController _messageController = TextEditingController();
 
   @override
@@ -71,7 +71,7 @@ class _GroupChatViewState extends State<GroupChatView> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (final context) => GroupChatInfoView(
+                        builder: (final context) => ChatInfoView(
                               chat: chat,
                             )),
                   );

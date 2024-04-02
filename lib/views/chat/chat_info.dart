@@ -4,18 +4,18 @@ import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
 import "package:flutter/material.dart";
 
-class GroupChatInfoView extends StatefulWidget {
+class ChatInfoView extends StatefulWidget {
   final Chat chat;
-  const GroupChatInfoView({super.key, required this.chat});
+  const ChatInfoView({super.key, required this.chat});
 
   @override
-  _GroupChatInfoViewState createState() => _GroupChatInfoViewState(chat: chat);
+  _ChatInfoViewState createState() => _ChatInfoViewState(chat: chat);
 }
 
-class _GroupChatInfoViewState extends State<GroupChatInfoView> {
+class _ChatInfoViewState extends State<ChatInfoView> {
   final Chat chat;
   bool isAdmin = false;
-  _GroupChatInfoViewState({required this.chat});
+  _ChatInfoViewState({required this.chat});
 
   @override
   void initState() {

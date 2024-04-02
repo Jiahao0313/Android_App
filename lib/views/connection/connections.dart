@@ -3,10 +3,10 @@ import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
-import "package:babylon_app/views/chat/create_new_groupchat.dart";
+import "package:babylon_app/views/chat/create_new_chat.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
-import "package:babylon_app/views/chat/group_chat.dart";
+import "package:babylon_app/views/chat/chat_view.dart";
 
 // Define ConnectionsScreen as a StatefulWidget to manage dynamic content.
 class ConnectionsScreen extends StatefulWidget {
@@ -47,8 +47,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     final currentUserUID = ConnectedBabylonUser().userUID;
 
     setState(() {
-
-      searchResults = users.where((final user) => user.userUID != currentUserUID).toList();
+      searchResults =
+          users.where((final user) => user.userUID != currentUserUID).toList();
     });
   }
 
@@ -59,16 +59,18 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
       final currentUserUID = ConnectedBabylonUser().userUID;
 
       setState(() {
-
-        searchResults = allUsers.where((final user) => user.userUID != currentUserUID).toList();
+        searchResults = allUsers
+            .where((final user) => user.userUID != currentUserUID)
+            .toList();
       });
     } else {
       final searchResultsTemp = await UserService.searchBabylonUsers(query);
       final currentUserUID = ConnectedBabylonUser().userUID;
 
       setState(() {
-
-        searchResults = searchResultsTemp.where((final user) => user.userUID != currentUserUID).toList();
+        searchResults = searchResultsTemp
+            .where((final user) => user.userUID != currentUserUID)
+            .toList();
       });
     }
   }
@@ -440,7 +442,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (final context) => CreateNewGroupChat()),
+                          builder: (final context) => GroupChat()),
                     );
                   },
                   backgroundColor: Colors.blue,
@@ -474,7 +476,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (final context) => GroupChatView(
+              builder: (final context) => ChatView(
                     chat: chat,
                   )),
         );

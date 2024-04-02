@@ -79,6 +79,10 @@ class ChatService {
       if (otherUser != null) {
         newChatData["users"] =
             FieldValue.arrayUnion([curr.userUID, otherUser.userUID]);
+        final String chatDocID = curr.userUID.compareTo(otherUser.userUID) == -1
+            ? "${curr.userUID}_${otherUser.userUID}"
+            : "${otherUser.userUID}_${curr.userUID}";
+        await db.collection("chats").doc(chatDocID).set(newChatData);
       } else {
         newChatData["chatName"] = chatName;
         newChatData["admin"] = adminUID;
@@ -99,8 +103,8 @@ class ChatService {
         if (usersUID.isNotEmpty) {
           newChatData["users"] = FieldValue.arrayUnion(usersUID);
         }
+        await db.collection("chats").doc().set(newChatData);
       }
-      await db.collection("chats").doc().set(newChatData);
     } catch (e) {
       rethrow;
     }
