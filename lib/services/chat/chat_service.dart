@@ -218,4 +218,28 @@ class ChatService {
       rethrow;
     }
   }
+
+  static Future<void> sendGroupChatInvitation() async {
+    try {} catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> cancelGroupChatInvitation() async {
+    try {} catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> acceptGroupChatInvitation() async {
+    try {} catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> declineGroupChatInvitation() async {
+    try {} catch (e) {
+      rethrow;
+    }
+  }
 }

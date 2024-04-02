@@ -462,14 +462,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
       contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       leading: InkWell(
         onTap: () => chat.adminUID == null || chat.adminUID == ""
-            ? Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (final context) => OtherProfile(
-                          babylonUser: chat.users!.firstWhere((final aUser) =>
-                              aUser.userUID != ConnectedBabylonUser().userUID),
-                        )),
-              )
+            ? null
             : Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -529,7 +522,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                           children: [
                             Padding(
                               padding: EdgeInsets.all(8.0),
-                              child: ImageLoader.loadProfilePicture(person.imagePath, 30),
+                              child: ImageLoader.loadProfilePicture(
+                                  person.imagePath, 30),
                             ),
                             Expanded(
                               child: Padding(
