@@ -4,6 +4,7 @@ import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/chat/chat_info.dart";
+import "package:babylon_app/utils/image_loader.dart";
 import "package:babylon_app/views/chat/create_new_chat.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
@@ -528,11 +529,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                           children: [
                             Padding(
                               padding: EdgeInsets.all(8.0),
-                              child: CircleAvatar(
-                                  radius: 30.0,
-                                  backgroundImage: NetworkImage(person
-                                      .imagePath) // Usa NetworkImage para cargar la imagen de la URL
-                                  ),
+                              child: ImageLoader.loadProfilePicture(person.imagePath, 30),
                             ),
                             Expanded(
                               child: Padding(

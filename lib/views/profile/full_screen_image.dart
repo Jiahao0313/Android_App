@@ -1,3 +1,4 @@
+import "package:babylon_app/utils/image_loader.dart";
 import "package:flutter/material.dart";
 
 class FullScreenImage extends StatelessWidget {
@@ -29,9 +30,7 @@ class FullScreenImage extends StatelessWidget {
         onTap: () => Navigator.pop(
             context), // Allows closing the image by tapping anywhere on the screen.
         child: Center(
-          child: Image.asset(imagePath,
-              fit: BoxFit
-                  .contain), // Displays the image in full screen, fitting it to the screen while maintaining the aspect ratio.
+          child: ImageLoader.withFallback(imagePath), // Displays the image in full screen, fitting it to the screen while maintaining the aspect ratio.
         ),
       ),
     );
