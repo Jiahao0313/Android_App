@@ -2,6 +2,7 @@ import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
+import "package:babylon_app/views/profile/other_profile.dart";
 import "package:flutter/material.dart";
 
 class ChatInfoView extends StatefulWidget {
@@ -17,12 +18,27 @@ class _ChatInfoViewState extends State<ChatInfoView> {
   bool isAdmin = false;
   _ChatInfoViewState({required this.chat});
 
+  bool hasUsersLoaded = false;
+
   @override
   void initState() {
     super.initState();
-
+    fetchUsersData();
     setState(() {
       isAdmin = chat.adminUID == ConnectedBabylonUser().userUID;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void fetchUsersData() async {
+    final users = await ChatService.getChatUsers(chatUID: chat.chatUID);
+    setState(() {
+      chat.users = users;
+      hasUsersLoaded = true;
     });
   }
 
@@ -43,55 +59,58 @@ class _ChatInfoViewState extends State<ChatInfoView> {
             : "Chat info"),
         backgroundColor: Colors.green, // Updated color for a fresh look
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
+      body: hasUsersLoaded
+          ? SingleChildScrollView(
+              padding: EdgeInsets.all(20),
               child: Column(
                 children: [
-                  Text(
-                    chat.chatName != "" && chat.chatName != null
-                        ? chat.chatName!
-                        : "Chat info",
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green.shade900),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          chat.chatName != "" && chat.chatName != null
+                              ? chat.chatName!
+                              : "Chat info",
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green.shade900),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          "This group is for testing the group chat!",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    "This group is for testing the group chat!",
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  if (isAdmin)
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        // Add participant action
+                      },
+                      icon: Icon(Icons.add, color: Colors.white),
+                      label: Text("Add Participant",
+                          style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                    ),
+                  if (isAdmin) _buildSectionTitle("Join Requests"),
+                  if (isAdmin) _buildJoinRequestsList(),
+                  _buildSectionTitle("Participants"),
+                  _buildParticipantsList(context),
+                  if (isAdmin) _buildSectionTitle("Banned participants"),
+                  if (isAdmin) _buildBannedParticipantsList(context),
                 ],
               ),
-            ),
-            if (isAdmin)
-              ElevatedButton.icon(
-                onPressed: () {
-                  // Add participant action
-                },
-                icon: Icon(Icons.add, color: Colors.white),
-                label: Text("Add Participant",
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                ),
-              ),
-            if (isAdmin) _buildSectionTitle("Join Requests"),
-            if (isAdmin) _buildJoinRequestsList(),
-            _buildSectionTitle("Participants"),
-            _buildParticipantsList(context),
-            if (isAdmin) _buildSectionTitle("Banned participants"),
-            if (isAdmin) _buildBannedParticipantsList(context),
-          ],
-        ),
-      ),
+            )
+          : null,
     );
   }
 
@@ -147,7 +166,16 @@ class _ChatInfoViewState extends State<ChatInfoView> {
     return Column(
       children: chat.users!.map((final user) {
         return ListTile(
-          leading: CircleAvatar(backgroundImage: NetworkImage(user.imagePath)),
+          leading: InkWell(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (final context) => OtherProfile(babylonUser: user)),
+            ),
+            child: CircleAvatar(
+              backgroundImage: NetworkImage(user.imagePath),
+            ),
+          ),
           title: Text(user.fullName),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
@@ -194,7 +222,16 @@ class _ChatInfoViewState extends State<ChatInfoView> {
     return Column(
       children: bannedUsers.map((final user) {
         return ListTile(
-          leading: CircleAvatar(backgroundImage: NetworkImage(user.imagePath)),
+          leading: InkWell(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (final context) => OtherProfile(babylonUser: user)),
+            ),
+            child: CircleAvatar(
+              backgroundImage: NetworkImage(user.imagePath),
+            ),
+          ),
           title: Text(user.fullName),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,

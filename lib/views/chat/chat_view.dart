@@ -4,6 +4,7 @@ import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/message.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
 import "package:babylon_app/views/chat/chat_info.dart";
+import "package:babylon_app/views/profile/other_profile.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
@@ -124,8 +125,16 @@ class _ChatViewState extends State<ChatView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isCurrentUser) // Only show profile picture for other users
-            CircleAvatar(
-              backgroundImage: NetworkImage(user.imagePath),
+            InkWell(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (final context) =>
+                        OtherProfile(babylonUser: user)),
+              ),
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(user.imagePath),
+              ),
             ),
           if (!isCurrentUser) // Add spacing only if the profile picture is displayed
             SizedBox(width: 10),

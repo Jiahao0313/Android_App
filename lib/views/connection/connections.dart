@@ -3,6 +3,7 @@ import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
+import "package:babylon_app/views/chat/chat_info.dart";
 import "package:babylon_app/views/chat/create_new_chat.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
@@ -458,10 +459,26 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
   Widget _buildChat({required final Chat chat}) {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-      leading: CircleAvatar(
-        backgroundImage:
-            NetworkImage(chat.iconPath!), // Placeholder for group snapshot.
-        radius: 25, // Adjust the size of the CircleAvatar here.
+      leading: InkWell(
+        onTap: () => chat.adminUID == null || chat.adminUID == ""
+            ? Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (final context) => OtherProfile(
+                          babylonUser: chat.users!.firstWhere((final aUser) =>
+                              aUser.userUID != ConnectedBabylonUser().userUID),
+                        )),
+              )
+            : Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (final context) => ChatInfoView(chat: chat)),
+              ),
+        child: CircleAvatar(
+          backgroundImage:
+              NetworkImage(chat.iconPath!), // Placeholder for group snapshot.
+          radius: 25, // Adjust the size of the CircleAvatar here.
+        ),
       ),
       title:
           Text(chat.chatName!, style: TextStyle(fontWeight: FontWeight.bold)),
