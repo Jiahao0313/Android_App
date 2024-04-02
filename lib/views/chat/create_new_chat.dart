@@ -1,12 +1,15 @@
 import "dart:io";
-import "package:babylon_app/models/babylon_user.dart";
-import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/chat/chat_exceptions.dart";
-import "package:babylon_app/services/chat/chat_service.dart";
-import "package:babylon_app/views/connection/connections.dart";
-import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:image_picker/image_picker.dart";
+import "package:firebase_auth/firebase_auth.dart";
+import "package:babylon_app/models/babylon_user.dart";
+import "package:babylon_app/models/chat.dart";
+import "package:babylon_app/models/connected_babylon_user.dart";
+import "package:babylon_app/services/chat/chat_service.dart";
+import "package:babylon_app/services/user/user_service.dart";
+import "package:babylon_app/views/connection/connections.dart";
+import "package:babylon_app/views/profile/other_profile.dart";
 
 class GroupChat extends StatefulWidget {
   const GroupChat({super.key});
@@ -17,11 +20,15 @@ class GroupChat extends StatefulWidget {
 
 class _GroupChatState extends State<GroupChat> {
   final TextEditingController _groupNameController = TextEditingController();
-  final TextEditingController _groupDescriptionController =
-      TextEditingController();
+  final TextEditingController _groupDescriptionController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   File? _groupImage;
   String? _error = "";
-  final List<String> _usersUID = List<String>.empty(growable: true);
+  final List<String> _usersUID = [];
+  final List<BabylonUser> _addedUsers = [];
+  List<BabylonUser> _filteredUsers = [];
+  bool _isSearching = false;
+  List<BabylonUser> _allUsers = [];
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -33,6 +40,102 @@ class _GroupChatState extends State<GroupChat> {
       });
     }
   }
+
+  Widget _buildAddedParticipants() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            "Added Participants",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.green.shade900,
+            ),
+          ),
+        ),
+        ..._addedUsers.map((final user) {
+          return ListTile(
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(user.imagePath),
+              backgroundColor: Colors.grey.shade200,
+            ),
+            title: Text(user.fullName, style: TextStyle(fontSize: 16)),
+          );
+        }).toList(),
+      ],
+    );
+  }
+
+  void _showAddParticipantDialog() async {
+
+    if (_allUsers.isEmpty) {
+      _allUsers = await UserService.getAllBabylonUsers();
+    }
+    _filteredUsers = List.from(_allUsers);
+    showDialog(
+      context: context,
+      builder: (final context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(hintText: "Search user..."),
+                  onChanged: (final value) {
+                    _filterUsers(value);
+                    },
+                ),
+                _filteredUsers.isEmpty
+                    ? Expanded(child: Text("No users found"))
+                    : Expanded(
+                  child: ListView.separated(
+                    itemCount: _filteredUsers.length,
+                    separatorBuilder: (final context, final index) => Divider(color: Colors.grey.shade400),
+                    itemBuilder: (final context, final index) {
+                      final user = _filteredUsers[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(user.imagePath),
+                          backgroundColor: Colors.grey.shade200,
+                        ),
+                        title: Text(user.fullName),
+                        onTap: () {
+                          if (!_usersUID.contains(user.userUID)) {
+                            setState(() {
+                              _usersUID.add(user.userUID);
+                              _addedUsers.add(user);
+                            });
+                            Navigator.pop(context);
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _filterUsers(final String searchText) {
+    setState(() {
+      _filteredUsers = _allUsers.where((final user) =>
+          user.fullName.toLowerCase().contains(searchText.toLowerCase())
+      ).toList();
+    });
+  }
+
+
 
   @override
   Widget build(final BuildContext context) {
@@ -50,14 +153,8 @@ class _GroupChatState extends State<GroupChat> {
               onTap: _pickImage,
               child: CircleAvatar(
                 radius: 80,
-                backgroundImage: _groupImage != null
-                    ? FileImage(_groupImage!)
-                    : AssetImage("assets/group_placeholder.png")
-                        as ImageProvider,
-                child: _groupImage == null
-                    ? Icon(Icons.camera_alt,
-                        color: Colors.white.withOpacity(0.7), size: 40)
-                    : null,
+                backgroundImage: _groupImage != null ? FileImage(_groupImage!) : AssetImage("assets/group_placeholder.png") as ImageProvider,
+                child: _groupImage == null ? Icon(Icons.camera_alt, color: Colors.white.withOpacity(0.7), size: 40) : null,
               ),
             ),
             Center(
@@ -65,8 +162,7 @@ class _GroupChatState extends State<GroupChat> {
                 padding: const EdgeInsets.only(top: 10),
                 child: TextButton(
                   onPressed: _pickImage,
-                  child: Text("Select a Photo",
-                      style: TextStyle(fontSize: 18, color: Colors.green)),
+                  child: Text("Select a Photo", style: TextStyle(fontSize: 18, color: Colors.green)),
                 ),
               ),
             ),
@@ -75,8 +171,7 @@ class _GroupChatState extends State<GroupChat> {
               controller: _groupNameController,
               decoration: InputDecoration(
                 labelText: "* Group Name",
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 prefixIcon: Icon(Icons.group),
               ),
             ),
@@ -85,86 +180,62 @@ class _GroupChatState extends State<GroupChat> {
               controller: _groupDescriptionController,
               decoration: InputDecoration(
                 labelText: "Description",
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 prefixIcon: Icon(Icons.description),
               ),
               maxLines: 3,
             ),
             SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      labelText: "Add People",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      prefixIcon: Icon(Icons.person_add),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: IconButton(
-                      icon: Icon(Icons.add_circle_outline,
-                          size: 40, color: Colors.green),
-                      onPressed: () async {
-                        // add user
-                      }),
-                ),
-              ],
+            ElevatedButton.icon(
+              onPressed: _showAddParticipantDialog,
+              icon: Icon(Icons.add, color: Colors.white),
+              label: Text("Add People", style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
             ),
+            _buildAddedParticipants(),
             SizedBox(height: 30),
             ElevatedButton(
               onPressed: () async {
                 try {
                   final BabylonUser currUser = ConnectedBabylonUser();
-                  _usersUID.add(currUser.userUID);
-                  ChatException.validateUpdateOrCreateForm(
-                      chatName: _groupNameController.text,
+                  ChatException.validateUpdateOrCreateForm(chatName: _groupNameController.text,
                       adminUID: currUser.userUID,
                       chatDescription: _groupDescriptionController.text,
                       image: _groupImage,
                       usersUID: _usersUID);
+                  _usersUID.add(currUser.userUID);
                   await ChatService.createChat(
                       chatName: _groupNameController.text,
                       adminUID: currUser.userUID,
                       chatDescription: _groupDescriptionController.text,
                       image: _groupImage,
                       usersUID: _usersUID);
-                  if (!context.mounted) return;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (final context) => const ConnectionsScreen()),
-                  );
+                  if (!mounted) return;
+                  Navigator.push(context, MaterialPageRoute(builder: (final context) => ConnectionsScreen()));
                 } catch (e) {
-                  if (e is FirebaseAuthException) {
-                    setState(() {
-                      _error = e.message;
-                    });
-                  } else {
-                    setState(() {
-                      _error = e.toString();
-                    });
-                  }
+                  setState(() {
+                    _error = e.toString();
+                  });
                 }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 padding: EdgeInsets.symmetric(vertical: 14),
               ),
               child: Text("Create", style: TextStyle(fontSize: 20)),
             ),
             Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  _error!,
-                  style: TextStyle(color: Colors.red),
-                )),
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                _error ?? "",
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
           ],
         ),
       ),

@@ -148,7 +148,9 @@ class UserService {
           dateOfBirth: userInfo["birthDate"]!,
           imagePath: userInfo["imgURL"]!,
           listedEvents: eventsLists,
-          listedConnections: connectionsList);
+          listedConnections: connectionsList,
+          friendRequests: [],
+      );
       print(userData);
     } catch (e) {
       print(e);
@@ -181,6 +183,18 @@ class UserService {
         final data = doc.data();
         final List<String> eventsLists = [];
         final List<String> connectionsLists = [];
+        final List<String> friendRequestsList = List.empty(growable: true);
+
+        final docsListedFriendRequests = await db
+            .collection("users")
+            .doc(doc.id)
+            .collection("requests")
+            .get();
+
+        await Future.forEach(docsListedFriendRequests.docs,
+                (final snapShot) async => friendRequestsList.add(snapShot.reference.id));
+
+
         final user = BabylonUser.withData(
             userUID: doc.id,
             fullName: data["Name"] ?? "",
@@ -190,7 +204,8 @@ class UserService {
             dateOfBirth: data["Date of Birth"] ?? "",
             imagePath: data["ImageUrl"] ?? "",
             listedEvents: eventsLists,
-            listedConnections: connectionsLists);
+            listedConnections: connectionsLists,
+            friendRequests: [],);
         users.add(user);
       }
     } catch (e) {
@@ -211,7 +226,18 @@ class UserService {
           .get();
 
       for (final doc in querySnapshot.docs) {
+        final List<String> friendRequestsList = List.empty(growable: true);
         final data = doc.data();
+
+        final docsListedFriendRequests = await db
+            .collection("users")
+            .doc(doc.id)
+            .collection("requests")
+            .get();
+
+        await Future.forEach(docsListedFriendRequests.docs,
+                (final snapShot) async => friendRequestsList.add(snapShot.reference.id));
+
         final user = BabylonUser.withData(
           userUID: doc.id,
           fullName: data["Name"] ?? "",
@@ -220,6 +246,7 @@ class UserService {
           originCountry: data["Country of Origin"] ?? "",
           dateOfBirth: data["Date of Birth"] ?? "",
           imagePath: data["ImageUrl"] ?? "",
+          friendRequests: [],
         );
         searchResults.add(user);
       }

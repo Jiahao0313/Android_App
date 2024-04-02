@@ -6,6 +6,7 @@ import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
 import "package:flutter/material.dart";
 
+
 class ChatInfoView extends StatefulWidget {
   final Chat chat;
   const ChatInfoView({super.key, required this.chat});
@@ -16,6 +17,7 @@ class ChatInfoView extends StatefulWidget {
 
 class _ChatInfoViewState extends State<ChatInfoView> {
   final Chat chat;
+  TextEditingController searchController = TextEditingController();
   bool isAdmin = false;
   _ChatInfoViewState({required this.chat});
   List<BabylonUser> joiningRequests = [];
@@ -90,27 +92,14 @@ class _ChatInfoViewState extends State<ChatInfoView> {
                   if (isAdmin)
                     ElevatedButton.icon(
                       onPressed: () async {
-                        // Add participant action
-                        try {
-                          await ChatService.sendGroupChatInvitation(
-                              chatUID: chat.chatUID,
-                              userUID: "oAxwoYTb52RsCXO1KWWAC12ONz82");
-                          setState(() {
-                            invitations.add(chat.users![0]);
-                          });
-                        } catch (e) {
-                          rethrow;
-                        }
+                        _showAddParticipantDialog(context);
                       },
                       icon: Icon(Icons.add, color: Colors.white),
-                      label: Text("Add Participant",
-                          style: TextStyle(color: Colors.white)),
+                      label: Text("Add Participant", style: TextStyle(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                     ),
                   if (isAdmin) _buildSectionTitle("Join Requests"),
@@ -125,6 +114,153 @@ class _ChatInfoViewState extends State<ChatInfoView> {
               ),
             )
           : null,
+    );
+  }
+
+  // Method to show the "Add Participant" dialog with a search functionality
+  void _showAddParticipantDialog(final BuildContext context) {
+    // Controller for the search TextField
+    final TextEditingController searchController = TextEditingController();
+
+    // Show dialog
+    showDialog(
+      context: context,
+      builder: (final BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0), // Smoothly rounded borders for the dialog
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Add Participant",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+                SizedBox(height: 16),
+                // Search TextField
+                TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: "Search...",
+                    prefixIcon: Icon(Icons.search, color: Colors.grey.shade500),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey.shade200,
+                    contentPadding: EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  // Updating the state on text change to filter users
+                  onChanged: (final value) {
+                    // Triggering state update
+                    (context as Element).markNeedsBuild();
+                  },
+                ),
+                SizedBox(height: 16),
+                // Fetch and display all Babylon users
+                FutureBuilder<List<BabylonUser>>(
+                  future: UserService.getAllBabylonUsers(), // Method to fetch all users
+                  builder: (final context, final snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator(); // Show loading indicator while fetching users
+                    } else if (snapshot.hasError) {
+                      return Text("Error: ${snapshot.error}"); // Show error if any
+                    } else {
+                      // Filtering users based on search query
+                      final filteredUsers = searchController.text.isEmpty
+                          ? snapshot.data
+                          : snapshot.data!.where((final user) {
+                        // Assuming BabylonUser has a 'fullName' field. Adjust according to your data model
+                        return user.fullName.toLowerCase().contains(searchController.text.toLowerCase());
+                      }).toList();
+
+                      return Expanded(
+                        child: ListView.builder(
+                          itemCount: filteredUsers?.length ?? 0,
+                          itemBuilder: (final BuildContext context, final int index) {
+                            final user = filteredUsers![index];
+                            return ListTile(
+                              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                              leading: CircleAvatar(
+                                backgroundImage: NetworkImage(user.imagePath), // User's profile image
+                              ),
+                              title: Text(
+                                user.fullName, // Displaying user's full name
+                                style: TextStyle(color: Colors.grey.shade800),
+                              ),
+                              onTap: () async {
+                                // Check if the user ID is already in the invitations list
+                                if (!invitations.any((invitedUser) => invitedUser.userUID == user.userUID)) {
+                                  // If not, send the invitation and add the user to the list
+                                  await ChatService.sendGroupChatInvitation(chatUID: chat.chatUID, userUID: user.userUID);
+                                  setState(() {
+                                    // Add the user to the invitations list
+                                    invitations.add(user);
+                                  });
+                                  Navigator.of(context).pop(); // Close the add participant dialog
+                                } else {
+                                  // Close the current dialog before showing the message
+                                  Navigator.of(context).pop();
+
+                                  // Wait a moment before showing the message to ensure the previous dialog has closed
+                                  await Future.delayed(Duration(milliseconds: 100));
+
+                                  // Show an AlertDialog as a message
+                                  showDialog(
+                                    context: context,
+                                    builder: (final BuildContext context) {
+                                      // Return the AlertDialog
+                                      return AlertDialog(
+                                        title: Text("Information"),
+                                        content: Text("${user.fullName} has already been invited."),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: Text("OK"),
+                                            onPressed: () {
+                                              // Close the AlertDialog when "OK" is pressed
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+
+                                  // Optionally, close the AlertDialog after a set time
+                                  await Future.delayed(Duration(seconds: 3));
+                                  Navigator.of(context).pop(); // Automatically close the AlertDialog
+                                }
+                              },
+
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  },
+                ),
+                SizedBox(height: 16),
+                // Cancel button
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(), // Close the dialog
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.blueAccent),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -10,6 +10,8 @@ class BabylonUser {
   String imagePath = "";
   List<String>? listedEvents = [];
   List<String>? listedConnections = [];
+  List<String>? friendRequests = [];
+
 
   // Constructors
 
@@ -23,5 +25,6 @@ class BabylonUser {
       this.dateOfBirth,
       required this.imagePath,
       this.listedEvents,
-      this.listedConnections});
+      this.listedConnections,
+      required this.friendRequests});
 }

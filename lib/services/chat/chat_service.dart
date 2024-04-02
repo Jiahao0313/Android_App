@@ -102,6 +102,7 @@ class ChatService {
               referenceDirImages.child(imgName);
           await referenceImageToUpload.putFile(image);
           newChatData["iconPath"] = "/images/${imgName}";
+        } else {
         }
         if (usersUID.isNotEmpty) {
           newChatData["users"] = FieldValue.arrayUnion(usersUID);

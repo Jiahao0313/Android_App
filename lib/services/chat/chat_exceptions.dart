@@ -10,5 +10,8 @@ class ChatException {
     if (chatName == "") {
       throw ("The chat name is missing");
     }
+    if(image == null){
+      throw("The image is missing");
+    }
   }
 }
