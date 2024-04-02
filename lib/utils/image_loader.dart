@@ -2,7 +2,8 @@ import "package:cached_network_image/cached_network_image.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 
-class ImageLoader { // TODO(EnzoL): there is a bug for the first time you load the image where it displays as blue
+class ImageLoader {
+  // TODO(EnzoL): there is a bug for the first time you load the image where it displays as blue
   static Widget withFallback(final String imagePath) => FutureBuilder(
         future: _futureAssetWithFallback(imagePath),
         builder: (final BuildContext context, final snapshot) =>
@@ -10,11 +11,31 @@ class ImageLoader { // TODO(EnzoL): there is a bug for the first time you load t
             Image(image: CachedNetworkImageProvider(imagePath)),
       );
 
-  static Widget loadProfilePicture(final String imagePath, final double radius) => FutureBuilder(
+  static Widget loadProfilePicture(
+          final String imagePath, final double radius) =>
+      FutureBuilder(
         future: _futureAssetForProfilePicture(imagePath),
         builder: (final BuildContext context, final snapshot) => CircleAvatar(
           radius: radius,
-          backgroundImage: snapshot.data ?? Image(image: CachedNetworkImageProvider(imagePath)).image, // Display user"s profile picture.
+          backgroundImage: snapshot.data ??
+              Image(image: CachedNetworkImageProvider(imagePath))
+                  .image, // Display user"s profile picture.
+        ),
+      );
+
+  static Widget loadEventPicture(final String imagePath) => FutureBuilder(
+        future: _futureAssetForEventPicture(imagePath),
+        builder: (final BuildContext context, final snapshot) => ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: 70,
+            minHeight: 70,
+            maxWidth: 70,
+            maxHeight: 70,
+          ),
+          child: snapshot.data ??
+              Image(
+                  image: CachedNetworkImageProvider(imagePath),
+                  fit: BoxFit.cover), // Display event picture.
         ),
       );
 
@@ -25,10 +46,22 @@ class ImageLoader { // TODO(EnzoL): there is a bug for the first time you load t
           : Image.asset("assets/images/default_user_logo.png");
 
   static Future<ImageProvider<Object>> _futureAssetForProfilePicture(
-       final String imagePath) async =>
+          final String imagePath) async =>
       (await isNetworkAsset(imagePath))
           ? Image.network(imagePath).image
           : Image.asset("assets/images/default_user_logo.png").image;
+
+  static Future<Widget> _futureAssetForEventPicture(
+          final String imagePath) async =>
+      (await isNetworkAsset(imagePath))
+          ? Image.network(
+              imagePath,
+              fit: BoxFit.cover,
+            )
+          : Image.asset(
+              "assets/images/logoSquare.png",
+              fit: BoxFit.cover,
+            );
 
   static Future<bool> isNetworkAsset(final String networkPath) async {
     try {

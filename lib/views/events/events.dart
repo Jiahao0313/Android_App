@@ -1,6 +1,7 @@
+import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/event.dart";
 import "package:babylon_app/services/event/event_service.dart";
-import "package:firebase_auth/firebase_auth.dart";
+import "package:babylon_app/utils/image_loader.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 import "package:babylon_app/views/events/events_info.dart";
@@ -19,8 +20,8 @@ class _EventsScreenState extends State<EventsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final Future<List<Event>> _allEvents = EventService.getEvents();
-  final Future<List<Event>> _myEvents = EventService.getListedEventsOfUser(
-      FirebaseAuth.instance.currentUser!.uid);
+  final Future<List<Event>> _myEvents =
+      EventService.getListedEventsOfUser(ConnectedBabylonUser().userUID);
 
   @override
   void initState() {
@@ -220,9 +221,7 @@ class _EventsScreenState extends State<EventsScreen>
           );
         },
         child: ListTile(
-          leading: event.pictureURL != ""
-              ? Image.network(event.pictureURL!)
-              : Image.asset("assets/images/logoSquare.png"),
+          leading: ImageLoader.loadEventPicture(event.pictureURL!),
           title: Text(event.title!),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

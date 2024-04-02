@@ -67,10 +67,13 @@ class EventService {
             attendeesID.add(anAttendee.id);
           });
 
-          final imageUrl = await FirebaseStorage.instance
+          String imageUrl = "";
+          if(event.keys.contains("picture")) {
+            imageUrl = await FirebaseStorage.instance
               .ref()
               .child(event["picture"])
-              .getDownloadURL();
+              .getDownloadURL(); 
+          }
           result.add(await Event.create(
               snapShot.reference.id,
               event["title"],
