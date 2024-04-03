@@ -219,26 +219,199 @@ class ChatService {
     }
   }
 
-  static Future<void> sendGroupChatInvitation() async {
-    try {} catch (e) {
+// groupchat invitations
+  static Future<void> sendGroupChatInvitation(
+      {required final String chatUID, required final String userUID}) async {
+    try {
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "sentInvitations": FieldValue.arrayUnion([userUID])
+      });
+      await FirebaseFirestore.instance.collection("users").doc(userUID).update({
+        "groupChatInvitations": FieldValue.arrayUnion([chatUID])
+      });
+    } catch (e) {
       rethrow;
     }
   }
 
-  static Future<void> cancelGroupChatInvitation() async {
-    try {} catch (e) {
+  static Future<void> cancelGroupChatInvitation(
+      {required final String chatUID, required final String userUID}) async {
+    try {
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "sentInvitations": FieldValue.arrayRemove([userUID])
+      });
+      await FirebaseFirestore.instance.collection("users").doc(userUID).update({
+        "groupChatInvitations": FieldValue.arrayRemove([chatUID])
+      });
+    } catch (e) {
       rethrow;
     }
   }
 
-  static Future<void> acceptGroupChatInvitation() async {
-    try {} catch (e) {
+  static Future<void> acceptGroupChatInvitation(
+      {required final String chatUID, required final String userUID}) async {
+    try {
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "users": FieldValue.arrayUnion([userUID])
+      });
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "sentInvitations": FieldValue.arrayRemove([userUID])
+      });
+      await FirebaseFirestore.instance.collection("users").doc(userUID).update({
+        "groupChatInvitations": FieldValue.arrayRemove([chatUID])
+      });
+    } catch (e) {
       rethrow;
     }
   }
 
-  static Future<void> declineGroupChatInvitation() async {
-    try {} catch (e) {
+  static Future<void> declineGroupChatInvitation(
+      {required final String chatUID, required final String userUID}) async {
+    try {
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "sentInvitations": FieldValue.arrayRemove([userUID])
+      });
+      await FirebaseFirestore.instance.collection("users").doc(userUID).update({
+        "groupChatInvitations": FieldValue.arrayRemove([chatUID])
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+// groupchat join requests
+  static Future<void> sendGroupChatJoinRequest(
+      {required final String chatUID, required final String userUID}) async {
+    try {
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "joiningRequests": FieldValue.arrayUnion([userUID])
+      });
+      await FirebaseFirestore.instance.collection("users").doc(userUID).update({
+        "groupChatJoinRequests": FieldValue.arrayUnion([chatUID])
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> cancelGroupChatJoinRequest(
+      {required final String chatUID, required final String userUID}) async {
+    try {
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "joiningRequests": FieldValue.arrayRemove([userUID])
+      });
+      await FirebaseFirestore.instance.collection("users").doc(userUID).update({
+        "groupChatJoinRequests": FieldValue.arrayRemove([chatUID])
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> acceptGroupChatJoinRequest(
+      {required final String chatUID, required final String userUID}) async {
+    try {
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "users": FieldValue.arrayUnion([userUID])
+      });
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "groupChatJoinRequests": FieldValue.arrayRemove([userUID])
+      });
+      await FirebaseFirestore.instance.collection("users").doc(userUID).update({
+        "joiningRequests": FieldValue.arrayRemove([chatUID])
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> declineGroupChatJoinRequest(
+      {required final String chatUID, required final String userUID}) async {
+    try {
+      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
+        "joiningRequests": FieldValue.arrayRemove([userUID])
+      });
+      await FirebaseFirestore.instance.collection("users").doc(userUID).update({
+        "groupChatJoinRequests": FieldValue.arrayRemove([chatUID])
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<Chat?> getChatFromUID({required final String chatUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      final chatSnapshot = await db.collection("chats").doc(chatUID).get();
+      final chatData = chatSnapshot.data();
+
+      if (chatData != null) {
+        //if is groupchat (has admin)
+        if (chatData.containsKey("admin") && chatData["admin"] != "") {
+          final imageUrl = await FirebaseStorage.instance
+              .ref()
+              .child(chatData["iconPath"])
+              .getDownloadURL();
+
+          return Chat(
+              chatUID: chatSnapshot.id,
+              adminUID: chatData["admin"],
+              chatName: chatData["chatName"],
+              iconPath: imageUrl,
+              bannedUsersUID: chatData.containsKey("bannedUsers")
+                  ? List<String>.from(chatData["bannedUsers"])
+                  : [],
+              lastMessage: chatData.containsKey("lastMessage") &&
+                      chatData.containsKey("lastMessageTime") &&
+                      chatData.containsKey("lastSender") &&
+                      chatData["lastMessage"] != "" &&
+                      chatData["lastSender"] != "" &&
+                      chatData["lastMessageTime"] != ""
+                  ? Message(
+                      message: chatData["lastMessage"],
+                      senderUID: chatData["lastSender"],
+                      time: chatData["lastMessageTime"])
+                  : null);
+        } else {
+          final BabylonUser? otherUser = await UserService.getBabylonUser(
+              List<String>.from(chatData["users"]).firstWhere(
+                  (final userListUID) =>
+                      userListUID != ConnectedBabylonUser().userUID));
+          return Chat(
+              chatUID: chatSnapshot.id,
+              adminUID: chatData["admin"],
+              chatName: otherUser!.fullName,
+              iconPath: otherUser.imagePath,
+              lastMessage: chatData.containsKey("lastMessage") &&
+                      chatData.containsKey("lastMessageTime") &&
+                      chatData.containsKey("lastSender") &&
+                      chatData["lastMessage"] != "" &&
+                      chatData["lastSender"] != "" &&
+                      chatData["lastMessageTime"] != ""
+                  ? Message(
+                      message: chatData["lastMessage"],
+                      senderUID: chatData["lastSender"],
+                      time: chatData["lastMessageTime"])
+                  : null);
+        }
+      } else {
+        return null;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<List<Chat?>> getChatsFromUIDs({
+    required final List<String> chatUIDList,
+  }) async {
+    try {
+      final List<Chat?> chatList = [];
+      await Future.forEach(chatUIDList, (final userUID) async {
+        chatList.add(await getChatFromUID(chatUID: userUID));
+      });
+      return chatList;
+    } catch (e) {
       rethrow;
     }
   }

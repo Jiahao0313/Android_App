@@ -173,6 +173,19 @@ class UserService {
     return result;
   }
 
+  static Future<List<BabylonUser?>> getBabylonUsersFromUIDs(
+      {required final List<String> userUIDList}) async {
+    try {
+      final List<BabylonUser?> babylonUserList = [];
+      await Future.forEach(userUIDList, (final userUID) async {
+        babylonUserList.add(await getBabylonUser(userUID));
+      });
+      return babylonUserList;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   static Future<List<BabylonUser?>> getConnections() async {
     final List<BabylonUser?> connections = [];
     await Future.forEach(ConnectedBabylonUser().listedConnections,
@@ -301,7 +314,8 @@ class UserService {
     return users;
   }
 
-  static Future<List<String>> _getSubCollectionData(final DocumentReference parentRef, final String subCollection) async {
+  static Future<List<String>> _getSubCollectionData(
+      final DocumentReference parentRef, final String subCollection) async {
     final List<String> subCollectionData = [];
     try {
       final snapshot = await parentRef.collection(subCollection).get();
@@ -313,7 +327,9 @@ class UserService {
     }
     return subCollectionData;
   }
-  static Future<List<BabylonUser>> searchBabylonUsers(final String query) async {
+
+  static Future<List<BabylonUser>> searchBabylonUsers(
+      final String query) async {
     final List<BabylonUser> searchResults = [];
     try {
       final db = FirebaseFirestore.instance;
