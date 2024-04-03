@@ -1,6 +1,7 @@
 import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/user/user_service.dart";
+import "package:babylon_app/utils/datetime_utils.dart";
 import "package:babylon_app/utils/image_loader.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/views/profile/full_screen_image.dart";
@@ -46,7 +47,7 @@ class OtherProfileState extends State<OtherProfile> {
                     fontSize: 24,
                     fontWeight: FontWeight.bold)), // Display user"s name.
             Text(
-                "${DateTime.now().month > DateTime.parse("${babylonUser.dateOfBirth}").month && DateTime.now().day > DateTime.parse("${babylonUser.dateOfBirth}").day ? DateTime.now().year - DateTime.parse("${babylonUser.dateOfBirth}").year : DateTime.now().year - DateTime.parse("${babylonUser.dateOfBirth}").year - 1} years old, from ${babylonUser.originCountry}",
+                "${DatetimeUtils.age(DateTime.parse(babylonUser.dateOfBirth!))} years old, from ${babylonUser.originCountry}",
                 style: TextStyle(
                     fontSize: 18,
                     fontStyle:
