@@ -144,7 +144,7 @@ class ChatService {
       final chatData = chatDoc.data();
       final List<String> userIDList = List<String>.from(chatData!["users"]);
       await Future.forEach(userIDList, (final userID) async {
-        res.add((await UserService.getBabylonUser(userID))!);
+        res.add((await UserService.getBabylonUser(userUID: userID))!);
       });
       return res;
     } catch (e) {
@@ -335,7 +335,7 @@ class ChatService {
                   : null);
         } else {
           final BabylonUser? otherUser = await UserService.getBabylonUser(
-              List<String>.from(chatData["users"]).firstWhere(
+              userUID: List<String>.from(chatData["users"]).firstWhere(
                   (final userListUID) =>
                       userListUID != ConnectedBabylonUser().userUID));
           return Chat(

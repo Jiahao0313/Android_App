@@ -8,20 +8,20 @@ class BabylonUser {
   String? originCountry;
   String? about;
   String imagePath = "";
-  List<String> listedEvents = [];
-  List<String> listedConnections = [];
+  List<String>? listedEvents = [];
+  List<String>? listedConnections = [];
 
   // Constructors
 
   BabylonUser();
   BabylonUser.withData(
-      this.userUID,
-      this.fullName,
-      this.email,
+      {required this.userUID,
+      required this.fullName,
+      required this.email,
       this.about,
       this.originCountry,
       this.dateOfBirth,
-      this.imagePath,
+      required this.imagePath,
       this.listedEvents,
-      this.listedConnections);
+      this.listedConnections});
 }

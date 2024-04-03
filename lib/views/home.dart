@@ -40,8 +40,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    UserService.setUpConnectedBabylonUser(currentUser!
-        .uid); //BabylonUser.updateCurrentBabylonUserData(currentUserUID: currentUser!.uid);
+    UserService.setUpConnectedBabylonUser(
+        userUID: currentUser!
+            .uid); //BabylonUser.updateCurrentBabylonUserData(currentUserUID: currentUser!.uid);
     // Update the BabylonUser data with the current user
   }
 

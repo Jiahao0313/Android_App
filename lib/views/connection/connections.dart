@@ -236,9 +236,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                   icon: Icon(Icons.check, color: Colors.green),
                   onPressed: () {
                     setState(() {
-                      UserService.addRequestConnection(request.userUID);
+                      UserService.addRequestConnection(
+                          requestUID: request.userUID);
                       UserService.setUpConnectedBabylonUser(
-                          ConnectedBabylonUser().userUID);
+                          userUID: ConnectedBabylonUser().userUID);
                       _requests = UserService.getRequests();
                     });
                   },
@@ -248,9 +249,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                   onPressed: () {
                     // Placeholder for "Decline" action.
                     setState(() {
-                      UserService.removeRequestConnection(request.userUID);
+                      UserService.removeRequestConnection(
+                          requestUID: request.userUID);
                       UserService.setUpConnectedBabylonUser(
-                          ConnectedBabylonUser().userUID);
+                          userUID: ConnectedBabylonUser().userUID);
                       _requests = UserService.getRequests();
                     });
                   },
@@ -635,7 +637,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
   }
 
   void pressedRequestButton(final BabylonUser babylonUser) {
-    UserService.createRequest(babylonUser.userUID);
+    UserService.createRequest(requestUID: babylonUser.userUID);
   }
 
   void pressedChatButton(final BabylonUser babylonUser) {

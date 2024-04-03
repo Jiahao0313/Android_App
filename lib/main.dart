@@ -143,7 +143,7 @@ class LogoScreen extends StatelessWidget {
                             final UserCredential loginUser =
                                 await AuthService.signInWithGoogle();
                             UserService.setUpConnectedBabylonUser(
-                                loginUser.user!.uid);
+                                userUID: loginUser.user!.uid);
                             if (!context.mounted) return;
                             Navigator.pushAndRemoveUntil(
                               context,

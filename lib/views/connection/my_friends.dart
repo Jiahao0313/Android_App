@@ -89,9 +89,9 @@ class MyFriendsState extends State<MyFriends> {
             onPressed: () {
               // Accept join request action
               setState(() {
-                UserService.addRequestConnection(request.userUID);
+                UserService.addRequestConnection(requestUID: request.userUID);
                 UserService.setUpConnectedBabylonUser(
-                    ConnectedBabylonUser().userUID);
+                    userUID: ConnectedBabylonUser().userUID);
                 _connections = UserService.getConnections();
                 _requests = UserService.getRequests();
               });
@@ -102,9 +102,10 @@ class MyFriendsState extends State<MyFriends> {
             onPressed: () {
               // Cancel join request action
               setState(() {
-                UserService.removeRequestConnection(request.userUID);
+                UserService.removeRequestConnection(
+                    requestUID: request.userUID);
                 UserService.setUpConnectedBabylonUser(
-                    ConnectedBabylonUser().userUID);
+                    userUID: ConnectedBabylonUser().userUID);
                 _requests = UserService.getRequests();
               });
             },
@@ -175,9 +176,10 @@ class MyFriendsState extends State<MyFriends> {
               child: Text("Yes"),
               onPressed: () {
                 setState(() {
-                  UserService.removeConnection(connection.userUID);
+                  UserService.removeConnection(
+                      connectionUID: connection.userUID);
                   UserService.setUpConnectedBabylonUser(
-                      ConnectedBabylonUser().userUID);
+                      userUID: ConnectedBabylonUser().userUID);
                   _connections = UserService.getConnections();
                 });
                 Navigator.of(context).pop();

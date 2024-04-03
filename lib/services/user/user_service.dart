@@ -1,10 +1,7 @@
 import "dart:async";
-import "dart:convert";
-import "dart:typed_data";
 import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:firebase_auth/firebase_auth.dart";
-import "package:flutter/material.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_storage/firebase_storage.dart";
 import "dart:io";
@@ -13,44 +10,41 @@ class UserService {
   static Future<void> fillUser(
       {required final User user,
       required final Map<String, String> userInfo}) async {
-    final db = FirebaseFirestore.instance;
-
-    final docUser = db.collection("users").doc(user.uid);
-
     try {
+      final db = FirebaseFirestore.instance;
+      final docUser = db.collection("users").doc(user.uid);
       await docUser.set(userInfo);
     } catch (e) {
       print("Error writing document: $e");
+      rethrow;
     }
   }
 
   static Future<void> addPhoto(
       {required final User user, required final File file}) async {
-    final Reference referenceRoot = FirebaseStorage.instance.ref();
-    final Reference referenceDirImages = referenceRoot.child("images");
-    final String imgName = "${user.uid}.jpg";
-    final Reference referenceImageToUpload = referenceDirImages.child(imgName);
     String imgUrl = "";
     try {
+      final Reference referenceRoot = FirebaseStorage.instance.ref();
+      final Reference referenceDirImages = referenceRoot.child("images");
+      final String imgName = "${user.uid}.jpg";
+      final Reference referenceImageToUpload =
+          referenceDirImages.child(imgName);
       await referenceImageToUpload.putFile(file);
       imgUrl = await referenceImageToUpload.getDownloadURL();
-    } catch (error) {
-      print(error);
-    }
-    if (imgUrl.isNotEmpty) {
-      FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .update({"ImageUrl": imgUrl})
-          .then((final value) => print("User Updated and photo added"))
-          .catchError(
-              (final error) => print("Failed to add the photo: $error"));
 
-      try {
+      if (imgUrl.isNotEmpty) {
+        FirebaseFirestore.instance
+            .collection("users")
+            .doc(user.uid)
+            .update({"ImageUrl": imgUrl})
+            .then((final value) => print("User Updated and photo added"))
+            .catchError(
+                (final error) => print("Failed to add the photo: $error"));
+
         await user.updatePhotoURL(imgUrl);
-      } catch (error) {
-        print("Failed to add the photo to user in auth: $error");
       }
+    } catch (error) {
+      print("Failed to add the photo to user in auth: $error");
     }
   }
 
@@ -60,60 +54,52 @@ class UserService {
       final Map<String, bool>? activities,
       final Map<String, bool>? music,
       final Map<String, bool>? hobbies}) async {
-    final userActivities = [], userMusic = [], userHobbies = [];
+    try {
+      final userActivities = [], userMusic = [], userHobbies = [];
 
-    if (activities != null) {
-      for (final activity in activities.entries) {
-        if (activity.value) userActivities.add(activity.key);
+      if (activities != null) {
+        for (final activity in activities.entries) {
+          if (activity.value) userActivities.add(activity.key);
+        }
       }
-    }
 
-    if (music != null) {
-      for (final music in music.entries) {
-        if (music.value) userMusic.add(music.key);
+      if (music != null) {
+        for (final music in music.entries) {
+          if (music.value) userMusic.add(music.key);
+        }
       }
-    }
 
-    if (hobbies != null) {
-      for (final hobby in hobbies.entries) {
-        if (hobby.value) userHobbies.add(hobby.key);
+      if (hobbies != null) {
+        for (final hobby in hobbies.entries) {
+          if (hobby.value) userHobbies.add(hobby.key);
+        }
       }
-    }
 
-    if (userActivities.isNotEmpty ||
-        userMusic.isNotEmpty ||
-        userHobbies.isNotEmpty ||
-        newData!.isNotEmpty) {
-      FirebaseFirestore.instance
-          .collection("users")
-          .doc(uuid)
-          .update({
-            "activities": userActivities,
-            "music": userMusic,
-            "hobbies": userHobbies,
-            "Country of Origin": newData!.containsKey("originCountry")
-                ? newData["originCountry"]
-                : "",
-            "Date of Birth":
-                newData.containsKey("birthDate") ? newData["birthDate"] : "",
-            "About": newData.containsKey("about") ? newData["about"] : "",
-            "Name": newData.containsKey("name") ? newData["name"] : "",
-          })
-          .then((final value) => print("User Updated and additionalInfo added"))
-          .catchError((final error) =>
-              print("Failed to add the additionalInfo: $error"));
+      if (userActivities.isNotEmpty ||
+          userMusic.isNotEmpty ||
+          userHobbies.isNotEmpty ||
+          newData!.isNotEmpty) {
+        await FirebaseFirestore.instance.collection("users").doc(uuid).update({
+          "activities": userActivities,
+          "music": userMusic,
+          "hobbies": userHobbies,
+          "Country of Origin": newData!.containsKey("originCountry")
+              ? newData["originCountry"]
+              : "",
+          "Date of Birth":
+              newData.containsKey("birthDate") ? newData["birthDate"] : "",
+          "About": newData.containsKey("about") ? newData["about"] : "",
+          "Name": newData.containsKey("name") ? newData["name"] : "",
+        });
+      }
+    } catch (e) {
+      print("Failed to add the additionalInfo: $e");
+      rethrow;
     }
   }
 
-  static Future<Image> convertFileToImage(final File picture) async {
-    final List<int> imageBase64 = picture.readAsBytesSync();
-    final String imageAsString = base64Encode(imageBase64);
-    final Uint8List uint8list = base64.decode(imageAsString);
-    final Image image = Image.memory(uint8list);
-    return image;
-  }
-
-  static Future<BabylonUser?> getBabylonUser(final String userUID) async {
+  static Future<BabylonUser?> getBabylonUser(
+      {required final String userUID}) async {
     BabylonUser? result;
     final Map<String, String> userInfo = {};
 
@@ -157,15 +143,15 @@ class UserService {
           (final snapShot) async => connectionsList.add(snapShot.reference.id));
 
       result = BabylonUser.withData(
-          userInfo["UUID"]!,
-          userInfo["name"]!,
-          userInfo["email"]!,
-          userInfo["about"]!,
-          userInfo["country"]!,
-          userInfo["birthDate"]!,
-          userInfo["imgURL"]!,
-          eventsLists,
-          connectionsList);
+          userUID: userInfo["UUID"]!,
+          fullName: userInfo["name"]!,
+          email: userInfo["email"]!,
+          about: userInfo["about"]!,
+          originCountry: userInfo["country"]!,
+          dateOfBirth: userInfo["birthDate"]!,
+          imagePath: userInfo["imgURL"]!,
+          listedEvents: eventsLists,
+          listedConnections: connectionsList);
       print(userData);
     } catch (e) {
       print(e);
@@ -178,7 +164,7 @@ class UserService {
     try {
       final List<BabylonUser> babylonUserList = [];
       await Future.forEach(userUIDList!, (final userUID) async {
-        final babylonUser = await getBabylonUser(userUID);
+        final babylonUser = await getBabylonUser(userUID: userUID);
         if (babylonUser != null) {
           babylonUserList.add(babylonUser);
         }
@@ -189,105 +175,149 @@ class UserService {
     }
   }
 
-  static Future<List<BabylonUser?>> getConnections() async {
-    final List<BabylonUser?> connections = [];
-    await Future.forEach(ConnectedBabylonUser().listedConnections,
-        (final connectionId) async {
-      final BabylonUser? babylonUser = await getBabylonUser(connectionId);
-      connections.add(babylonUser);
-    });
-    connections.sort((final connection1, final connection2) =>
-        connection1!.fullName.compareTo(connection2!.fullName));
-    return connections;
+  static Future<List<BabylonUser>> getConnections() async {
+    try {
+      final List<BabylonUser> connections = [];
+      final BabylonUser currUser = ConnectedBabylonUser();
+      if (currUser.listedConnections != null) {
+        await Future.forEach(currUser.listedConnections!,
+            (final connectionId) async {
+          final BabylonUser? babylonUser =
+              await getBabylonUser(userUID: connectionId);
+          if (babylonUser != null) connections.add(babylonUser);
+        });
+      }
+      connections.sort((final connection1, final connection2) =>
+          connection1.fullName.compareTo(connection2.fullName));
+      return connections;
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  static Future<List<BabylonUser?>> getRequests() async {
-    final List<BabylonUser?> requests = [];
-    await Future.forEach(ConnectedBabylonUser().listedRequests,
-        (final requestId) async {
-      final BabylonUser? babylonUser = await getBabylonUser(requestId);
-      requests.add(babylonUser);
-    });
-    return requests;
+  static Future<List<BabylonUser>> getRequests() async {
+    try {
+      final List<BabylonUser> requests = [];
+      await Future.forEach(ConnectedBabylonUser().listedRequests,
+          (final requestId) async {
+        final BabylonUser? babylonUser =
+            await getBabylonUser(userUID: requestId);
+        if (babylonUser != null) requests.add(babylonUser);
+      });
+      return requests;
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  static void createRequest(final String requestUID) async {
-    final db = FirebaseFirestore.instance;
-    final userUID = ConnectedBabylonUser().userUID;
-    db
-        .collection("users")
-        .doc(requestUID)
-        .collection("requests")
-        .doc(userUID)
-        .set({});
+  static Future<void> createRequest({required final String requestUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      final userUID = ConnectedBabylonUser().userUID;
+      db
+          .collection("users")
+          .doc(requestUID)
+          .collection("requests")
+          .doc(userUID)
+          .set({});
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  static void removeConnection(final String connectionUID) async {
-    final db = FirebaseFirestore.instance;
-    final userUID = ConnectedBabylonUser().userUID;
-    db
-        .collection("users")
-        .doc(userUID)
-        .collection("connections")
-        .doc(connectionUID)
-        .delete();
-    db
-        .collection("users")
-        .doc(connectionUID)
-        .collection("connections")
-        .doc(userUID)
-        .delete();
-    ConnectedBabylonUser().listedConnections.remove(connectionUID);
+  static Future<void> removeConnection(
+      {required final String connectionUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      final BabylonUser currUser = ConnectedBabylonUser();
+      if (currUser.listedConnections != null) {
+        db
+            .collection("users")
+            .doc(currUser.userUID)
+            .collection("connections")
+            .doc(connectionUID)
+            .delete();
+        db
+            .collection("users")
+            .doc(connectionUID)
+            .collection("connections")
+            .doc(currUser.userUID)
+            .delete();
+        ConnectedBabylonUser().listedConnections!.remove(connectionUID);
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  static void addRequestConnection(final String requestUID) async {
-    final db = FirebaseFirestore.instance;
-    final userUID = ConnectedBabylonUser().userUID;
-    db
-        .collection("users")
-        .doc(userUID)
-        .collection("connections")
-        .doc(requestUID)
-        .set({});
-    db
-        .collection("users")
-        .doc(requestUID)
-        .collection("connections")
-        .doc(userUID)
-        .set({});
-    db
-        .collection("users")
-        .doc(userUID)
-        .collection("requests")
-        .doc(requestUID)
-        .delete();
-    ConnectedBabylonUser().listedConnections.add(requestUID);
-    ConnectedBabylonUser().listedRequests.remove(requestUID);
+  static Future<void> addRequestConnection(
+      {required final String requestUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      final BabylonUser currUser = ConnectedBabylonUser();
+      if (currUser.listedConnections != null && currUser.listedEvents != null) {
+        final userUID = currUser.userUID;
+        db
+            .collection("users")
+            .doc(userUID)
+            .collection("connections")
+            .doc(requestUID)
+            .set({});
+        db
+            .collection("users")
+            .doc(requestUID)
+            .collection("connections")
+            .doc(userUID)
+            .set({});
+        db
+            .collection("users")
+            .doc(userUID)
+            .collection("requests")
+            .doc(requestUID)
+            .delete();
+        ConnectedBabylonUser().listedConnections!.add(requestUID);
+        ConnectedBabylonUser().listedRequests.remove(requestUID);
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  static void removeRequestConnection(final String requestUID) async {
-    final db = FirebaseFirestore.instance;
-    await db
-        .collection("users")
-        .doc(ConnectedBabylonUser().userUID)
-        .collection("requests")
-        .doc(requestUID)
-        .delete();
-    ConnectedBabylonUser().listedRequests.remove(requestUID);
+  static void removeRequestConnection(
+      {required final String requestUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      await db
+          .collection("users")
+          .doc(ConnectedBabylonUser().userUID)
+          .collection("requests")
+          .doc(requestUID)
+          .delete();
+      ConnectedBabylonUser().listedRequests.remove(requestUID);
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  static void setUpConnectedBabylonUser(final String userUID) async {
-    final BabylonUser? babylonUser = await getBabylonUser(userUID);
-    final List<String> requestsList = List.empty(growable: true);
+  static void setUpConnectedBabylonUser({required final String userUID}) async {
+    try {
+      final BabylonUser? babylonUser = await getBabylonUser(userUID: userUID);
+      final List<String> requestsList = List.empty(growable: true);
 
-    final db = FirebaseFirestore.instance;
-    final docsListedRequests =
-        await db.collection("users").doc(userUID).collection("requests").get();
-    await Future.forEach(docsListedRequests.docs,
-        (final snapshot) async => requestsList.add(snapshot.reference.id));
+      final db = FirebaseFirestore.instance;
+      final docsListedRequests = await db
+          .collection("users")
+          .doc(userUID)
+          .collection("requests")
+          .get();
+      await Future.forEach(docsListedRequests.docs,
+          (final snapshot) async => requestsList.add(snapshot.reference.id));
 
-    await ConnectedBabylonUser.setConnectedBabylonUser(babylonUser);
-    await ConnectedBabylonUser.setRequests(requestsList);
+      await ConnectedBabylonUser.setConnectedBabylonUser(babylonUser);
+      await ConnectedBabylonUser.setRequests(requestsList);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   static Future<List<BabylonUser>> getAllBabylonUsers() async {
@@ -300,35 +330,21 @@ class UserService {
         final List<String> eventsLists = [];
         final List<String> connectionsLists = [];
         final user = BabylonUser.withData(
-            doc.id,
-            data["Name"] ?? "",
-            data["Email Address"] ?? "",
-            data["About"] ?? "",
-            data["Country of Origin"] ?? "",
-            data["Date of Birth"] ?? "",
-            data["ImageUrl"] ?? "",
-            eventsLists,
-            connectionsLists);
+            userUID: doc.id,
+            fullName: data["Name"] ?? "",
+            email: data["Email Address"] ?? "",
+            about: data["About"] ?? "",
+            originCountry: data["Country of Origin"] ?? "",
+            dateOfBirth: data["Date of Birth"] ?? "",
+            imagePath: data["ImageUrl"] ?? "",
+            listedEvents: eventsLists,
+            listedConnections: connectionsLists);
         users.add(user);
       }
     } catch (e) {
       print("Error fetching users: $e");
     }
     return users;
-  }
-
-  static Future<List<String>> _getSubCollectionData(
-      final DocumentReference parentRef, final String subCollection) async {
-    final List<String> subCollectionData = [];
-    try {
-      final snapshot = await parentRef.collection(subCollection).get();
-      for (final doc in snapshot.docs) {
-        subCollectionData.add(doc.id);
-      }
-    } catch (e) {
-      print("Error fetching sub collection data for $subCollection: $e");
-    }
-    return subCollectionData;
   }
 
   static Future<List<BabylonUser>> searchBabylonUsers(
@@ -345,13 +361,14 @@ class UserService {
       for (final doc in querySnapshot.docs) {
         final data = doc.data();
         final user = BabylonUser.withData(
-            doc.id,
-            data["Name"] ?? "",
-            data["Email Address"] ?? "",
-            data["About"] ?? "",
-            data["Country of Origin"] ?? "",
-            data["Date of Birth"] ?? "",
-            data["ImageUrl"] ?? "", [], []);
+          userUID: doc.id,
+          fullName: data["Name"] ?? "",
+          email: data["Email Address"] ?? "",
+          about: data["About"] ?? "",
+          originCountry: data["Country of Origin"] ?? "",
+          dateOfBirth: data["Date of Birth"] ?? "",
+          imagePath: data["ImageUrl"] ?? "",
+        );
         searchResults.add(user);
       }
     } catch (e) {

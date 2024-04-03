@@ -48,48 +48,54 @@ class EventService {
     return result;
   }
 
-  static Future<List<Event>> getListedEventsOfUser(final String uuid) async {
-    final BabylonUser? babylonUser = await UserService.getBabylonUser(uuid);
-    final List<Event> result = List.empty(growable: true);
+  static Future<List<Event>> getListedEventsOfUser(
+      {required final String uuid}) async {
     try {
-      final db = FirebaseFirestore.instance;
-      final snapShot = await db.collection("events").get();
-      await Future.forEach(snapShot.docs, (final snapShot) async {
-        final event = snapShot.data();
-        if (babylonUser!.listedEvents.contains(snapShot.reference.id)) {
-          final List<String> attendeesID = List.empty(growable: true);
-          final attendeesSnapshot = await db
-              .collection("events")
-              .doc(snapShot.id)
-              .collection("attendees")
-              .get();
-          attendeesSnapshot.docs.forEach((final anAttendee) {
-            attendeesID.add(anAttendee.id);
-          });
+      final List<Event> result = List<Event>.empty(growable: true);
+      final BabylonUser? babylonUser =
+          await UserService.getBabylonUser(userUID: uuid);
+      if (babylonUser != null && babylonUser.listedEvents != null) {
+        final db = FirebaseFirestore.instance;
+        final snapShot = await db.collection("events").get();
 
-          String imageUrl = "";
-          if(event.keys.contains("picture")) {
-            imageUrl = await FirebaseStorage.instance
-              .ref()
-              .child(event["picture"])
-              .getDownloadURL(); 
+        await Future.forEach(snapShot.docs, (final snapShot) async {
+          final event = snapShot.data();
+          if (babylonUser.listedEvents!.contains(snapShot.reference.id)) {
+            final List<String> attendeesID = List.empty(growable: true);
+            final attendeesSnapshot = await db
+                .collection("events")
+                .doc(snapShot.id)
+                .collection("attendees")
+                .get();
+            attendeesSnapshot.docs.forEach((final anAttendee) {
+              attendeesID.add(anAttendee.id);
+            });
+
+            String imageUrl = "";
+            if (event.keys.contains("picture")) {
+              imageUrl = await FirebaseStorage.instance
+                  .ref()
+                  .child(event["picture"])
+                  .getDownloadURL();
+            }
+            result.add(await Event.create(
+                snapShot.reference.id,
+                event["title"],
+                event["creator"],
+                event["place"],
+                (event["date"] as Timestamp).toDate(),
+                event["fullDescription"],
+                event["shortDescription"],
+                imageUrl,
+                attendeesID));
           }
-          result.add(await Event.create(
-              snapShot.reference.id,
-              event["title"],
-              event["creator"],
-              event["place"],
-              (event["date"] as Timestamp).toDate(),
-              event["fullDescription"],
-              event["shortDescription"],
-              imageUrl,
-              attendeesID));
-        }
-      });
+        });
+      }
+      return result;
     } catch (error) {
       print(error);
+      rethrow;
     }
-    return result;
   }
 
   static Future<bool> addUserToEvent(final Event event) async {

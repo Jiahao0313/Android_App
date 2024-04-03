@@ -21,7 +21,7 @@ class _EventsScreenState extends State<EventsScreen>
   late TabController _tabController;
   final Future<List<Event>> _allEvents = EventService.getEvents();
   final Future<List<Event>> _myEvents =
-      EventService.getListedEventsOfUser(ConnectedBabylonUser().userUID);
+      EventService.getListedEventsOfUser(uuid: ConnectedBabylonUser().userUID);
 
   @override
   void initState() {

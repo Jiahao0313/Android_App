@@ -91,7 +91,7 @@ class _MyProfileState extends State<MyProfile> {
                         ),
                         onPressed: () {
                           UserService.setUpConnectedBabylonUser(
-                              ConnectedBabylonUser().userUID);
+                              userUID: ConnectedBabylonUser().userUID);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -176,8 +176,9 @@ class _MyProfileState extends State<MyProfile> {
                   "birthDate": _dateOfBirth.text,
                   "about": _about.text
                 });
-                UserService.setUpConnectedBabylonUser(user
-                    .userUID); // await BabylonUser.updateCurrentBabylonUserData(currentUserUID: user.userUID);
+                UserService.setUpConnectedBabylonUser(
+                    userUID: user
+                        .userUID); // await BabylonUser.updateCurrentBabylonUserData(currentUserUID: user.userUID);
                 if (_fileImage != null) {
                   UserService.addPhoto(
                       user: FirebaseAuth.instance.currentUser!,

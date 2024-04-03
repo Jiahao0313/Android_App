@@ -21,8 +21,9 @@ class AuthService {
       await user!.updateDisplayName(name);
       await user.reload();
       user = auth.currentUser;
-      UserService.setUpConnectedBabylonUser(user!
-          .uid); // await BabylonUser.updateCurrentBabylonUserData(currentUserUID: user!.uid);
+      UserService.setUpConnectedBabylonUser(
+          userUID: user!
+              .uid); // await BabylonUser.updateCurrentBabylonUserData(currentUserUID: user!.uid);
     } catch (e) {
       print(e);
       rethrow;
@@ -43,8 +44,9 @@ class AuthService {
         password: password,
       );
       user = userCredential.user;
-      UserService.setUpConnectedBabylonUser(user!
-          .uid); // await BabylonUser.updateCurrentBabylonUserData(currentUserUID: user!.uid);
+      UserService.setUpConnectedBabylonUser(
+          userUID: user!
+              .uid); // await BabylonUser.updateCurrentBabylonUserData(currentUserUID: user!.uid);
     } catch (e) {
       print(e);
       rethrow;
@@ -70,8 +72,9 @@ class AuthService {
         await FirebaseAuth.instance.signInWithCredential(credential);
 
     await hasCurrentUserData();
-    UserService.setUpConnectedBabylonUser(signedIdUser.user!
-        .uid); // await BabylonUser.updateCurrentBabylonUserData(currentUserUID: signedIdUser.user!.uid);
+    UserService.setUpConnectedBabylonUser(
+        userUID: signedIdUser.user!
+            .uid); // await BabylonUser.updateCurrentBabylonUserData(currentUserUID: signedIdUser.user!.uid);
     // Once signed in, return the UserCredential
     return signedIdUser;
   }

@@ -46,10 +46,11 @@ class Event {
       final String? newShortDescription,
       final String? newPictureURL,
       final List<String> attendeeIDs) async {
-    final BabylonUser? user = await UserService.getBabylonUser(babylonUserUID);
+    final BabylonUser? user =
+        await UserService.getBabylonUser(userUID: babylonUserUID);
     final List<BabylonUser?> attendees = List.empty(growable: true);
     await Future.forEach(attendeeIDs, (final attendee) async {
-      attendees.add(await UserService.getBabylonUser(attendee));
+      attendees.add(await UserService.getBabylonUser(userUID: attendee));
     });
     return Event(newEventDocumentID, newTitle, user, newPlace, newDate,
         newFullDescription, newShortDescription, newPictureURL, attendees);
