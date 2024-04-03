@@ -2,6 +2,7 @@ import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
+import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
 import "package:flutter/material.dart";
 
@@ -17,7 +18,8 @@ class _ChatInfoViewState extends State<ChatInfoView> {
   final Chat chat;
   bool isAdmin = false;
   _ChatInfoViewState({required this.chat});
-
+  List<BabylonUser> joiningRequests = [];
+  List<BabylonUser> invitations = [];
   bool hasUsersLoaded = false;
 
   @override
@@ -36,19 +38,19 @@ class _ChatInfoViewState extends State<ChatInfoView> {
 
   void fetchUsersData() async {
     final users = await ChatService.getChatUsers(chatUID: chat.chatUID);
+    final List<BabylonUser> joiningRequestsData =
+        await UserService.getBabylonUsersFromUIDs(
+            userUIDList: chat.joiningRequests);
+    final List<BabylonUser> sentInvitationsData =
+        await UserService.getBabylonUsersFromUIDs(
+            userUIDList: chat.sentInvitations);
     setState(() {
       chat.users = users;
       hasUsersLoaded = true;
+      joiningRequests = joiningRequestsData;
+      invitations = sentInvitationsData;
     });
   }
-
-  final List<Map<String, String>> joinRequests = List.generate(
-    3,
-    (final index) => {
-      "name": "Request ${index + 1}",
-      "profilePic": "assets/images/default_user_logo.png"
-    },
-  );
 
   @override
   Widget build(final BuildContext context) {
@@ -87,8 +89,18 @@ class _ChatInfoViewState extends State<ChatInfoView> {
                   ),
                   if (isAdmin)
                     ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: () async {
                         // Add participant action
+                        try {
+                          await ChatService.sendGroupChatInvitation(
+                              chatUID: chat.chatUID,
+                              userUID: "oAxwoYTb52RsCXO1KWWAC12ONz82");
+                          setState(() {
+                            invitations.add(chat.users![0]);
+                          });
+                        } catch (e) {
+                          rethrow;
+                        }
                       },
                       icon: Icon(Icons.add, color: Colors.white),
                       label: Text("Add Participant",
@@ -103,6 +115,8 @@ class _ChatInfoViewState extends State<ChatInfoView> {
                     ),
                   if (isAdmin) _buildSectionTitle("Join Requests"),
                   if (isAdmin) _buildJoinRequestsList(),
+                  if (isAdmin) _buildSectionTitle("Sent invitations"),
+                  if (isAdmin) _buildSentInvitationsList(),
                   _buildSectionTitle("Participants"),
                   _buildParticipantsList(context),
                   if (isAdmin) _buildSectionTitle("Banned participants"),
@@ -132,29 +146,88 @@ class _ChatInfoViewState extends State<ChatInfoView> {
 
   Widget _buildJoinRequestsList() {
     return Column(
-      children: joinRequests
-          .map((final request) => ListTile(
+      children: joiningRequests
+          .map((final user) => ListTile(
                 leading: CircleAvatar(
-                  backgroundImage: AssetImage(request["profilePic"]!),
+                  backgroundImage: NetworkImage(user.imagePath),
                 ),
-                title: Text(request["name"]!),
+                title: Text(user.fullName),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (isAdmin)
                       IconButton(
                         icon: Icon(Icons.check, color: Colors.green),
-                        onPressed: () {
+                        onPressed: () async {
                           // Accept join request action
+                          try {
+                            await ChatService.acceptGroupChatJoinRequest(
+                                chatUID: chat.chatUID, userUID: user.userUID);
+                            setState(() {
+                              joiningRequests.removeWhere((final anUser) =>
+                                  anUser.userUID == user.userUID);
+                              chat.users!.add(user);
+                            });
+                          } catch (e) {
+                            rethrow;
+                          }
                         },
                       ),
                     if (isAdmin)
                       IconButton(
                         icon: Icon(Icons.cancel, color: Colors.red),
-                        onPressed: () {
-                          // Cancel join request action
+                        onPressed: () async {
+                          // decline join request action
+                          try {
+                            await ChatService.declineGroupChatJoinRequest(
+                                chatUID: chat.chatUID, userUID: user.userUID);
+                            setState(() {
+                              joiningRequests.removeWhere((final anUser) =>
+                                  anUser.userUID == user.userUID);
+                            });
+                          } catch (e) {
+                            rethrow;
+                          }
                         },
                       ),
+                  ],
+                ),
+              ))
+          .toList(),
+    );
+  }
+
+  Widget _buildSentInvitationsList() {
+    return Column(
+      children: invitations
+          .map((final user) => ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(user.imagePath),
+                ),
+                title: Text(user.fullName),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isAdmin)
+                      InkWell(
+                        onTap: () async {
+                          // Cancel join request action
+                          try {
+                            await ChatService.cancelGroupChatInvitation(
+                                chatUID: chat.chatUID, userUID: user.userUID);
+                            setState(() {
+                              invitations.removeWhere((final anUser) =>
+                                  anUser.userUID == user.userUID);
+                            });
+                          } catch (e) {
+                            rethrow;
+                          }
+                        },
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(color: Colors.red, fontSize: 16),
+                        ),
+                      )
                   ],
                 ),
               ))

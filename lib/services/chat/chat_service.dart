@@ -122,58 +122,13 @@ class ChatService {
           .collection("chats")
           .where("users", arrayContains: userUID)
           .get();
-
       await Future.forEach(userChats.docs, (final snapShot) async {
-        final chatData = snapShot.data();
-
-        //if is groupchat (has admin)
-        if (chatData.containsKey("admin") && chatData["admin"] != "") {
-          final imageUrl = await FirebaseStorage.instance
-              .ref()
-              .child(chatData["iconPath"])
-              .getDownloadURL();
-
-          res.add(Chat(
-              chatUID: snapShot.id,
-              adminUID: chatData["admin"],
-              chatName: chatData["chatName"],
-              iconPath: imageUrl,
-              bannedUsersUID: chatData.containsKey("bannedUsers")
-                  ? List<String>.from(chatData["bannedUsers"])
-                  : [],
-              lastMessage: chatData.containsKey("lastMessage") &&
-                      chatData.containsKey("lastMessageTime") &&
-                      chatData.containsKey("lastSender") &&
-                      chatData["lastMessage"] != "" &&
-                      chatData["lastSender"] != "" &&
-                      chatData["lastMessageTime"] != ""
-                  ? Message(
-                      message: chatData["lastMessage"],
-                      senderUID: chatData["lastSender"],
-                      time: chatData["lastMessageTime"])
-                  : null));
-        } else {
-          final BabylonUser? otherUser = await UserService.getBabylonUser(
-              List<String>.from(chatData["users"])
-                  .firstWhere((final userListUID) => userListUID != userUID));
-          res.add(Chat(
-              chatUID: snapShot.id,
-              adminUID: chatData["admin"],
-              chatName: otherUser!.fullName,
-              iconPath: otherUser.imagePath,
-              lastMessage: chatData.containsKey("lastMessage") &&
-                      chatData.containsKey("lastMessageTime") &&
-                      chatData.containsKey("lastSender") &&
-                      chatData["lastMessage"] != "" &&
-                      chatData["lastSender"] != "" &&
-                      chatData["lastMessageTime"] != ""
-                  ? Message(
-                      message: chatData["lastMessage"],
-                      senderUID: chatData["lastSender"],
-                      time: chatData["lastMessageTime"])
-                  : null));
+        final chat = await ChatService.getChatFromUID(chatUID: snapShot.id);
+        if (chat != null) {
+          res.add(chat);
         }
       });
+
       return res;
     } catch (e) {
       rethrow;
@@ -287,7 +242,7 @@ class ChatService {
         "joiningRequests": FieldValue.arrayUnion([userUID])
       });
       await FirebaseFirestore.instance.collection("users").doc(userUID).update({
-        "groupChatJoinRequests": FieldValue.arrayUnion([chatUID])
+        "groupChatJoiningRequests": FieldValue.arrayUnion([chatUID])
       });
     } catch (e) {
       rethrow;
@@ -301,7 +256,7 @@ class ChatService {
         "joiningRequests": FieldValue.arrayRemove([userUID])
       });
       await FirebaseFirestore.instance.collection("users").doc(userUID).update({
-        "groupChatJoinRequests": FieldValue.arrayRemove([chatUID])
+        "groupChatJoiningRequests": FieldValue.arrayRemove([chatUID])
       });
     } catch (e) {
       rethrow;
@@ -315,7 +270,7 @@ class ChatService {
         "users": FieldValue.arrayUnion([userUID])
       });
       await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
-        "groupChatJoinRequests": FieldValue.arrayRemove([userUID])
+        "groupChatJoiningRequests": FieldValue.arrayRemove([userUID])
       });
       await FirebaseFirestore.instance.collection("users").doc(userUID).update({
         "joiningRequests": FieldValue.arrayRemove([chatUID])
@@ -332,7 +287,7 @@ class ChatService {
         "joiningRequests": FieldValue.arrayRemove([userUID])
       });
       await FirebaseFirestore.instance.collection("users").doc(userUID).update({
-        "groupChatJoinRequests": FieldValue.arrayRemove([chatUID])
+        "groupChatJoiningRequests": FieldValue.arrayRemove([chatUID])
       });
     } catch (e) {
       rethrow;
@@ -360,6 +315,12 @@ class ChatService {
               iconPath: imageUrl,
               bannedUsersUID: chatData.containsKey("bannedUsers")
                   ? List<String>.from(chatData["bannedUsers"])
+                  : [],
+              joiningRequests: chatData.containsKey("joiningRequests")
+                  ? List<String>.from(chatData["joiningRequests"])
+                  : [],
+              sentInvitations: chatData.containsKey("sentInvitations")
+                  ? List<String>.from(chatData["sentInvitations"])
                   : [],
               lastMessage: chatData.containsKey("lastMessage") &&
                       chatData.containsKey("lastMessageTime") &&
@@ -402,15 +363,20 @@ class ChatService {
     }
   }
 
-  static Future<List<Chat?>> getChatsFromUIDs({
-    required final List<String> chatUIDList,
+  static Future<List<Chat>>? getChatsFromUIDs({
+    required final List<String>? chatUIDList,
   }) async {
     try {
-      final List<Chat?> chatList = [];
-      await Future.forEach(chatUIDList, (final userUID) async {
-        chatList.add(await getChatFromUID(chatUID: userUID));
-      });
-      return chatList;
+      if (chatUIDList != null) {
+        final List<Chat> chatList = [];
+        await Future.forEach(chatUIDList, (final userUID) async {
+          final chat = await getChatFromUID(chatUID: userUID);
+          if (chat != null) chatList.add(chat);
+        });
+        return chatList;
+      } else {
+        return [];
+      }
     } catch (e) {
       rethrow;
     }

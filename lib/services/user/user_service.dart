@@ -173,12 +173,15 @@ class UserService {
     return result;
   }
 
-  static Future<List<BabylonUser?>> getBabylonUsersFromUIDs(
-      {required final List<String> userUIDList}) async {
+  static Future<List<BabylonUser>> getBabylonUsersFromUIDs(
+      {required final List<String>? userUIDList}) async {
     try {
-      final List<BabylonUser?> babylonUserList = [];
-      await Future.forEach(userUIDList, (final userUID) async {
-        babylonUserList.add(await getBabylonUser(userUID));
+      final List<BabylonUser> babylonUserList = [];
+      await Future.forEach(userUIDList!, (final userUID) async {
+        final babylonUser = await getBabylonUser(userUID);
+        if (babylonUser != null) {
+          babylonUserList.add(babylonUser);
+        }
       });
       return babylonUserList;
     } catch (e) {

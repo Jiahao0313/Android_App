@@ -9,6 +9,8 @@ class Chat {
   String? chatName;
   List<BabylonUser>? users;
   List<String>? bannedUsersUID;
+  List<String>? sentInvitations;
+  List<String>? joiningRequests;
 
   Chat(
       {required this.chatUID,
@@ -16,5 +18,7 @@ class Chat {
       this.adminUID,
       this.lastMessage,
       this.iconPath,
-      this.bannedUsersUID});
+      this.bannedUsersUID,
+      this.sentInvitations,
+      this.joiningRequests});
 }
