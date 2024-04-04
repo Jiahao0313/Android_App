@@ -16,8 +16,8 @@ class ConnectedBabylonUser extends BabylonUser {
   factory ConnectedBabylonUser() => _instance;
 
   static Future<void> setConnectedBabylonUser(
-      final BabylonUser? babylonUser) async {
-    _instance.imagePath = babylonUser!.imagePath;
+      {required final BabylonUser babylonUser}) async {
+    _instance.imagePath = babylonUser.imagePath;
     _instance.email = babylonUser.email;
     _instance.fullName = babylonUser.fullName;
     _instance.dateOfBirth = babylonUser.dateOfBirth;
@@ -28,7 +28,8 @@ class ConnectedBabylonUser extends BabylonUser {
     _instance.listedConnections = babylonUser.listedConnections;
   }
 
-  static Future<void> setRequests(final List<String> requests) async {
-    _instance.listedRequests = requests;
+  static Future<void> setConnectionRequests(
+      {required final List<String> connectionRequests}) async {
+    _instance.listedRequests = connectionRequests;
   }
 }

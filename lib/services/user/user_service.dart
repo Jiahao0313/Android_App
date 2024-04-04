@@ -105,7 +105,7 @@ class UserService {
 
     try {
       final List<String> eventsLists = List.empty(growable: true);
-      final List<String> connectionsList = List.empty(growable: true);
+      List<String> connectionsList = [];
       final db = FirebaseFirestore.instance;
       final docUser = await db.collection("users").doc(userUID).get();
       final userData = docUser.data();
@@ -125,22 +125,19 @@ class UserService {
           ? userData["Date of Birth"]
           : "";
 
+      if (userData.containsKey("connections")) {
+        connectionsList = List<String>.from(userData["connections"]);
+      }
+
       final docsListedEvents = await db
           .collection("users")
           .doc(userUID)
           .collection("listedEvents")
           .get();
-      final docsListedConnections = await db
-          .collection("users")
-          .doc(userUID)
-          .collection("connections")
-          .get();
 
       await Future.forEach(docsListedEvents.docs, (final snapShot) async {
         eventsLists.add(snapShot.reference.id);
       });
-      await Future.forEach(docsListedConnections.docs,
-          (final snapShot) async => connectionsList.add(snapShot.reference.id));
 
       result = BabylonUser.withData(
           userUID: userInfo["UUID"]!,
@@ -265,18 +262,12 @@ class UserService {
       final db = FirebaseFirestore.instance;
       final BabylonUser currUser = ConnectedBabylonUser();
       if (currUser.listedConnections != null) {
-        db
-            .collection("users")
-            .doc(currUser.userUID)
-            .collection("connections")
-            .doc(connectionUID)
-            .delete();
-        db
-            .collection("users")
-            .doc(connectionUID)
-            .collection("connections")
-            .doc(currUser.userUID)
-            .delete();
+        db.collection("users").doc(currUser.userUID).update({
+          "connections": FieldValue.arrayRemove([connectionUID])
+        });
+        db.collection("users").doc(connectionUID).update({
+          "connections": FieldValue.arrayRemove([currUser.userUID])
+        });
         ConnectedBabylonUser().listedConnections!.remove(connectionUID);
       }
     } catch (e) {
@@ -291,24 +282,15 @@ class UserService {
       final BabylonUser currUser = ConnectedBabylonUser();
       if (currUser.listedConnections != null && currUser.listedEvents != null) {
         final userUID = currUser.userUID;
-        db
-            .collection("users")
-            .doc(userUID)
-            .collection("connections")
-            .doc(requestUID)
-            .set({});
-        db
-            .collection("users")
-            .doc(requestUID)
-            .collection("connections")
-            .doc(userUID)
-            .set({});
-        db
-            .collection("users")
-            .doc(userUID)
-            .collection("requests")
-            .doc(requestUID)
-            .delete();
+        db.collection("users").doc(userUID).update({
+          "connections": FieldValue.arrayUnion([requestUID])
+        });
+        db.collection("users").doc(requestUID).update({
+          "connections": FieldValue.arrayUnion([userUID])
+        });
+        db.collection("users").doc(userUID).update({
+          "connectionRequests": FieldValue.arrayRemove([requestUID])
+        });
         ConnectedBabylonUser().listedConnections!.add(requestUID);
         ConnectedBabylonUser().listedRequests.remove(requestUID);
       }
@@ -321,12 +303,9 @@ class UserService {
       {required final String requestUID}) async {
     try {
       final db = FirebaseFirestore.instance;
-      await db
-          .collection("users")
-          .doc(ConnectedBabylonUser().userUID)
-          .collection("requests")
-          .doc(requestUID)
-          .delete();
+      await db.collection("users").doc(ConnectedBabylonUser().userUID).update({
+        "connectionRequests": FieldValue.arrayRemove([requestUID])
+      });
       ConnectedBabylonUser().listedRequests.remove(requestUID);
     } catch (e) {
       rethrow;
@@ -337,13 +316,10 @@ class UserService {
       {required final String requestUID}) async {
     try {
       final db = FirebaseFirestore.instance;
-      final userUID = ConnectedBabylonUser().userUID;
-      db
-          .collection("users")
-          .doc(requestUID)
-          .collection("requests")
-          .doc(userUID)
-          .set({});
+      await db.collection("users").doc(requestUID).update({
+        "connectionRequests":
+            FieldValue.arrayUnion([ConnectedBabylonUser().userUID])
+      });
     } catch (e) {
       rethrow;
     }
@@ -353,19 +329,23 @@ class UserService {
       {required final String userUID}) async {
     try {
       final BabylonUser? babylonUser = await getBabylonUser(userUID: userUID);
-      final List<String> requestsList = List.empty(growable: true);
+      List<String> connectionRequestsList = [];
 
       final db = FirebaseFirestore.instance;
-      final docsListedRequests = await db
-          .collection("users")
-          .doc(userUID)
-          .collection("requests")
-          .get();
-      await Future.forEach(docsListedRequests.docs,
-          (final snapshot) async => requestsList.add(snapshot.reference.id));
-
-      await ConnectedBabylonUser.setConnectedBabylonUser(babylonUser);
-      await ConnectedBabylonUser.setRequests(requestsList);
+      final docsListedConnectionRequests =
+          await db.collection("users").doc(userUID).get();
+      final listedConnectionRequestsData = docsListedConnectionRequests.data();
+      if (listedConnectionRequestsData != null &&
+          listedConnectionRequestsData.containsKey("connectionRequests")) {
+        connectionRequestsList = List<String>.from(
+            listedConnectionRequestsData["connectionRequests"]);
+      }
+      if (babylonUser != null) {
+        await ConnectedBabylonUser.setConnectedBabylonUser(
+            babylonUser: babylonUser);
+      }
+      await ConnectedBabylonUser.setConnectionRequests(
+          connectionRequests: connectionRequestsList);
     } catch (e) {
       rethrow;
     }
