@@ -89,7 +89,7 @@ class MyFriendsState extends State<MyFriends> {
             onPressed: () {
               // Accept join request action
               setState(() {
-                UserService.sendConnectionRequest(requestUID: request.userUID);
+                UserService.addConnectionToUser(requestUID: request.userUID);
                 UserService.setUpConnectedBabylonUser(
                     userUID: ConnectedBabylonUser().userUID);
                 _connections = UserService.getConnections();
