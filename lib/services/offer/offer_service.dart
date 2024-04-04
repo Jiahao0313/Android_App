@@ -16,18 +16,16 @@ class OfferService {
             .child(partner["picture"])
             .getDownloadURL();
         result.add(Offer(
-            snapShot.id,
-            partner["name"],
-            partner["location"],
-            partner["discount"],
-            imageUrl,
-            partner["fullDescription"],
-            partner["shortDescription"]));
+            documentID: snapShot.id,
+            name: partner["name"],
+            location: partner["location"],
+            discount: partner["discount"],
+            pictureURL: imageUrl,
+            fullDescription: partner["fullDescription"],
+            shortDescription: partner["shortDescription"]));
       });
-
-      print(result);
     } catch (error) {
-      print(error);
+      rethrow;
     }
     return result;
   }

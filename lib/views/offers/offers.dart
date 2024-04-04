@@ -51,8 +51,6 @@ class _FutureBuilderOffersState extends State<FutureBuilderOffers> {
                 final AsyncSnapshot<List<Offer>> snapshot) {
               List<Widget> children;
               if (snapshot.hasData) {
-                print(1);
-                print(snapshot.data);
                 children = <Widget>[
                   Padding(
                     padding: EdgeInsets.only(left: 16, top: 16),

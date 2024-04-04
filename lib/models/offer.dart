@@ -12,18 +12,11 @@ class Offer {
   // Constructors
 
   Offer(
-      final String? newDocumentID,
-      final String? newName,
-      final String? newLocation,
-      final String? newDiscount,
-      final String? newPictureURL,
-      final String? newFullDescription,
-      final String? newShortDescription)
-      : documentID = newDocumentID,
-        name = newName,
-        location = newLocation,
-        discount = newDiscount,
-        pictureURL = newPictureURL,
-        fullDescription = newFullDescription,
-        shortDescription = newShortDescription;
+      {this.documentID,
+      this.name,
+      this.location,
+      this.discount,
+      this.pictureURL,
+      this.fullDescription,
+      this.shortDescription});
 }
