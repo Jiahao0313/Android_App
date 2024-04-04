@@ -16,7 +16,8 @@ class EventService {
       await Future.forEach(snapShot.docs, (final snapShot) async {
         List<String> attendeeIDs = [];
         final event = snapShot.data();
-
+        final BabylonUser? creator =
+            await UserService.getBabylonUser(userUID: event["creator"]);
         if (event.containsKey("attendees")) {
           attendeeIDs = List<String>.from(event["attendees"]);
         }
@@ -26,17 +27,16 @@ class EventService {
                 .child(event["picture"])
                 .getDownloadURL()
             : "";
-        final Event? anEvent = await Event.create(
-            newEventDocumentID: snapShot.reference.id,
-            newTitle: event["title"],
-            babylonUserUID: event["creator"],
-            newPlace: event["place"],
-            newDate: (event["date"] as Timestamp).toDate(),
-            newFullDescription: event["fullDescription"],
-            newShortDescription: event["shortDescription"],
-            newPictureURL: imageUrl,
-            attendeeIDs: attendeeIDs);
-        if (anEvent != null) result.add(anEvent);
+        result.add(Event(
+            eventUID: snapShot.reference.id,
+            title: event["title"] ?? "" ?? "",
+            creator: creator!,
+            place: event["place"] ?? "",
+            date: (event["date"] as Timestamp).toDate(),
+            fullDescription: event["fullDescription"] ?? "",
+            shortDescription: event["shortDescription"] ?? "",
+            pictureURL: imageUrl,
+            attendeesUIDs: attendeeIDs));
       });
     } catch (error) {
       print(error);
@@ -50,8 +50,9 @@ class EventService {
       final eventSnapshot = await db.collection("events").doc(eventUID).get();
       final eventData = eventSnapshot.data();
       List<String> attendeeIDs = [];
-
       if (eventData != null) {
+        final BabylonUser? creator =
+            await UserService.getBabylonUser(userUID: eventData["creator"]);
         String imageUrl = "";
         if (eventData.keys.contains("picture")) {
           imageUrl = await FirebaseStorage.instance
@@ -64,19 +65,16 @@ class EventService {
           attendeeIDs = List<String>.from(eventData["attendees"]);
         }
 
-        final Event? anEvent = await Event.create(
-            newEventDocumentID: eventSnapshot.id,
-            newTitle: eventData["title"] ?? "",
-            babylonUserUID: eventData["creator"] ?? "",
-            newPlace: eventData["place"] ?? "",
-            newDate: (eventData["date"] as Timestamp).toDate(),
-            newFullDescription: eventData["fullDescription"] ?? "",
-            newShortDescription: eventData["shortDescription"] ?? "",
-            newPictureURL: imageUrl,
-            attendeeIDs: attendeeIDs);
-        if (anEvent != null) {
-          return anEvent;
-        }
+        return Event(
+            eventUID: eventSnapshot.id,
+            creator: creator!,
+            title: eventData["title"] ?? "",
+            place: eventData["place"] ?? "",
+            date: (eventData["date"] as Timestamp).toDate(),
+            fullDescription: eventData["fullDescription"] ?? "",
+            shortDescription: eventData["shortDescription"] ?? "",
+            pictureURL: imageUrl,
+            attendeesUIDs: attendeeIDs);
       }
       return null;
     } catch (e) {
@@ -110,9 +108,9 @@ class EventService {
       final User currUser = FirebaseAuth.instance.currentUser!;
       final db = FirebaseFirestore.instance;
       await db.collection("users").doc(currUser.uid).update({
-        "listedEvents": FieldValue.arrayUnion([event.eventDocumentID])
+        "listedEvents": FieldValue.arrayUnion([event.eventUID])
       });
-      await db.collection("events").doc(event.eventDocumentID).update({
+      await db.collection("events").doc(event.eventUID).update({
         "attendees": FieldValue.arrayUnion([currUser.uid])
       });
       return true;

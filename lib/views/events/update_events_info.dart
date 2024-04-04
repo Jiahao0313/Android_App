@@ -47,7 +47,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
     super.initState();
     _descriptionController.text = event.fullDescription!;
     _descriptionShortController.text = event.shortDescription!;
-    _nameController.text = event.title!;
+    _nameController.text = event.title;
     _placeController.text = event.place!;
     _image = null;
     _eventImgURL = event.pictureURL!;
@@ -189,7 +189,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
                           selectedTimeOfDay: _selectedTime,
                           place: _placeController.text);
                       await EventService.updateEvent(
-                          eventUID: event.eventDocumentID,
+                          eventUID: event.eventUID,
                           eventName: _nameController.text,
                           image: _image == null ? null : File(_image!.path),
                           eventTimeStamp: Timestamp.fromDate(DateTime(

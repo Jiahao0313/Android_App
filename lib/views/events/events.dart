@@ -222,7 +222,7 @@ class _EventsScreenState extends State<EventsScreen>
         },
         child: ListTile(
           leading: ImageLoader.loadEventPicture(event.pictureURL!),
-          title: Text(event.title!),
+          title: Text(event.title),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -231,7 +231,7 @@ class _EventsScreenState extends State<EventsScreen>
               Text(event.shortDescription!,
                   maxLines: 3, overflow: TextOverflow.ellipsis),
               Text(
-                  "Host: ${event.creator!.fullName}"), // Display the host of the event.
+                  "Host: ${event.creator.fullName}"), // Display the host of the event.
               Text(
                   "Location: ${event.place}"), // Display the location of the event.
             ],
