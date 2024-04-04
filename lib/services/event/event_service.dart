@@ -14,38 +14,74 @@ class EventService {
       final db = FirebaseFirestore.instance;
       final snapShot = await db.collection("events").get();
       await Future.forEach(snapShot.docs, (final snapShot) async {
-        final List<String> attendeesID = List.empty(growable: true);
-        final attendeesSnapshot = await db
-            .collection("events")
-            .doc(snapShot.id)
-            .collection("attendees")
-            .get();
-        attendeesSnapshot.docs.forEach((final anAttendee) {
-          attendeesID.add(anAttendee.id);
-        });
-
+        List<String> attendeeIDs = [];
         final event = snapShot.data();
+
+        if (event.containsKey("attendees")) {
+          attendeeIDs = List<String>.from(event["attendees"]);
+        }
         final imageUrl = event.containsKey("picture")
             ? await FirebaseStorage.instance
                 .ref()
                 .child(event["picture"])
                 .getDownloadURL()
             : "";
-        result.add(await Event.create(
-            snapShot.reference.id,
-            event["title"],
-            event["creator"],
-            event["place"],
-            (event["date"] as Timestamp).toDate(),
-            event["fullDescription"],
-            event["shortDescription"],
-            imageUrl,
-            attendeesID));
+        final Event? anEvent = await Event.create(
+            newEventDocumentID: snapShot.reference.id,
+            newTitle: event["title"],
+            babylonUserUID: event["creator"],
+            newPlace: event["place"],
+            newDate: (event["date"] as Timestamp).toDate(),
+            newFullDescription: event["fullDescription"],
+            newShortDescription: event["shortDescription"],
+            newPictureURL: imageUrl,
+            attendeeIDs: attendeeIDs);
+        if (anEvent != null) result.add(anEvent);
       });
     } catch (error) {
       print(error);
     }
     return result;
+  }
+
+  static Future<Event?> getEvent({required final String eventUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      final eventSnapshot = await db.collection("events").doc(eventUID).get();
+      final eventData = eventSnapshot.data();
+      List<String> attendeeIDs = [];
+
+      if (eventData != null) {
+        String imageUrl = "";
+        if (eventData.keys.contains("picture")) {
+          imageUrl = await FirebaseStorage.instance
+              .ref()
+              .child(eventData["picture"])
+              .getDownloadURL();
+        }
+
+        if (eventData.containsKey("attendees")) {
+          attendeeIDs = List<String>.from(eventData["attendees"]);
+        }
+
+        final Event? anEvent = await Event.create(
+            newEventDocumentID: eventSnapshot.id,
+            newTitle: eventData["title"] ?? "",
+            babylonUserUID: eventData["creator"] ?? "",
+            newPlace: eventData["place"] ?? "",
+            newDate: (eventData["date"] as Timestamp).toDate(),
+            newFullDescription: eventData["fullDescription"] ?? "",
+            newShortDescription: eventData["shortDescription"] ?? "",
+            newPictureURL: imageUrl,
+            attendeeIDs: attendeeIDs);
+        if (anEvent != null) {
+          return anEvent;
+        }
+      }
+      return null;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   static Future<List<Event>> getListedEventsOfUser(
@@ -54,41 +90,12 @@ class EventService {
       final List<Event> result = List<Event>.empty(growable: true);
       final BabylonUser? babylonUser =
           await UserService.getBabylonUser(userUID: uuid);
+
       if (babylonUser != null && babylonUser.listedEvents != null) {
-        final db = FirebaseFirestore.instance;
-        final snapShot = await db.collection("events").get();
-
-        await Future.forEach(snapShot.docs, (final snapShot) async {
-          final event = snapShot.data();
-          if (babylonUser.listedEvents!.contains(snapShot.reference.id)) {
-            final List<String> attendeesID = List.empty(growable: true);
-            final attendeesSnapshot = await db
-                .collection("events")
-                .doc(snapShot.id)
-                .collection("attendees")
-                .get();
-            attendeesSnapshot.docs.forEach((final anAttendee) {
-              attendeesID.add(anAttendee.id);
-            });
-
-            String imageUrl = "";
-            if (event.keys.contains("picture")) {
-              imageUrl = await FirebaseStorage.instance
-                  .ref()
-                  .child(event["picture"])
-                  .getDownloadURL();
-            }
-            result.add(await Event.create(
-                snapShot.reference.id,
-                event["title"],
-                event["creator"],
-                event["place"],
-                (event["date"] as Timestamp).toDate(),
-                event["fullDescription"],
-                event["shortDescription"],
-                imageUrl,
-                attendeesID));
-          }
+        await Future.forEach(babylonUser.listedEvents!,
+            (final anEventUID) async {
+          final Event? anEvent = await getEvent(eventUID: anEventUID);
+          if (anEvent != null) result.add(anEvent);
         });
       }
       return result;
@@ -98,22 +105,16 @@ class EventService {
     }
   }
 
-  static Future<bool> addUserToEvent(final Event event) async {
+  static Future<bool> addUserToEvent({required final Event event}) async {
     try {
       final User currUser = FirebaseAuth.instance.currentUser!;
       final db = FirebaseFirestore.instance;
-      await db
-          .collection("users")
-          .doc(currUser.uid)
-          .collection("listedEvents")
-          .doc(event.eventDocumentID)
-          .set({});
-      await db
-          .collection("events")
-          .doc(event.eventDocumentID)
-          .collection("attendees")
-          .doc(currUser.uid)
-          .set({});
+      await db.collection("users").doc(currUser.uid).update({
+        "listedEvents": FieldValue.arrayUnion([event.eventDocumentID])
+      });
+      await db.collection("events").doc(event.eventDocumentID).update({
+        "attendees": FieldValue.arrayUnion([currUser.uid])
+      });
       return true;
     } catch (e) {
       print(e);

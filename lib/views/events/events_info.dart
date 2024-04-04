@@ -25,9 +25,8 @@ class EventInfoState extends State<EventInfoScreen> {
   void initState() {
     super.initState();
     // Update the BabylonUser data with the current user
-
     _isAttending = event.attendees.any((final anAttendee) =>
-        anAttendee!.userUID == FirebaseAuth.instance.currentUser!.uid);
+        anAttendee.userUID == FirebaseAuth.instance.currentUser!.uid);
   }
 
   // Event object passed through the constructor containing all event details.
@@ -63,10 +62,10 @@ class EventInfoState extends State<EventInfoScreen> {
               width: screenWidth,
               child: event.pictureURL != null && event.pictureURL!.isNotEmpty
                   ? Image.network(
-                event.pictureURL!,
-                height: 250, // Height for a more prominent image.
-                fit: BoxFit.cover,
-              )
+                      event.pictureURL!,
+                      height: 250, // Height for a more prominent image.
+                      fit: BoxFit.cover,
+                    )
                   : Image.asset("assets/images/logoSquare.png", height: 250),
             ),
             // Padding for the content below the image.
@@ -146,7 +145,7 @@ class EventInfoState extends State<EventInfoScreen> {
                       onPressed: () async {
                         if (!_isAttending) {
                           final bool added =
-                              await EventService.addUserToEvent(event);
+                              await EventService.addUserToEvent(event: event);
                           if (added) {
                             setState(() {
                               _isAttending = true;
