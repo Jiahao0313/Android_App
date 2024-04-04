@@ -69,7 +69,7 @@ class OtherProfileState extends State<OtherProfile> {
                   label: Text("Add Friend"),
                   onPressed: () {
                     setState(() {
-                      UserService.addRequestConnection(
+                      UserService.sendConnectionRequest(
                           requestUID: babylonUser.userUID);
                       UserService.setUpConnectedBabylonUser(
                           userUID: ConnectedBabylonUser().userUID);

@@ -28,7 +28,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
   final Future<List<Chat>> _myChats =
       ChatService.getUserChats(userUID: ConnectedBabylonUser().userUID);
 
-  Future<List<BabylonUser?>> _requests = UserService.getRequests();
+  Future<List<BabylonUser?>> _requests = UserService.getConnectionsRequests();
 
   @override
   void initState() {
@@ -236,11 +236,11 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                   icon: Icon(Icons.check, color: Colors.green),
                   onPressed: () {
                     setState(() {
-                      UserService.addRequestConnection(
+                      UserService.sendConnectionRequest(
                           requestUID: request.userUID);
                       UserService.setUpConnectedBabylonUser(
                           userUID: ConnectedBabylonUser().userUID);
-                      _requests = UserService.getRequests();
+                      _requests = UserService.getConnectionsRequests();
                     });
                   },
                 ),
@@ -249,11 +249,11 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                   onPressed: () {
                     // Placeholder for "Decline" action.
                     setState(() {
-                      UserService.removeRequestConnection(
+                      UserService.removeConnectionRequest(
                           requestUID: request.userUID);
                       UserService.setUpConnectedBabylonUser(
                           userUID: ConnectedBabylonUser().userUID);
-                      _requests = UserService.getRequests();
+                      _requests = UserService.getConnectionsRequests();
                     });
                   },
                 ),
@@ -637,7 +637,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
   }
 
   void pressedRequestButton(final BabylonUser babylonUser) {
-    UserService.createRequest(requestUID: babylonUser.userUID);
+    UserService.sendConnectionRequest(requestUID: babylonUser.userUID);
   }
 
   void pressedChatButton(final BabylonUser babylonUser) {

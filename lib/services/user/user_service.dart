@@ -175,151 +175,6 @@ class UserService {
     }
   }
 
-  static Future<List<BabylonUser>> getConnections() async {
-    try {
-      final List<BabylonUser> connections = [];
-      final BabylonUser currUser = ConnectedBabylonUser();
-      if (currUser.listedConnections != null) {
-        await Future.forEach(currUser.listedConnections!,
-            (final connectionId) async {
-          final BabylonUser? babylonUser =
-              await getBabylonUser(userUID: connectionId);
-          if (babylonUser != null) connections.add(babylonUser);
-        });
-      }
-      connections.sort((final connection1, final connection2) =>
-          connection1.fullName.compareTo(connection2.fullName));
-      return connections;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  static Future<List<BabylonUser>> getRequests() async {
-    try {
-      final List<BabylonUser> requests = [];
-      await Future.forEach(ConnectedBabylonUser().listedRequests,
-          (final requestId) async {
-        final BabylonUser? babylonUser =
-            await getBabylonUser(userUID: requestId);
-        if (babylonUser != null) requests.add(babylonUser);
-      });
-      return requests;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  static Future<void> createRequest({required final String requestUID}) async {
-    try {
-      final db = FirebaseFirestore.instance;
-      final userUID = ConnectedBabylonUser().userUID;
-      db
-          .collection("users")
-          .doc(requestUID)
-          .collection("requests")
-          .doc(userUID)
-          .set({});
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  static Future<void> removeConnection(
-      {required final String connectionUID}) async {
-    try {
-      final db = FirebaseFirestore.instance;
-      final BabylonUser currUser = ConnectedBabylonUser();
-      if (currUser.listedConnections != null) {
-        db
-            .collection("users")
-            .doc(currUser.userUID)
-            .collection("connections")
-            .doc(connectionUID)
-            .delete();
-        db
-            .collection("users")
-            .doc(connectionUID)
-            .collection("connections")
-            .doc(currUser.userUID)
-            .delete();
-        ConnectedBabylonUser().listedConnections!.remove(connectionUID);
-      }
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  static Future<void> addRequestConnection(
-      {required final String requestUID}) async {
-    try {
-      final db = FirebaseFirestore.instance;
-      final BabylonUser currUser = ConnectedBabylonUser();
-      if (currUser.listedConnections != null && currUser.listedEvents != null) {
-        final userUID = currUser.userUID;
-        db
-            .collection("users")
-            .doc(userUID)
-            .collection("connections")
-            .doc(requestUID)
-            .set({});
-        db
-            .collection("users")
-            .doc(requestUID)
-            .collection("connections")
-            .doc(userUID)
-            .set({});
-        db
-            .collection("users")
-            .doc(userUID)
-            .collection("requests")
-            .doc(requestUID)
-            .delete();
-        ConnectedBabylonUser().listedConnections!.add(requestUID);
-        ConnectedBabylonUser().listedRequests.remove(requestUID);
-      }
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  static void removeRequestConnection(
-      {required final String requestUID}) async {
-    try {
-      final db = FirebaseFirestore.instance;
-      await db
-          .collection("users")
-          .doc(ConnectedBabylonUser().userUID)
-          .collection("requests")
-          .doc(requestUID)
-          .delete();
-      ConnectedBabylonUser().listedRequests.remove(requestUID);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  static void setUpConnectedBabylonUser({required final String userUID}) async {
-    try {
-      final BabylonUser? babylonUser = await getBabylonUser(userUID: userUID);
-      final List<String> requestsList = List.empty(growable: true);
-
-      final db = FirebaseFirestore.instance;
-      final docsListedRequests = await db
-          .collection("users")
-          .doc(userUID)
-          .collection("requests")
-          .get();
-      await Future.forEach(docsListedRequests.docs,
-          (final snapshot) async => requestsList.add(snapshot.reference.id));
-
-      await ConnectedBabylonUser.setConnectedBabylonUser(babylonUser);
-      await ConnectedBabylonUser.setRequests(requestsList);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
   static Future<List<BabylonUser>> getAllBabylonUsers() async {
     final List<BabylonUser> users = [];
     try {
@@ -375,5 +230,144 @@ class UserService {
       print("Error searching users: $e");
     }
     return searchResults;
+  }
+
+  static Future<List<BabylonUser>> getConnections() async {
+    try {
+      List<BabylonUser> connections = [];
+      final BabylonUser currUser = ConnectedBabylonUser();
+      if (currUser.listedConnections != null) {
+        connections = await getBabylonUsersFromUIDs(
+            userUIDList: currUser.listedConnections);
+      }
+      connections.sort((final connection1, final connection2) =>
+          connection1.fullName.compareTo(connection2.fullName));
+      return connections;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<List<BabylonUser>> getConnectionsRequests() async {
+    try {
+      List<BabylonUser> requests = [];
+      requests = await getBabylonUsersFromUIDs(
+          userUIDList: ConnectedBabylonUser().listedRequests);
+      return requests;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> removeConnectionToUser(
+      {required final String connectionUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      final BabylonUser currUser = ConnectedBabylonUser();
+      if (currUser.listedConnections != null) {
+        db
+            .collection("users")
+            .doc(currUser.userUID)
+            .collection("connections")
+            .doc(connectionUID)
+            .delete();
+        db
+            .collection("users")
+            .doc(connectionUID)
+            .collection("connections")
+            .doc(currUser.userUID)
+            .delete();
+        ConnectedBabylonUser().listedConnections!.remove(connectionUID);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> addConnectionToUser(
+      {required final String requestUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      final BabylonUser currUser = ConnectedBabylonUser();
+      if (currUser.listedConnections != null && currUser.listedEvents != null) {
+        final userUID = currUser.userUID;
+        db
+            .collection("users")
+            .doc(userUID)
+            .collection("connections")
+            .doc(requestUID)
+            .set({});
+        db
+            .collection("users")
+            .doc(requestUID)
+            .collection("connections")
+            .doc(userUID)
+            .set({});
+        db
+            .collection("users")
+            .doc(userUID)
+            .collection("requests")
+            .doc(requestUID)
+            .delete();
+        ConnectedBabylonUser().listedConnections!.add(requestUID);
+        ConnectedBabylonUser().listedRequests.remove(requestUID);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> removeConnectionRequest(
+      {required final String requestUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      await db
+          .collection("users")
+          .doc(ConnectedBabylonUser().userUID)
+          .collection("requests")
+          .doc(requestUID)
+          .delete();
+      ConnectedBabylonUser().listedRequests.remove(requestUID);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> sendConnectionRequest(
+      {required final String requestUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      final userUID = ConnectedBabylonUser().userUID;
+      db
+          .collection("users")
+          .doc(requestUID)
+          .collection("requests")
+          .doc(userUID)
+          .set({});
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> setUpConnectedBabylonUser(
+      {required final String userUID}) async {
+    try {
+      final BabylonUser? babylonUser = await getBabylonUser(userUID: userUID);
+      final List<String> requestsList = List.empty(growable: true);
+
+      final db = FirebaseFirestore.instance;
+      final docsListedRequests = await db
+          .collection("users")
+          .doc(userUID)
+          .collection("requests")
+          .get();
+      await Future.forEach(docsListedRequests.docs,
+          (final snapshot) async => requestsList.add(snapshot.reference.id));
+
+      await ConnectedBabylonUser.setConnectedBabylonUser(babylonUser);
+      await ConnectedBabylonUser.setRequests(requestsList);
+    } catch (e) {
+      rethrow;
+    }
   }
 }

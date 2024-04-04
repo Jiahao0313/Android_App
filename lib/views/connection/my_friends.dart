@@ -12,7 +12,7 @@ class MyFriends extends StatefulWidget {
 }
 
 class MyFriendsState extends State<MyFriends> {
-  Future<List<BabylonUser?>> _requests = UserService.getRequests();
+  Future<List<BabylonUser?>> _requests = UserService.getConnectionsRequests();
   Future<List<BabylonUser?>> _connections = UserService.getConnections();
 
   @override
@@ -89,11 +89,11 @@ class MyFriendsState extends State<MyFriends> {
             onPressed: () {
               // Accept join request action
               setState(() {
-                UserService.addRequestConnection(requestUID: request.userUID);
+                UserService.sendConnectionRequest(requestUID: request.userUID);
                 UserService.setUpConnectedBabylonUser(
                     userUID: ConnectedBabylonUser().userUID);
                 _connections = UserService.getConnections();
-                _requests = UserService.getRequests();
+                _requests = UserService.getConnectionsRequests();
               });
             },
           ),
@@ -102,11 +102,11 @@ class MyFriendsState extends State<MyFriends> {
             onPressed: () {
               // Cancel join request action
               setState(() {
-                UserService.removeRequestConnection(
+                UserService.removeConnectionRequest(
                     requestUID: request.userUID);
                 UserService.setUpConnectedBabylonUser(
                     userUID: ConnectedBabylonUser().userUID);
-                _requests = UserService.getRequests();
+                _requests = UserService.getConnectionsRequests();
               });
             },
           ),
@@ -176,7 +176,7 @@ class MyFriendsState extends State<MyFriends> {
               child: Text("Yes"),
               onPressed: () {
                 setState(() {
-                  UserService.removeConnection(
+                  UserService.removeConnectionToUser(
                       connectionUID: connection.userUID);
                   UserService.setUpConnectedBabylonUser(
                       userUID: ConnectedBabylonUser().userUID);
