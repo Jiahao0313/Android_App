@@ -8,11 +8,14 @@ import "package:firebase_auth/firebase_auth.dart";
 import "package:firebase_storage/firebase_storage.dart";
 
 class EventService {
-  static Future<List<Event>> getEvents() async {
+  static Future<List<Event>> getUpcomingEvents() async {
     final List<Event> result = List.empty(growable: true);
     try {
       final db = FirebaseFirestore.instance;
-      final snapShot = await db.collection("events").get();
+      final snapShot = await db
+          .collection("events")
+          .where("date", isGreaterThan: Timestamp.now())
+          .get();
       await Future.forEach(snapShot.docs, (final snapShot) async {
         List<String> attendeeIDs = [];
         final event = snapShot.data();

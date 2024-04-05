@@ -19,7 +19,7 @@ class EventsScreen extends StatefulWidget {
 class _EventsScreenState extends State<EventsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final Future<List<Event>> _allEvents = EventService.getEvents();
+  final Future<List<Event>> _allEvents = EventService.getUpcomingEvents();
   final Future<List<Event>> _myEvents =
       EventService.getListedEventsOfUser(uuid: ConnectedBabylonUser().userUID);
 
