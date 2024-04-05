@@ -66,10 +66,7 @@ class _EventsScreenState extends State<EventsScreen>
         backgroundColor: Colors.green,
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: "UPCOMING EVENTS"),
-            Tab(text: "MY EVENTS"),
-          ],
+          tabs: const [Tab(text: "UPCOMING EVENTS"), Tab(text: "MY EVENTS")],
           indicatorColor:
               Colors.white, // Color of the indicator of selected tab
           labelColor: Colors.white, // Color of the text
@@ -92,16 +89,35 @@ class _EventsScreenState extends State<EventsScreen>
             final AsyncSnapshot<List<Event>> snapshot) {
           List<Widget> children;
           if (snapshot.hasData) {
-            children = <Widget>[
-              Padding(
-                padding: EdgeInsets.only(left: 16, top: 16),
-                child: Text("Upcoming events",
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-              ...snapshot.data!.map((final anEvent) => _buildEventCard(anEvent))
-            ];
+            if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+              children = <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(left: 16, top: 16),
+                  child: Text("Upcoming events",
+                      textAlign: TextAlign.left,
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+                ...snapshot.data!
+                    .map((final anEvent) => _buildEventCard(anEvent))
+              ];
+            } else {
+              children = <Widget>[
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        top: 20.0), // Adjust the top margin here
+                    child: Text(
+                      "Event calendar is empty at the moment. Stay tuned for announcements! 📆",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ];
+            }
           } else if (snapshot.hasError) {
             children = <Widget>[
               const Icon(
@@ -153,16 +169,35 @@ class _EventsScreenState extends State<EventsScreen>
             final AsyncSnapshot<List<Event>> snapshot) {
           List<Widget> children;
           if (snapshot.hasData) {
-            children = <Widget>[
-              Padding(
-                padding: EdgeInsets.only(left: 16, top: 16),
-                child: Text("Upcoming events",
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-              ...snapshot.data!.map((final anEvent) => _buildEventCard(anEvent))
-            ];
+            if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+              children = <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(left: 16, top: 16),
+                  child: Text("Upcoming events",
+                      textAlign: TextAlign.left,
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+                ...snapshot.data!
+                    .map((final anEvent) => _buildEventCard(anEvent))
+              ];
+            } else {
+              children = <Widget>[
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        top: 20.0), // Adjust the top margin here
+                    child: Text(
+                      "Your event list is empty! Time to plan something fun. 🎉",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ];
+            }
           } else if (snapshot.hasError) {
             children = <Widget>[
               const Icon(
