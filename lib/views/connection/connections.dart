@@ -539,7 +539,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16.0)),
                                     SizedBox(height: 5),
-                                    Text(person.about!,
+                                    Text(person.about ?? "",
                                         style: TextStyle(fontSize: 14.0)),
                                   ],
                                 ),
@@ -558,7 +558,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                                       person,
                                       pressedProfileButton),
                                   _buttonOption(
-                                      person.friendRequestsUIDs!.any(
+                                      person.conectionRequestsUIDs!.any(
                                               (final userUID) =>
                                                   userUID ==
                                                   ConnectedBabylonUser()
@@ -647,7 +647,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     setState(() {
       searchResults
           .firstWhere((final search) => babylonUser.userUID == search.userUID)
-          .friendRequestsUIDs!
+          .conectionRequestsUIDs!
           .add(ConnectedBabylonUser().userUID);
     });
   }

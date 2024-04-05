@@ -14,8 +14,8 @@ class BabylonUser {
   List<Event>? listedEvents = [];
   List<String>? listedEventsUIDs = [];
 
-  List<BabylonUser>? friendRequests = [];
-  List<String>? friendRequestsUIDs = [];
+  List<BabylonUser>? conectionRequests = [];
+  List<String>? conectionRequestsUIDs = [];
 
   List<BabylonUser>? listedConnections = [];
   List<String>? listedConnectionsUIDs = [];
@@ -35,6 +35,6 @@ class BabylonUser {
       this.listedEventsUIDs,
       this.listedConnections,
       this.listedConnectionsUIDs,
-      this.friendRequests,
-      this.friendRequestsUIDs});
+      this.conectionRequests,
+      this.conectionRequestsUIDs});
 }

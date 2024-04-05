@@ -104,8 +104,10 @@ class UserService {
     final Map<String, String> userInfo = {};
 
     try {
-      final List<String> eventsLists = List.empty(growable: true);
-      List<String> connectionsList = [];
+      List<String> eventsListsUIDs = [];
+      List<String> connectionsListUIDs = [];
+      List<String> connectionRequestsListUIDs = [];
+
       final db = FirebaseFirestore.instance;
       final docUser = await db.collection("users").doc(userUID).get();
       final userData = docUser.data();
@@ -126,18 +128,17 @@ class UserService {
           : "";
 
       if (userData.containsKey("connections")) {
-        connectionsList = List<String>.from(userData["connections"]);
+        connectionsListUIDs = List<String>.from(userData["connections"]);
       }
 
-      final docsListedEvents = await db
-          .collection("users")
-          .doc(userUID)
-          .collection("listedEvents")
-          .get();
+      if (userData.containsKey("listedEvents")) {
+        eventsListsUIDs = List<String>.from(userData["listedEvents"]);
+      }
 
-      await Future.forEach(docsListedEvents.docs, (final snapShot) async {
-        eventsLists.add(snapShot.reference.id);
-      });
+      if (userData.containsKey("connectionRequests")) {
+        connectionRequestsListUIDs =
+            List<String>.from(userData["connectionRequests"]);
+      }
 
       result = BabylonUser.withData(
         userUID: userInfo["UUID"]!,
@@ -147,9 +148,12 @@ class UserService {
         originCountry: userInfo["country"]!,
         dateOfBirth: userInfo["birthDate"]!,
         imagePath: userInfo["imgURL"]!,
-        listedEventsUIDs: eventsLists,
-        listedConnectionsUIDs: connectionsList,
-        friendRequests: [],
+        listedEvents: [],
+        listedEventsUIDs: eventsListsUIDs,
+        listedConnections: [],
+        listedConnectionsUIDs: connectionsListUIDs,
+        conectionRequests: [],
+        conectionRequestsUIDs: connectionRequestsListUIDs,
       );
       print(userData);
     } catch (e) {
@@ -180,33 +184,38 @@ class UserService {
       final db = FirebaseFirestore.instance;
       final querySnapshot = await db.collection("users").limit(20).get();
       for (final doc in querySnapshot.docs) {
-        final data = doc.data();
-        final List<String> eventsLists = [];
-        final List<String> connectionsLists = [];
-        final List<String> friendRequestsList = List.empty(growable: true);
+        final userData = doc.data();
+        List<String> eventsListsUIDs = [];
+        List<String> connectionsListUIDs = [];
+        List<String> connectionRequestsListUIDs = [];
 
-        final docsListedFriendRequests = await db
-            .collection("users")
-            .doc(doc.id)
-            .collection("requests")
-            .get();
+        if (userData.containsKey("connections")) {
+          connectionsListUIDs = List<String>.from(userData["connections"]);
+        }
 
-        await Future.forEach(
-            docsListedFriendRequests.docs,
-            (final snapShot) async =>
-                friendRequestsList.add(snapShot.reference.id));
+        if (userData.containsKey("listedEvents")) {
+          eventsListsUIDs = List<String>.from(userData["listedEvents"]);
+        }
+
+        if (userData.containsKey("connectionRequests")) {
+          connectionRequestsListUIDs =
+              List<String>.from(userData["connectionRequests"]);
+        }
 
         final user = BabylonUser.withData(
           userUID: doc.id,
-          fullName: data["Name"] ?? "",
-          email: data["Email Address"] ?? "",
-          about: data["About"] ?? "",
-          originCountry: data["Country of Origin"] ?? "",
-          dateOfBirth: data["Date of Birth"] ?? "",
-          imagePath: data["ImageUrl"] ?? "",
-          listedEventsUIDs: eventsLists,
-          listedConnectionsUIDs: connectionsLists,
-          friendRequests: [],
+          fullName: userData["Name"] ?? "",
+          email: userData["Email Address"] ?? "",
+          about: userData["About"] ?? "",
+          originCountry: userData["Country of Origin"] ?? "",
+          dateOfBirth: userData["Date of Birth"] ?? "",
+          imagePath: userData["ImageUrl"] ?? "",
+          listedEvents: [],
+          listedEventsUIDs: eventsListsUIDs,
+          listedConnections: [],
+          listedConnectionsUIDs: connectionsListUIDs,
+          conectionRequests: [],
+          conectionRequestsUIDs: connectionRequestsListUIDs,
         );
         users.add(user);
       }
@@ -228,29 +237,38 @@ class UserService {
           .get();
 
       for (final doc in querySnapshot.docs) {
-        final List<String> friendRequestsList = List.empty(growable: true);
-        final data = doc.data();
+        final userData = doc.data();
+        List<String> eventsListsUIDs = [];
+        List<String> connectionsListUIDs = [];
+        List<String> connectionRequestsListUIDs = [];
 
-        final docsListedFriendRequests = await db
-            .collection("users")
-            .doc(doc.id)
-            .collection("requests")
-            .get();
+        if (userData.containsKey("connections")) {
+          connectionsListUIDs = List<String>.from(userData["connections"]);
+        }
 
-        await Future.forEach(
-            docsListedFriendRequests.docs,
-            (final snapShot) async =>
-                friendRequestsList.add(snapShot.reference.id));
+        if (userData.containsKey("listedEvents")) {
+          eventsListsUIDs = List<String>.from(userData["listedEvents"]);
+        }
+
+        if (userData.containsKey("connectionRequests")) {
+          connectionRequestsListUIDs =
+              List<String>.from(userData["connectionRequests"]);
+        }
 
         final user = BabylonUser.withData(
           userUID: doc.id,
-          fullName: data["Name"] ?? "",
-          email: data["Email Address"] ?? "",
-          about: data["About"] ?? "",
-          originCountry: data["Country of Origin"] ?? "",
-          dateOfBirth: data["Date of Birth"] ?? "",
-          imagePath: data["ImageUrl"] ?? "",
-          friendRequests: [],
+          fullName: userData["Name"] ?? "",
+          email: userData["Email Address"] ?? "",
+          about: userData["About"] ?? "",
+          originCountry: userData["Country of Origin"] ?? "",
+          dateOfBirth: userData["Date of Birth"] ?? "",
+          imagePath: userData["ImageUrl"] ?? "",
+          listedEvents: [],
+          listedEventsUIDs: eventsListsUIDs,
+          listedConnections: [],
+          listedConnectionsUIDs: connectionsListUIDs,
+          conectionRequests: [],
+          conectionRequestsUIDs: connectionRequestsListUIDs,
         );
         searchResults.add(user);
       }
