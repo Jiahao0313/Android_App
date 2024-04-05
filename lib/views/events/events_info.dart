@@ -4,6 +4,7 @@ import "package:babylon_app/models/event.dart";
 import "package:babylon_app/services/event/event_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/events/update_events_info.dart";
+import "package:babylon_app/views/profile/other_profile.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
@@ -137,6 +138,12 @@ class EventInfoState extends State<EventInfoScreen> {
                           text: "Hosted by: ",
                         ),
                         WidgetSpan(
+                            child: InkWell(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (final context) => OtherProfile(
+                                      babylonUser: event.creator))),
                           child: Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 10.0),
@@ -146,7 +153,7 @@ class EventInfoState extends State<EventInfoScreen> {
                               radius: 20,
                             ),
                           ),
-                        ),
+                        )),
                         TextSpan(
                           text: event.creator!.fullName,
                         ),
@@ -312,17 +319,18 @@ class EventInfoState extends State<EventInfoScreen> {
                 itemCount: event.attendees!.length,
                 itemBuilder: (final BuildContext context, final int index) {
                   return ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage:
-                          NetworkImage(event.attendees![index].imagePath),
-                      radius: 20,
-                    ),
-                    title: Text(event.attendees![index].fullName,
-                        style: TextStyle(fontSize: 16)),
-                    onTap: () {
-                      // TODO(Enzo): Implement navigation to attendee"s profile
-                    },
-                  );
+                      leading: CircleAvatar(
+                        backgroundImage:
+                            NetworkImage(event.attendees![index].imagePath),
+                        radius: 20,
+                      ),
+                      title: Text(event.attendees![index].fullName,
+                          style: TextStyle(fontSize: 16)),
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (final context) => OtherProfile(
+                                  babylonUser: event.attendees![index]))));
                 },
               ),
             ),
