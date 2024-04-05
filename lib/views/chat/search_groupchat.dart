@@ -1,8 +1,13 @@
+import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
 import "package:flutter/material.dart";
-import "../../models/chat.dart";
+import "package:babylon_app/models/chat.dart";
+import "package:babylon_app/views/chat/chat_info.dart";
+import "package:babylon_app/views/chat/chat_view.dart";
 
 class SearchGroupChatView extends StatefulWidget {
+  const SearchGroupChatView({super.key});
+
   @override
   _SearchGroupChatViewState createState() => _SearchGroupChatViewState();
 }
@@ -28,7 +33,7 @@ class _SearchGroupChatViewState extends State<SearchGroupChatView> {
 
   }
 
-  void _filterChats(String query) {
+  void _filterChats(final String query) {
     if (query.isEmpty) {
       setState(() => _filteredChats = allChat);
     } else {
@@ -41,7 +46,7 @@ class _SearchGroupChatViewState extends State<SearchGroupChatView> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Search Group Chat"),
@@ -68,7 +73,7 @@ class _SearchGroupChatViewState extends State<SearchGroupChatView> {
                   onPressed: () {
                     setState(() {
                       _searchController.clear();
-                      _filterChats('');
+                      _filterChats("");
                     });
                   },
                 )
@@ -80,19 +85,35 @@ class _SearchGroupChatViewState extends State<SearchGroupChatView> {
       ),
       body: ListView.builder(
         itemCount: _filteredChats.length,
-        itemBuilder: (context, index) {
-          var chat = _filteredChats[index];
+        itemBuilder: (final context, final index) {
+          final chat = _filteredChats[index];
           return ListTile(
-            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            leading: CircleAvatar(
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+            leading: InkWell(
+              onTap: () => chat.adminUID == null || chat.adminUID == ""
+                  ? null
+                  : Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (final context) => ChatInfoView(chat: chat)),
+              ),
+              child: CircleAvatar(
                 backgroundImage:
                 NetworkImage(chat.iconPath!), // Placeholder for group snapshot.
-                radius: 25,
+                radius: 25, // Adjust the size of the CircleAvatar here.
+              ),
             ),
-            title: Text(chat.chatName!, style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text(chat.lastMessage != null ? chat.lastMessage!.message! : ""),
+            title:
+            Text(chat.chatName!, style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(
+                chat.lastMessage == null || chat.lastMessage!.message == null
+                    ? ""
+                    : chat.lastMessage!.message!,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis),
+            trailing: Icon(Icons.chat_bubble_outline, color: Colors.blue),
             onTap: () {
-              // Define la acción al tocar un chat de grupo
+              ChatService.sendGroupChatJoinRequest(chatUID: chat.chatUID, userUID: ConnectedBabylonUser().userUID);
             },
           );
         },
