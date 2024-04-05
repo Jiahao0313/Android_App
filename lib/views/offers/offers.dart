@@ -62,7 +62,7 @@ class _FutureBuilderOffersState extends State<FutureBuilderOffers> {
                   ...snapshot.data!.map((final aOffer) => Card(
                         child: ListTile(
                             leading: Image.network(aOffer.pictureURL!),
-                            title: Text(aOffer.name!),
+                            title: Text(aOffer.name),
                             subtitle:
                                 Text("What you can get: ${aOffer.discount}"),
                             trailing: Icon(Icons.view_list),
@@ -70,7 +70,7 @@ class _FutureBuilderOffersState extends State<FutureBuilderOffers> {
                                   context: context,
                                   builder: (final BuildContext context) {
                                     return AlertDialog(
-                                      title: Text(aOffer.name!),
+                                      title: Text(aOffer.name),
                                       content: Text(
                                           "You can get ${aOffer.discount} at ${aOffer.location}"),
                                       actions: <Widget>[
@@ -143,7 +143,7 @@ class OfferTile extends StatelessWidget {
       context: context,
       builder: (final BuildContext context) {
         return AlertDialog(
-          title: Text(partner.name!),
+          title: Text(partner.name),
           content:
               Text("You can get ${partner.discount} at ${partner.location}"),
           actions: <Widget>[
@@ -164,7 +164,7 @@ class OfferTile extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: FlutterLogo(size: 56.0), // Replace with actual logo
-        title: Text(partner.name!),
+        title: Text(partner.name),
         subtitle: Text("What you can get: ${partner.discount}"),
         trailing: Icon(Icons.view_list),
         onTap: () => _showDetails(context),

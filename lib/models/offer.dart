@@ -1,8 +1,8 @@
 class Offer {
   // Attributes
 
-  String? documentID;
-  String? name;
+  String offerUID;
+  String name;
   String? location;
   String? discount;
   String? pictureURL;
@@ -12,8 +12,8 @@ class Offer {
   // Constructors
 
   Offer(
-      {this.documentID,
-      this.name,
+      {required this.offerUID,
+      required this.name,
       this.location,
       this.discount,
       this.pictureURL,

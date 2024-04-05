@@ -266,7 +266,7 @@ class _EventsScreenState extends State<EventsScreen>
               Text(event.shortDescription!,
                   maxLines: 3, overflow: TextOverflow.ellipsis),
               Text(
-                  "Host: ${event.creator.fullName}"), // Display the host of the event.
+                  "Host: ${event.creator!.fullName}"), // Display the host of the event.
               Text(
                   "Location: ${event.place}"), // Display the location of the event.
             ],

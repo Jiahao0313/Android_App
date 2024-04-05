@@ -5,26 +5,30 @@ class Event {
 
   String eventUID;
   String title;
-  BabylonUser creator;
   String? place;
   DateTime? date;
   String? fullDescription;
   String? shortDescription;
   String? pictureURL;
+
+  BabylonUser? creator;
+  String creatorUID;
+
   List<BabylonUser>? attendees;
-  List<String> attendeesUIDs;
+  List<String>? attendeesUIDs = [];
 
   // Constructors
 
   Event(
       {required this.eventUID,
       required this.title,
-      required this.creator,
       this.place,
       this.date,
       this.fullDescription,
       this.shortDescription,
       this.pictureURL,
-      required this.attendeesUIDs,
+      required this.creatorUID,
+      this.creator,
+      this.attendeesUIDs,
       this.attendees});
 }

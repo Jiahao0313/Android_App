@@ -16,7 +16,7 @@ class OfferService {
             .child(partner["picture"])
             .getDownloadURL();
         result.add(Offer(
-            documentID: snapShot.id,
+            offerUID: snapShot.id,
             name: partner["name"],
             location: partner["location"],
             discount: partner["discount"],

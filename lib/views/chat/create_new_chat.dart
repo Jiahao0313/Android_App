@@ -2,14 +2,11 @@ import "dart:io";
 import "package:babylon_app/services/chat/chat_exceptions.dart";
 import "package:flutter/material.dart";
 import "package:image_picker/image_picker.dart";
-import "package:firebase_auth/firebase_auth.dart";
 import "package:babylon_app/models/babylon_user.dart";
-import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/services/chat/chat_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/connection/connections.dart";
-import "package:babylon_app/views/profile/other_profile.dart";
 
 class GroupChat extends StatefulWidget {
   const GroupChat({super.key});
@@ -20,7 +17,8 @@ class GroupChat extends StatefulWidget {
 
 class _GroupChatState extends State<GroupChat> {
   final TextEditingController _groupNameController = TextEditingController();
-  final TextEditingController _groupDescriptionController = TextEditingController();
+  final TextEditingController _groupDescriptionController =
+      TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   File? _groupImage;
   String? _error = "";
@@ -64,7 +62,7 @@ class _GroupChatState extends State<GroupChat> {
             ),
             title: Text(user.fullName, style: TextStyle(fontSize: 16)),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -76,24 +74,28 @@ class _GroupChatState extends State<GroupChat> {
     _filteredUsers = List.from(_allUsers);
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (final context) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
+              builder:
+                  (final BuildContext context, final StateSetter setState) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: _searchController,
                       decoration: InputDecoration(hintText: "Search user..."),
-                      onChanged: (value) {
+                      onChanged: (final value) {
                         setState(() {
-                          _filteredUsers = _allUsers.where((user) =>
-                              user.fullName.toLowerCase().contains(value.toLowerCase())
-                          ).toList();
+                          _filteredUsers = _allUsers
+                              .where((final user) => user.fullName
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase()))
+                              .toList();
                         });
                       },
                     ),
@@ -101,28 +103,30 @@ class _GroupChatState extends State<GroupChat> {
                       child: _filteredUsers.isEmpty
                           ? Text("No users found")
                           : ListView.separated(
-                        itemCount: _filteredUsers.length,
-                        separatorBuilder: (context, index) => Divider(color: Colors.grey.shade400),
-                        itemBuilder: (context, index) {
-                          final user = _filteredUsers[index];
-                          return ListTile(
-                            leading: CircleAvatar(
-                              backgroundImage: NetworkImage(user.imagePath),
-                              backgroundColor: Colors.grey.shade200,
+                              itemCount: _filteredUsers.length,
+                              separatorBuilder: (final context, final index) =>
+                                  Divider(color: Colors.grey.shade400),
+                              itemBuilder: (final context, final index) {
+                                final user = _filteredUsers[index];
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage:
+                                        NetworkImage(user.imagePath),
+                                    backgroundColor: Colors.grey.shade200,
+                                  ),
+                                  title: Text(user.fullName),
+                                  onTap: () {
+                                    if (!_usersUID.contains(user.userUID)) {
+                                      this.setState(() {
+                                        _usersUID.add(user.userUID);
+                                        _addedUsers.add(user);
+                                      });
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                );
+                              },
                             ),
-                            title: Text(user.fullName),
-                            onTap: () {
-                              if (!_usersUID.contains(user.userUID)) {
-                                this.setState(() {
-                                  _usersUID.add(user.userUID);
-                                  _addedUsers.add(user);
-                                });
-                                Navigator.pop(context);
-                              }
-                            },
-                          );
-                        },
-                      ),
                     ),
                   ],
                 );
@@ -134,16 +138,14 @@ class _GroupChatState extends State<GroupChat> {
     );
   }
 
-
   void _filterUsers(final String searchText) {
     setState(() {
-      _filteredUsers = _allUsers.where((final user) =>
-          user.fullName.toLowerCase().contains(searchText.toLowerCase())
-      ).toList();
+      _filteredUsers = _allUsers
+          .where((final user) =>
+              user.fullName.toLowerCase().contains(searchText.toLowerCase()))
+          .toList();
     });
   }
-
-
 
   @override
   Widget build(final BuildContext context) {
@@ -161,8 +163,14 @@ class _GroupChatState extends State<GroupChat> {
               onTap: _pickImage,
               child: CircleAvatar(
                 radius: 80,
-                backgroundImage: _groupImage != null ? FileImage(_groupImage!) : AssetImage("assets/group_placeholder.png") as ImageProvider,
-                child: _groupImage == null ? Icon(Icons.camera_alt, color: Colors.white.withOpacity(0.7), size: 40) : null,
+                backgroundImage: _groupImage != null
+                    ? FileImage(_groupImage!)
+                    : AssetImage("assets/group_placeholder.png")
+                        as ImageProvider,
+                child: _groupImage == null
+                    ? Icon(Icons.camera_alt,
+                        color: Colors.white.withOpacity(0.7), size: 40)
+                    : null,
               ),
             ),
             Center(
@@ -170,7 +178,8 @@ class _GroupChatState extends State<GroupChat> {
                 padding: const EdgeInsets.only(top: 10),
                 child: TextButton(
                   onPressed: _pickImage,
-                  child: Text("Select a Photo", style: TextStyle(fontSize: 18, color: Colors.green)),
+                  child: Text("Select a Photo",
+                      style: TextStyle(fontSize: 18, color: Colors.green)),
                 ),
               ),
             ),
@@ -179,7 +188,8 @@ class _GroupChatState extends State<GroupChat> {
               controller: _groupNameController,
               decoration: InputDecoration(
                 labelText: "* Group Name",
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 prefixIcon: Icon(Icons.group),
               ),
             ),
@@ -188,7 +198,8 @@ class _GroupChatState extends State<GroupChat> {
               controller: _groupDescriptionController,
               decoration: InputDecoration(
                 labelText: "Description",
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 prefixIcon: Icon(Icons.description),
               ),
               maxLines: 3,
@@ -200,7 +211,8 @@ class _GroupChatState extends State<GroupChat> {
               label: Text("Add People", style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
             ),
@@ -210,7 +222,8 @@ class _GroupChatState extends State<GroupChat> {
               onPressed: () async {
                 try {
                   final BabylonUser currUser = ConnectedBabylonUser();
-                  ChatException.validateUpdateOrCreateForm(chatName: _groupNameController.text,
+                  ChatException.validateUpdateOrCreateForm(
+                      chatName: _groupNameController.text,
                       adminUID: currUser.userUID,
                       chatDescription: _groupDescriptionController.text,
                       image: _groupImage,
@@ -223,7 +236,10 @@ class _GroupChatState extends State<GroupChat> {
                       image: _groupImage,
                       usersUID: _usersUID);
                   if (!mounted) return;
-                  Navigator.push(context, MaterialPageRoute(builder: (final context) => ConnectionsScreen()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (final context) => ConnectionsScreen()));
                 } catch (e) {
                   setState(() {
                     _error = e.toString();
@@ -232,7 +248,8 @@ class _GroupChatState extends State<GroupChat> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
                 padding: EdgeInsets.symmetric(vertical: 14),
               ),
               child: Text("Create", style: TextStyle(fontSize: 20)),

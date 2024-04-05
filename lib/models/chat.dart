@@ -3,22 +3,35 @@ import "package:babylon_app/models/message.dart";
 
 class Chat {
   String chatUID;
-  Message? lastMessage;
+  String? chatName;
   String? adminUID;
   String? iconPath;
-  String? chatName;
-  List<BabylonUser>? users;
-  List<String>? bannedUsersUID;
-  List<String>? sentInvitations;
-  List<String>? joiningRequests;
+  Message? lastMessage;
+
+  List<BabylonUser>? users = [];
+  List<String> usersUIDs = [];
+
+  List<BabylonUser>? bannedUsers = [];
+  List<String>? bannedUsersUIDs = [];
+
+  List<BabylonUser>? sentInvitations = [];
+  List<String>? sentInvitationsUIDs = [];
+
+  List<BabylonUser>? joiningRequests = [];
+  List<String>? joiningRequestsUIDs = [];
 
   Chat(
       {required this.chatUID,
       this.chatName,
       this.adminUID,
-      this.lastMessage,
       this.iconPath,
-      this.bannedUsersUID,
+      this.lastMessage,
+      this.users,
+      required this.usersUIDs,
+      this.bannedUsers,
+      this.bannedUsersUIDs,
       this.sentInvitations,
-      this.joiningRequests});
+      this.sentInvitationsUIDs,
+      this.joiningRequests,
+      this.joiningRequestsUIDs});
 }

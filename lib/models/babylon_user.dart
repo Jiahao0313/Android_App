@@ -1,17 +1,24 @@
+import "package:babylon_app/models/event.dart";
+
 class BabylonUser {
   // Attributes
 
   String userUID = "";
   String fullName = "";
   String email = "";
+  String imagePath = "";
   String? dateOfBirth;
   String? originCountry;
   String? about;
-  String imagePath = "";
-  List<String>? listedEvents = [];
-  List<String>? listedConnections = [];
-  List<String>? friendRequests = [];
 
+  List<Event>? listedEvents = [];
+  List<String>? listedEventsUIDs = [];
+
+  List<BabylonUser>? friendRequests = [];
+  List<String>? friendRequestsUIDs = [];
+
+  List<BabylonUser>? listedConnections = [];
+  List<String>? listedConnectionsUIDs = [];
 
   // Constructors
 
@@ -20,11 +27,14 @@ class BabylonUser {
       {required this.userUID,
       required this.fullName,
       required this.email,
-      this.about,
-      this.originCountry,
-      this.dateOfBirth,
       required this.imagePath,
+      this.dateOfBirth,
+      this.originCountry,
+      this.about,
       this.listedEvents,
+      this.listedEventsUIDs,
       this.listedConnections,
-      required this.friendRequests});
+      this.listedConnectionsUIDs,
+      this.friendRequests,
+      this.friendRequestsUIDs});
 }

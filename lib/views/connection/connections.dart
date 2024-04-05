@@ -365,27 +365,46 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
               Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(title,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold)),
               ),
               FutureBuilder<List<Chat>>(
                 future: _myChats,
-                builder: (BuildContext context, AsyncSnapshot<List<Chat>> snapshot) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<List<Chat>> snapshot) {
                   List<Widget> children;
                   if (snapshot.hasData) {
                     final List<Chat> filteredChats = isGroupChats
-                        ? snapshot.data!.where((aChat) => aChat.adminUID != "" && aChat.adminUID != null).toList()
-                        : snapshot.data!.where((aChat) => aChat.adminUID == null || aChat.adminUID == "").toList();
-                    children = filteredChats.map((aChat) => _buildChat(chat: aChat)).toList();
+                        ? snapshot.data!
+                            .where((aChat) =>
+                                aChat.adminUID != "" && aChat.adminUID != null)
+                            .where((final aChat) => !aChat.bannedUsersUIDs!.any(
+                                (final aBannedUserUID) =>
+                                    aBannedUserUID ==
+                                    ConnectedBabylonUser().userUID))
+                            .toList()
+                        : snapshot.data!
+                            .where((aChat) =>
+                                aChat.adminUID == null || aChat.adminUID == "")
+                            .toList();
+                    children = filteredChats
+                        .map((aChat) => _buildChat(chat: aChat))
+                        .toList();
                   } else if (snapshot.hasError) {
                     children = <Widget>[
                       Icon(Icons.error_outline, color: Colors.red, size: 60),
-                      Padding(padding: const EdgeInsets.only(top: 16), child: Text("Error: ${snapshot.error}")),
+                      Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Text("Error: ${snapshot.error}")),
                     ];
                   } else {
                     children = <Widget>[
                       Padding(
                         padding: EdgeInsets.only(top: 16),
-                        child: CircularProgressIndicator(color: Color(0xFF006400)),
+                        child:
+                            CircularProgressIndicator(color: Color(0xFF006400)),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 16),
@@ -404,7 +423,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
               right: 16,
               child: FloatingActionButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => GroupChat()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => GroupChat()));
                 },
                 backgroundColor: Colors.blue,
                 child: Icon(Icons.add),
@@ -430,7 +450,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                 child: IconButton(
                   icon: Icon(Icons.search, color: Colors.white),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (final context) => SearchGroupChatView()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (final context) => SearchGroupChatView()));
                   },
                 ),
               ),
@@ -439,7 +462,6 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
       ),
     );
   }
-
 
   Widget _buildChat({required final Chat chat}) {
     return ListTile(
@@ -460,12 +482,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
       ),
       title:
           Text(chat.chatName!, style: TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(
-          chat.lastMessage == null || chat.lastMessage!.message == null
-              ? ""
-              : chat.lastMessage!.message!,
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis),
+      subtitle: Text(chat.lastMessage == null ? "" : chat.lastMessage!.message,
+          maxLines: 3, overflow: TextOverflow.ellipsis),
       trailing: Icon(Icons.chat_bubble_outline, color: Colors.blue),
       onTap: () {
         Navigator.push(
@@ -540,7 +558,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                                       person,
                                       pressedProfileButton),
                                   _buttonOption(
-                                      person.friendRequests!.any(
+                                      person.friendRequestsUIDs!.any(
                                               (final userUID) =>
                                                   userUID ==
                                                   ConnectedBabylonUser()
@@ -629,7 +647,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     setState(() {
       searchResults
           .firstWhere((final search) => babylonUser.userUID == search.userUID)
-          .friendRequests!
+          .friendRequestsUIDs!
           .add(ConnectedBabylonUser().userUID);
     });
   }

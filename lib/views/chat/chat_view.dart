@@ -161,13 +161,13 @@ class _ChatViewState extends State<ChatView> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        message.message!,
+                        message.message,
                         style: TextStyle(fontSize: 16),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
                         child: Text(
-                          "${DateFormat("dd MMMM yyyy").format(message.time!.toDate())} at ${DateFormat("hh:mm aaa").format(message.time!.toDate())}",
+                          "${DateFormat("dd MMMM yyyy").format(message.time.toDate())} at ${DateFormat("hh:mm aaa").format(message.time.toDate())}",
                           style: TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ),

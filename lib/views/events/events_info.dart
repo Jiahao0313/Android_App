@@ -142,13 +142,13 @@ class EventInfoState extends State<EventInfoScreen> {
                                 const EdgeInsets.symmetric(horizontal: 10.0),
                             child: CircleAvatar(
                               backgroundImage:
-                                  NetworkImage(event.creator.imagePath),
+                                  NetworkImage(event.creator!.imagePath),
                               radius: 20,
                             ),
                           ),
                         ),
                         TextSpan(
-                          text: event.creator.fullName,
+                          text: event.creator!.fullName,
                         ),
                       ],
                     ),
@@ -181,7 +181,7 @@ class EventInfoState extends State<EventInfoScreen> {
                             style: TextStyle(fontSize: 18))),
                   // Section for people attending the event.
                   if (_hasDataLoaded) _buildPeopleAttendingSection(context),
-                  if (event.creator.userUID == ConnectedBabylonUser().userUID)
+                  if (event.creator!.userUID == ConnectedBabylonUser().userUID)
                     _buildEditButton(context),
                 ],
               ),

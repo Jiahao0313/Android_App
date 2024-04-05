@@ -41,10 +41,10 @@ class _ChatInfoViewState extends State<ChatInfoView> {
     final users = await ChatService.getChatUsers(chatUID: chat.chatUID);
     final List<BabylonUser> joiningRequestsData =
         await UserService.getBabylonUsersFromUIDs(
-            userUIDList: chat.joiningRequests);
+            userUIDList: chat.joiningRequestsUIDs);
     final List<BabylonUser> sentInvitationsData =
         await UserService.getBabylonUsersFromUIDs(
-            userUIDList: chat.sentInvitations);
+            userUIDList: chat.sentInvitationsUIDs);
     setState(() {
       chat.users = users;
       hasUsersLoaded = true;
@@ -440,7 +440,7 @@ class _ChatInfoViewState extends State<ChatInfoView> {
   }
 
   Widget _buildBannedParticipantsList(final BuildContext context) {
-    final List<BabylonUser> bannedUsers = chat.bannedUsersUID!
+    final List<BabylonUser> bannedUsers = chat.bannedUsersUIDs!
         .map((final aBannedUserUID) => chat.users!
             .firstWhere((final aUser) => aUser.userUID == aBannedUserUID))
         .toList();
@@ -499,10 +499,10 @@ class _ChatInfoViewState extends State<ChatInfoView> {
               onPressed: () {
                 ChatService.addUserToGroupChatBanList(
                     userUID: participant.userUID, chatUID: chatUID);
-                if (!chat.bannedUsersUID!.contains(participant.userUID)) {
+                if (!chat.bannedUsersUIDs!.contains(participant.userUID)) {
                   setState(() {
-                    chat.bannedUsersUID = [
-                      ...chat.bannedUsersUID!,
+                    chat.bannedUsersUIDs = [
+                      ...chat.bannedUsersUIDs!,
                       participant.userUID
                     ];
                   });
@@ -538,7 +538,7 @@ class _ChatInfoViewState extends State<ChatInfoView> {
                 ChatService.removeUserOfGroupChatBanList(
                     userUID: participant.userUID, chatUID: chatUID);
                 setState(() {
-                  chat.bannedUsersUID = chat.bannedUsersUID!
+                  chat.bannedUsersUIDs = chat.bannedUsersUIDs!
                       .where((final aBannedUID) =>
                           aBannedUID != participant.userUID)
                       .toList();

@@ -33,6 +33,7 @@ class EventService {
         result.add(Event(
             eventUID: snapShot.reference.id,
             title: event["title"] ?? "" ?? "",
+            creatorUID: event["creator"],
             creator: creator!,
             place: event["place"] ?? "",
             date: (event["date"] as Timestamp).toDate(),
@@ -71,6 +72,7 @@ class EventService {
         return Event(
             eventUID: eventSnapshot.id,
             creator: creator!,
+            creatorUID: eventData["creator"],
             title: eventData["title"] ?? "",
             place: eventData["place"] ?? "",
             date: (eventData["date"] as Timestamp).toDate(),
@@ -92,8 +94,8 @@ class EventService {
       final BabylonUser? babylonUser =
           await UserService.getBabylonUser(userUID: uuid);
 
-      if (babylonUser != null && babylonUser.listedEvents != null) {
-        await Future.forEach(babylonUser.listedEvents!,
+      if (babylonUser != null && babylonUser.listedEventsUIDs != null) {
+        await Future.forEach(babylonUser.listedEventsUIDs!,
             (final anEventUID) async {
           final Event? anEvent = await getEvent(eventUID: anEventUID);
           if (anEvent != null) result.add(anEvent);

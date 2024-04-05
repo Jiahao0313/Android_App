@@ -61,7 +61,7 @@ class _FutureBuilderNewsState extends State<FutureBuilderNews> {
                   ),
                   ...snapshot.data!.map((final aPost) => GestureDetector(
                         onTap: () => goToUrl(
-                            "https://babylonradio.com/${aPost.url!}"), // Acción al tocar la tarjeta completa.
+                            "https://babylonradio.com/${aPost.url}"), // Acción al tocar la tarjeta completa.
                         child: Card(
                           margin: EdgeInsets.all(16),
                           child: Row(
@@ -74,8 +74,7 @@ class _FutureBuilderNewsState extends State<FutureBuilderNews> {
                                       BorderRadius.circular(20), // Image border
                                   child: SizedBox.fromSize(
                                     size: Size.fromRadius(50), // Image radius
-                                    child: Image.network(
-                                        aPost.featuredImageURL!,
+                                    child: Image.network(aPost.featuredImageURL,
                                         fit: BoxFit.cover, errorBuilder:
                                             (final BuildContext context,
                                                 final Object exception,
@@ -93,12 +92,12 @@ class _FutureBuilderNewsState extends State<FutureBuilderNews> {
                                 padding: EdgeInsets.all(16),
                                 child: Column(children: [
                                   Text(
-                                    aPost.title!,
+                                    aPost.title,
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  Text(stripHtml(aPost.excerpt!),
+                                  Text(stripHtml(aPost.excerpt),
                                       style: TextStyle(fontSize: 12),
                                       maxLines: 3,
                                       overflow: TextOverflow.ellipsis),
@@ -107,7 +106,7 @@ class _FutureBuilderNewsState extends State<FutureBuilderNews> {
                                     heightFactor: 1.4,
                                     child: TextButton(
                                       onPressed: () => goToUrl(
-                                          "https://babylonradio.com/${aPost.url!}"),
+                                          "https://babylonradio.com/${aPost.url}"),
                                       style: TextButton.styleFrom(
                                           foregroundColor: Colors.white,
                                           elevation: 2,

@@ -25,7 +25,7 @@ class ChatService {
         final List<Message> messages = [];
         for (final messageDoc in querySnapshot.docs) {
           messages.add(Message(
-            messageDocumentID: messageDoc.id,
+            messageUID: messageDoc.id,
             message: messageDoc["message"],
             time: messageDoc["time"],
             senderUID: messageDoc["sender"],
@@ -333,13 +333,16 @@ class ChatService {
               adminUID: chatData["admin"],
               chatName: chatData["chatName"],
               iconPath: imageUrl,
-              bannedUsersUID: chatData.containsKey("bannedUsers")
+              usersUIDs: chatData.containsKey("users")
+                  ? List<String>.from(chatData["users"])
+                  : [],
+              bannedUsersUIDs: chatData.containsKey("bannedUsers")
                   ? List<String>.from(chatData["bannedUsers"])
                   : [],
-              joiningRequests: chatData.containsKey("joiningRequests")
+              joiningRequestsUIDs: chatData.containsKey("joiningRequests")
                   ? List<String>.from(chatData["joiningRequests"])
                   : [],
-              sentInvitations: chatData.containsKey("sentInvitations")
+              sentInvitationsUIDs: chatData.containsKey("sentInvitations")
                   ? List<String>.from(chatData["sentInvitations"])
                   : [],
               lastMessage: chatData.containsKey("lastMessage") &&
@@ -363,6 +366,9 @@ class ChatService {
               adminUID: chatData["admin"],
               chatName: otherUser!.fullName,
               iconPath: otherUser.imagePath,
+              usersUIDs: chatData.containsKey("users")
+                  ? List<String>.from(chatData["users"])
+                  : [],
               lastMessage: chatData.containsKey("lastMessage") &&
                       chatData.containsKey("lastMessageTime") &&
                       chatData.containsKey("lastSender") &&

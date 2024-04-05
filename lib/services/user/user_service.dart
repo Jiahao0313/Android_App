@@ -140,16 +140,16 @@ class UserService {
       });
 
       result = BabylonUser.withData(
-          userUID: userInfo["UUID"]!,
-          fullName: userInfo["name"]!,
-          email: userInfo["email"]!,
-          about: userInfo["about"]!,
-          originCountry: userInfo["country"]!,
-          dateOfBirth: userInfo["birthDate"]!,
-          imagePath: userInfo["imgURL"]!,
-          listedEvents: eventsLists,
-          listedConnections: connectionsList,
-          friendRequests: [],
+        userUID: userInfo["UUID"]!,
+        fullName: userInfo["name"]!,
+        email: userInfo["email"]!,
+        about: userInfo["about"]!,
+        originCountry: userInfo["country"]!,
+        dateOfBirth: userInfo["birthDate"]!,
+        imagePath: userInfo["imgURL"]!,
+        listedEventsUIDs: eventsLists,
+        listedConnectionsUIDs: connectionsList,
+        friendRequests: [],
       );
       print(userData);
     } catch (e) {
@@ -191,21 +191,23 @@ class UserService {
             .collection("requests")
             .get();
 
-        await Future.forEach(docsListedFriendRequests.docs,
-                (final snapShot) async => friendRequestsList.add(snapShot.reference.id));
-
+        await Future.forEach(
+            docsListedFriendRequests.docs,
+            (final snapShot) async =>
+                friendRequestsList.add(snapShot.reference.id));
 
         final user = BabylonUser.withData(
-            userUID: doc.id,
-            fullName: data["Name"] ?? "",
-            email: data["Email Address"] ?? "",
-            about: data["About"] ?? "",
-            originCountry: data["Country of Origin"] ?? "",
-            dateOfBirth: data["Date of Birth"] ?? "",
-            imagePath: data["ImageUrl"] ?? "",
-            listedEvents: eventsLists,
-            listedConnections: connectionsLists,
-            friendRequests: [],);
+          userUID: doc.id,
+          fullName: data["Name"] ?? "",
+          email: data["Email Address"] ?? "",
+          about: data["About"] ?? "",
+          originCountry: data["Country of Origin"] ?? "",
+          dateOfBirth: data["Date of Birth"] ?? "",
+          imagePath: data["ImageUrl"] ?? "",
+          listedEventsUIDs: eventsLists,
+          listedConnectionsUIDs: connectionsLists,
+          friendRequests: [],
+        );
         users.add(user);
       }
     } catch (e) {
@@ -235,8 +237,10 @@ class UserService {
             .collection("requests")
             .get();
 
-        await Future.forEach(docsListedFriendRequests.docs,
-                (final snapShot) async => friendRequestsList.add(snapShot.reference.id));
+        await Future.forEach(
+            docsListedFriendRequests.docs,
+            (final snapShot) async =>
+                friendRequestsList.add(snapShot.reference.id));
 
         final user = BabylonUser.withData(
           userUID: doc.id,
@@ -260,9 +264,9 @@ class UserService {
     try {
       List<BabylonUser> connections = [];
       final BabylonUser currUser = ConnectedBabylonUser();
-      if (currUser.listedConnections != null) {
+      if (currUser.listedConnectionsUIDs != null) {
         connections = await getBabylonUsersFromUIDs(
-            userUIDList: currUser.listedConnections);
+            userUIDList: currUser.listedConnectionsUIDs);
       }
       connections.sort((final connection1, final connection2) =>
           connection1.fullName.compareTo(connection2.fullName));
@@ -288,14 +292,14 @@ class UserService {
     try {
       final db = FirebaseFirestore.instance;
       final BabylonUser currUser = ConnectedBabylonUser();
-      if (currUser.listedConnections != null) {
+      if (currUser.listedConnectionsUIDs != null) {
         db.collection("users").doc(currUser.userUID).update({
           "connections": FieldValue.arrayRemove([connectionUID])
         });
         db.collection("users").doc(connectionUID).update({
           "connections": FieldValue.arrayRemove([currUser.userUID])
         });
-        ConnectedBabylonUser().listedConnections!.remove(connectionUID);
+        ConnectedBabylonUser().listedConnectionsUIDs!.remove(connectionUID);
       }
     } catch (e) {
       rethrow;
@@ -318,7 +322,7 @@ class UserService {
         db.collection("users").doc(userUID).update({
           "connectionRequests": FieldValue.arrayRemove([requestUID])
         });
-        ConnectedBabylonUser().listedConnections!.add(requestUID);
+        ConnectedBabylonUser().listedConnectionsUIDs!.add(requestUID);
         ConnectedBabylonUser().listedRequests.remove(requestUID);
       }
     } catch (e) {
