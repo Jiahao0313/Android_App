@@ -1,8 +1,7 @@
 import "package:babylon_app/services/auth/auth_service.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
-import "package:babylon_app/views/home.dart"; // Asegúrate de que home.dart esté en el directorio correcto y tenga una clase HomePage
-
+import "package:babylon_app/views/home.dart";
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 

@@ -70,62 +70,70 @@ class _GroupChatState extends State<GroupChat> {
   }
 
   void _showAddParticipantDialog() async {
-
     if (_allUsers.isEmpty) {
       _allUsers = await UserService.getAllBabylonUsers();
     }
     _filteredUsers = List.from(_allUsers);
     showDialog(
       context: context,
-      builder: (final context) {
+      builder: (context) {
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(hintText: "Search user..."),
-                  onChanged: (final value) {
-                    _filterUsers(value);
-                    },
-                ),
-                _filteredUsers.isEmpty
-                    ? Expanded(child: Text("No users found"))
-                    : Expanded(
-                  child: ListView.separated(
-                    itemCount: _filteredUsers.length,
-                    separatorBuilder: (final context, final index) => Divider(color: Colors.grey.shade400),
-                    itemBuilder: (final context, final index) {
-                      final user = _filteredUsers[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(user.imagePath),
-                          backgroundColor: Colors.grey.shade200,
-                        ),
-                        title: Text(user.fullName),
-                        onTap: () {
-                          if (!_usersUID.contains(user.userUID)) {
-                            setState(() {
-                              _usersUID.add(user.userUID);
-                              _addedUsers.add(user);
-                            });
-                            Navigator.pop(context);
-                          }
+            child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(hintText: "Search user..."),
+                      onChanged: (value) {
+                        setState(() {
+                          _filteredUsers = _allUsers.where((user) =>
+                              user.fullName.toLowerCase().contains(value.toLowerCase())
+                          ).toList();
+                        });
+                      },
+                    ),
+                    Expanded(
+                      child: _filteredUsers.isEmpty
+                          ? Text("No users found")
+                          : ListView.separated(
+                        itemCount: _filteredUsers.length,
+                        separatorBuilder: (context, index) => Divider(color: Colors.grey.shade400),
+                        itemBuilder: (context, index) {
+                          final user = _filteredUsers[index];
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: NetworkImage(user.imagePath),
+                              backgroundColor: Colors.grey.shade200,
+                            ),
+                            title: Text(user.fullName),
+                            onTap: () {
+                              if (!_usersUID.contains(user.userUID)) {
+                                this.setState(() {
+                                  _usersUID.add(user.userUID);
+                                  _addedUsers.add(user);
+                                });
+                                Navigator.pop(context);
+                              }
+                            },
+                          );
                         },
-                      );
-                    },
-                  ),
-                ),
-              ],
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         );
       },
     );
   }
+
 
   void _filterUsers(final String searchText) {
     setState(() {
