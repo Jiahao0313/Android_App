@@ -75,6 +75,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     required final TextEditingController controller,
     required final String labelText,
     final bool readOnly = false,
+    final bool mandatory = false,
     final GestureTapCallback? onTap,
   }) {
     return Padding(
@@ -82,7 +83,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-          labelText: labelText,
+          labelText: mandatory ? '$labelText *' : labelText,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5.0),
           ),
@@ -113,14 +114,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         child: Column(
           children: [
             _buildTextField(
-              controller: _nameController,
-              labelText: "Event Name",
-            ),
+                controller: _nameController,
+                labelText: "Event Name",
+                mandatory: true),
 
             _buildTextField(
               controller: TextEditingController(
                   text: _formatDateTime(_selectedDate, _selectedTime)),
               labelText: "Date & Time",
+              mandatory: true,
               readOnly: true,
               onTap: () => _pickDateTime(context),
             ),
@@ -142,13 +144,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
             SizedBox(height: 8.0), // Add spacing between the elements
             _buildTextField(
-              controller: _placeController,
-              labelText: "Location",
-            ),
+                controller: _placeController,
+                labelText: "Location",
+                mandatory: true),
             _buildTextField(
-              controller: _descriptionShortController,
-              labelText: "Short Description",
-            ),
+                controller: _descriptionShortController,
+                labelText: "Short Description"),
             _buildTextField(
               controller: _descriptionController,
               labelText: "Event Description",
