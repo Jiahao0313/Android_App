@@ -372,13 +372,13 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
               ),
               FutureBuilder<List<Chat>>(
                 future: _myChats,
-                builder:
-                    (BuildContext context, AsyncSnapshot<List<Chat>> snapshot) {
+                builder: (final BuildContext context,
+                    final AsyncSnapshot<List<Chat>> snapshot) {
                   List<Widget> children;
                   if (snapshot.hasData) {
                     final List<Chat> filteredChats = isGroupChats
                         ? snapshot.data!
-                            .where((aChat) =>
+                            .where((final aChat) =>
                                 aChat.adminUID != "" && aChat.adminUID != null)
                             .where((final aChat) => !aChat.bannedUsersUIDs!.any(
                                 (final aBannedUserUID) =>
@@ -386,11 +386,11 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                                     ConnectedBabylonUser().userUID))
                             .toList()
                         : snapshot.data!
-                            .where((aChat) =>
+                            .where((final aChat) =>
                                 aChat.adminUID == null || aChat.adminUID == "")
                             .toList();
                     children = filteredChats
-                        .map((aChat) => _buildChat(chat: aChat))
+                        .map((final aChat) => _buildChat(chat: aChat))
                         .toList();
                   } else if (snapshot.hasError) {
                     children = <Widget>[
@@ -423,8 +423,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
               right: 16,
               child: FloatingActionButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => GroupChat()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (final context) => GroupChat()));
                 },
                 backgroundColor: Colors.blue,
                 child: Icon(Icons.add),

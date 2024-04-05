@@ -100,9 +100,6 @@ class UserService {
 
   static Future<BabylonUser?> getBabylonUser(
       {required final String userUID}) async {
-    BabylonUser? result;
-    final Map<String, String> userInfo = {};
-
     try {
       List<String> eventsListsUIDs = [];
       List<String> connectionsListUIDs = [];
@@ -111,55 +108,38 @@ class UserService {
       final db = FirebaseFirestore.instance;
       final docUser = await db.collection("users").doc(userUID).get();
       final userData = docUser.data();
-      userInfo["name"] = userData!.containsKey("Name") ? userData["Name"] : "";
-      userInfo["email"] = userData.containsKey("Email Address")
-          ? userData["Email Address"]
-          : "";
-      userInfo["imgURL"] =
-          userData.containsKey("ImageUrl") ? userData["ImageUrl"] : "";
-      userInfo["UUID"] = docUser.id;
-      userInfo["about"] =
-          userData.containsKey("About") ? userData["About"] : "";
-      userInfo["country"] = userData.containsKey("Country of Origin")
-          ? userData["Country of Origin"]
-          : "";
-      userInfo["birthDate"] = userData.containsKey("Date of Birth")
-          ? userData["Date of Birth"]
-          : "";
 
-      if (userData.containsKey("connections")) {
-        connectionsListUIDs = List<String>.from(userData["connections"]);
+      if (userData != null) {
+        if (userData.containsKey("connections")) {
+          connectionsListUIDs = List<String>.from(userData["connections"]);
+        }
+
+        if (userData.containsKey("listedEvents")) {
+          eventsListsUIDs = List<String>.from(userData["listedEvents"]);
+        }
+
+        if (userData.containsKey("connectionRequests")) {
+          connectionRequestsListUIDs =
+              List<String>.from(userData["connectionRequests"]);
+        }
+
+        return BabylonUser.withData(
+          userUID: docUser.id,
+          fullName: userData["Name"] ?? "",
+          email: userData["Email Address"] ?? "",
+          imagePath: userData["ImageUrl"],
+          about: userData["About"],
+          originCountry: userData["Country of Origin"],
+          dateOfBirth: userData["Date of Birth"],
+          listedEventsUIDs: eventsListsUIDs,
+          listedConnectionsUIDs: connectionsListUIDs,
+          conectionRequestsUIDs: connectionRequestsListUIDs,
+        );
       }
-
-      if (userData.containsKey("listedEvents")) {
-        eventsListsUIDs = List<String>.from(userData["listedEvents"]);
-      }
-
-      if (userData.containsKey("connectionRequests")) {
-        connectionRequestsListUIDs =
-            List<String>.from(userData["connectionRequests"]);
-      }
-
-      result = BabylonUser.withData(
-        userUID: userInfo["UUID"]!,
-        fullName: userInfo["name"]!,
-        email: userInfo["email"]!,
-        about: userInfo["about"]!,
-        originCountry: userInfo["country"]!,
-        dateOfBirth: userInfo["birthDate"]!,
-        imagePath: userInfo["imgURL"]!,
-        listedEvents: [],
-        listedEventsUIDs: eventsListsUIDs,
-        listedConnections: [],
-        listedConnectionsUIDs: connectionsListUIDs,
-        conectionRequests: [],
-        conectionRequestsUIDs: connectionRequestsListUIDs,
-      );
-      print(userData);
+      return null;
     } catch (e) {
-      print(e);
+      rethrow;
     }
-    return result;
   }
 
   static Future<List<BabylonUser>> getBabylonUsersFromUIDs(
@@ -185,6 +165,7 @@ class UserService {
       final querySnapshot = await db.collection("users").limit(20).get();
       for (final doc in querySnapshot.docs) {
         final userData = doc.data();
+
         List<String> eventsListsUIDs = [];
         List<String> connectionsListUIDs = [];
         List<String> connectionRequestsListUIDs = [];
@@ -202,22 +183,18 @@ class UserService {
               List<String>.from(userData["connectionRequests"]);
         }
 
-        final user = BabylonUser.withData(
+        users.add(BabylonUser.withData(
           userUID: doc.id,
           fullName: userData["Name"] ?? "",
           email: userData["Email Address"] ?? "",
-          about: userData["About"] ?? "",
-          originCountry: userData["Country of Origin"] ?? "",
-          dateOfBirth: userData["Date of Birth"] ?? "",
           imagePath: userData["ImageUrl"] ?? "",
-          listedEvents: [],
+          about: userData["About"],
+          originCountry: userData["Country of Origin"],
+          dateOfBirth: userData["Date of Birth"],
           listedEventsUIDs: eventsListsUIDs,
-          listedConnections: [],
           listedConnectionsUIDs: connectionsListUIDs,
-          conectionRequests: [],
           conectionRequestsUIDs: connectionRequestsListUIDs,
-        );
-        users.add(user);
+        ));
       }
     } catch (e) {
       print("Error fetching users: $e");
@@ -255,22 +232,18 @@ class UserService {
               List<String>.from(userData["connectionRequests"]);
         }
 
-        final user = BabylonUser.withData(
+        searchResults.add(BabylonUser.withData(
           userUID: doc.id,
           fullName: userData["Name"] ?? "",
           email: userData["Email Address"] ?? "",
-          about: userData["About"] ?? "",
-          originCountry: userData["Country of Origin"] ?? "",
-          dateOfBirth: userData["Date of Birth"] ?? "",
           imagePath: userData["ImageUrl"] ?? "",
-          listedEvents: [],
+          about: userData["About"],
+          originCountry: userData["Country of Origin"],
+          dateOfBirth: userData["Date of Birth"],
           listedEventsUIDs: eventsListsUIDs,
-          listedConnections: [],
           listedConnectionsUIDs: connectionsListUIDs,
-          conectionRequests: [],
           conectionRequestsUIDs: connectionRequestsListUIDs,
-        );
-        searchResults.add(user);
+        ));
       }
     } catch (e) {
       print("Error searching users: $e");

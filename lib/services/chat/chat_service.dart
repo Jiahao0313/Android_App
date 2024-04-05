@@ -139,9 +139,7 @@ class ChatService {
     try {
       final db = FirebaseFirestore.instance;
       final List<Chat> res = List<Chat>.empty(growable: true);
-      final userChats = await db
-          .collection("chats")
-          .get();
+      final userChats = await db.collection("chats").get();
       await Future.forEach(userChats.docs, (final snapShot) async {
         final chat = await ChatService.getChatFromUID(chatUID: snapShot.id);
         if (chat != null) {
@@ -149,7 +147,10 @@ class ChatService {
         }
       });
 
-      return res.where((final aChat) => aChat.adminUID != null && aChat.adminUID != "").toList();
+      return res
+          .where(
+              (final aChat) => aChat.adminUID != null && aChat.adminUID != "")
+          .toList();
     } catch (e) {
       rethrow;
     }
@@ -162,10 +163,14 @@ class ChatService {
       final db = FirebaseFirestore.instance;
       final chatDoc = await db.collection("chats").doc(chatUID).get();
       final chatData = chatDoc.data();
-      final List<String> userIDList = List<String>.from(chatData!["users"]);
-      await Future.forEach(userIDList, (final userID) async {
-        res.add((await UserService.getBabylonUser(userUID: userID))!);
-      });
+      if (chatData != null && chatData.containsKey("users")) {
+        final List<String> userIDList = List<String>.from(chatData["users"]);
+        await Future.forEach(userIDList, (final userID) async {
+          final BabylonUser? user =
+              await UserService.getBabylonUser(userUID: userID);
+          if (user != null) res.add(user);
+        });
+      }
       return res;
     } catch (e) {
       rethrow;
@@ -361,29 +366,30 @@ class ChatService {
               userUID: List<String>.from(chatData["users"]).firstWhere(
                   (final userListUID) =>
                       userListUID != ConnectedBabylonUser().userUID));
-          return Chat(
-              chatUID: chatSnapshot.id,
-              adminUID: chatData["admin"],
-              chatName: otherUser!.fullName,
-              iconPath: otherUser.imagePath,
-              usersUIDs: chatData.containsKey("users")
-                  ? List<String>.from(chatData["users"])
-                  : [],
-              lastMessage: chatData.containsKey("lastMessage") &&
-                      chatData.containsKey("lastMessageTime") &&
-                      chatData.containsKey("lastSender") &&
-                      chatData["lastMessage"] != "" &&
-                      chatData["lastSender"] != "" &&
-                      chatData["lastMessageTime"] != ""
-                  ? Message(
-                      message: chatData["lastMessage"],
-                      senderUID: chatData["lastSender"],
-                      time: chatData["lastMessageTime"])
-                  : null);
+          if (otherUser != null) {
+            return Chat(
+                chatUID: chatSnapshot.id,
+                adminUID: chatData["admin"],
+                chatName: otherUser.fullName,
+                iconPath: otherUser.imagePath,
+                usersUIDs: chatData.containsKey("users")
+                    ? List<String>.from(chatData["users"])
+                    : [],
+                lastMessage: chatData.containsKey("lastMessage") &&
+                        chatData.containsKey("lastMessageTime") &&
+                        chatData.containsKey("lastSender") &&
+                        chatData["lastMessage"] != "" &&
+                        chatData["lastSender"] != "" &&
+                        chatData["lastMessageTime"] != ""
+                    ? Message(
+                        message: chatData["lastMessage"],
+                        senderUID: chatData["lastSender"],
+                        time: chatData["lastMessageTime"])
+                    : null);
+          }
         }
-      } else {
-        return null;
       }
+      return null;
     } catch (e) {
       rethrow;
     }

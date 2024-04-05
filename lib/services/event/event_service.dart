@@ -71,13 +71,13 @@ class EventService {
 
         return Event(
             eventUID: eventSnapshot.id,
-            creator: creator!,
+            creator: creator,
             creatorUID: eventData["creator"],
             title: eventData["title"] ?? "",
-            place: eventData["place"] ?? "",
+            place: eventData["place"],
             date: (eventData["date"] as Timestamp).toDate(),
-            fullDescription: eventData["fullDescription"] ?? "",
-            shortDescription: eventData["shortDescription"] ?? "",
+            fullDescription: eventData["fullDescription"],
+            shortDescription: eventData["shortDescription"],
             pictureURL: imageUrl,
             attendeesUIDs: attendeeIDs);
       }
