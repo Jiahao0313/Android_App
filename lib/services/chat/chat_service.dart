@@ -101,7 +101,8 @@ class ChatService {
           final Reference referenceImageToUpload =
               referenceDirImages.child(imgName);
           await referenceImageToUpload.putFile(image);
-          newChatData["iconPath"] = "/images/${imgName}";
+          newChatData["iconPath"] =
+              await referenceImageToUpload.getDownloadURL();
         } else {}
         if (usersUID.isNotEmpty) {
           newChatData["users"] = FieldValue.arrayUnion(usersUID);
@@ -328,16 +329,11 @@ class ChatService {
       if (chatData != null) {
         //if is groupchat (has admin)
         if (chatData.containsKey("admin") && chatData["admin"] != "") {
-          final imageUrl = await FirebaseStorage.instance
-              .ref()
-              .child(chatData["iconPath"])
-              .getDownloadURL();
-
           return Chat(
               chatUID: chatSnapshot.id,
               adminUID: chatData["admin"],
               chatName: chatData["chatName"],
-              iconPath: imageUrl,
+              iconPath: chatData["iconPath"],
               usersUIDs: chatData.containsKey("users")
                   ? List<String>.from(chatData["users"])
                   : [],

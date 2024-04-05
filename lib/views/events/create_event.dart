@@ -83,7 +83,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-          labelText: mandatory ? '$labelText *' : labelText,
+          labelText: mandatory ? "$labelText *" : labelText,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5.0),
           ),

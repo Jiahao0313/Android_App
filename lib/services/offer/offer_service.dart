@@ -11,16 +11,13 @@ class OfferService {
 
       await Future.forEach(snapShot.docs, (final snapShot) async {
         final partner = snapShot.data();
-        final imageUrl = await FirebaseStorage.instance
-            .ref()
-            .child(partner["picture"])
-            .getDownloadURL();
+
         result.add(Offer(
             offerUID: snapShot.id,
             name: partner["name"],
             location: partner["location"],
             discount: partner["discount"],
-            pictureURL: imageUrl,
+            pictureURL: partner["picture"],
             fullDescription: partner["fullDescription"],
             shortDescription: partner["shortDescription"]));
       });

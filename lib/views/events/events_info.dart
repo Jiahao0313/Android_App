@@ -143,7 +143,7 @@ class EventInfoState extends State<EventInfoScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (final context) => OtherProfile(
-                                      babylonUser: event.creator))),
+                                      babylonUser: event.creator!))),
                           child: Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 10.0),

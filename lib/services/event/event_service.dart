@@ -24,12 +24,7 @@ class EventService {
         if (event.containsKey("attendees")) {
           attendeeIDs = List<String>.from(event["attendees"]);
         }
-        final imageUrl = event.containsKey("picture")
-            ? await FirebaseStorage.instance
-                .ref()
-                .child(event["picture"])
-                .getDownloadURL()
-            : "";
+
         result.add(Event(
             eventUID: snapShot.reference.id,
             title: event["title"] ?? "" ?? "",
@@ -39,7 +34,7 @@ class EventService {
             date: (event["date"] as Timestamp).toDate(),
             fullDescription: event["fullDescription"] ?? "",
             shortDescription: event["shortDescription"] ?? "",
-            pictureURL: imageUrl,
+            pictureURL: event["picture"] ?? "",
             attendeesUIDs: attendeeIDs));
       });
     } catch (error) {
@@ -57,13 +52,6 @@ class EventService {
       if (eventData != null) {
         final BabylonUser? creator =
             await UserService.getBabylonUser(userUID: eventData["creator"]);
-        String imageUrl = "";
-        if (eventData.keys.contains("picture")) {
-          imageUrl = await FirebaseStorage.instance
-              .ref()
-              .child(eventData["picture"])
-              .getDownloadURL();
-        }
 
         if (eventData.containsKey("attendees")) {
           attendeeIDs = List<String>.from(eventData["attendees"]);
@@ -78,7 +66,7 @@ class EventService {
             date: (eventData["date"] as Timestamp).toDate(),
             fullDescription: eventData["fullDescription"],
             shortDescription: eventData["shortDescription"],
-            pictureURL: imageUrl,
+            pictureURL: eventData["picture"] ?? "",
             attendeesUIDs: attendeeIDs);
       }
       return null;
@@ -153,7 +141,7 @@ class EventService {
         final Reference referenceImageToUpload =
             referenceDirImages.child(imgName);
         await referenceImageToUpload.putFile(image);
-        newEvent["picture"] = "/images/${imgName}";
+        newEvent["picture"] = await referenceImageToUpload.getDownloadURL();
       }
 
       db.collection("events").doc().set(newEvent);
@@ -192,7 +180,7 @@ class EventService {
         final Reference referenceImageToUpload =
             referenceDirImages.child(imgName);
         await referenceImageToUpload.putFile(image);
-        newEventData["picture"] = "/images/${imgName}";
+        newEventData["picture"] = await referenceImageToUpload.getDownloadURL();
       }
 
       db.collection("events").doc(eventUID).update(newEventData);
