@@ -136,6 +136,26 @@ class ChatService {
     }
   }
 
+  static Future<List<Chat>> getAllGroupChats() async {
+    try {
+      final db = FirebaseFirestore.instance;
+      final List<Chat> res = List<Chat>.empty(growable: true);
+      final userChats = await db
+          .collection("chats")
+          .get();
+      await Future.forEach(userChats.docs, (final snapShot) async {
+        final chat = await ChatService.getChatFromUID(chatUID: snapShot.id);
+        if (chat != null) {
+          res.add(chat);
+        }
+      });
+
+      return res.where((final aChat) => aChat.adminUID != null && aChat.adminUID != "").toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   static Future<List<BabylonUser>> getChatUsers(
       {required final String chatUID}) async {
     try {

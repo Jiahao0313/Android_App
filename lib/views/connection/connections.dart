@@ -9,6 +9,7 @@ import "package:babylon_app/views/chat/create_new_chat.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
 import "package:babylon_app/views/chat/chat_view.dart";
+import "../chat/search_groupchat.dart";
 
 // Define ConnectionsScreen as a StatefulWidget to manage dynamic content.
 class ConnectionsScreen extends StatefulWidget {
@@ -355,101 +356,81 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
       margin: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
       elevation: 3.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(title,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              ),
+              FutureBuilder<List<Chat>>(
+                future: _myChats,
+                builder: (BuildContext context, AsyncSnapshot<List<Chat>> snapshot) {
+                  List<Widget> children;
+                  if (snapshot.hasData) {
+                    final List<Chat> filteredChats = isGroupChats
+                        ? snapshot.data!.where((aChat) => aChat.adminUID != "" && aChat.adminUID != null).toList()
+                        : snapshot.data!.where((aChat) => aChat.adminUID == null || aChat.adminUID == "").toList();
+                    children = filteredChats.map((aChat) => _buildChat(chat: aChat)).toList();
+                  } else if (snapshot.hasError) {
+                    children = <Widget>[
+                      Icon(Icons.error_outline, color: Colors.red, size: 60),
+                      Padding(padding: const EdgeInsets.only(top: 16), child: Text("Error: ${snapshot.error}")),
+                    ];
+                  } else {
+                    children = <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: CircularProgressIndicator(color: Color(0xFF006400)),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Text("Loading..."),
+                      ),
+                    ];
+                  }
+                  return Column(children: children);
+                },
+              ),
+            ],
           ),
-          FutureBuilder<List<Chat>>(
-              future: _myChats, // a previously-obtained Future<String> or null
-              builder: (final BuildContext context,
-                  final AsyncSnapshot<List<Chat>> snapshot) {
-                List<Widget> children;
-                if (snapshot.hasData) {
-                  final List<Chat> filteredChats = isGroupChats
-                      ? snapshot.data!
-                          .where((final aChat) =>
-                              aChat.adminUID != "" && aChat.adminUID != null)
-                          .where((final aChat) => !aChat.bannedUsersUID!.any(
-                              (final aBannedUserUID) =>
-                                  aBannedUserUID ==
-                                  ConnectedBabylonUser().userUID))
-                          .toList()
-                      : snapshot.data!
-                          .where((final aChat) =>
-                              aChat.adminUID == null || aChat.adminUID == "")
-                          .toList();
-                  children = <Widget>[
-                    ...filteredChats
-                        .map((final aChat) => _buildChat(chat: aChat))
-                  ];
-                } else if (snapshot.hasError) {
-                  children = <Widget>[
-                    const Icon(
-                      Icons.error_outline,
-                      color: Colors.red,
-                      size: 60,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Text("Error: ${snapshot.error}"),
-                    ),
-                  ];
-                } else {
-                  children = <Widget>[
-                    Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 16),
-                          child: SizedBox(
-                            width: 60,
-                            height: 60,
-                            child: CircularProgressIndicator(
-                                color: Color(0xFF006400)),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 16),
-                          child: Text("Loading..."),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 128),
-                          child: Image.asset("assets/images/logoSquare.png",
-                              height: 185, width: 185),
-                        ),
-                      ],
-                    )
-                  ];
-                }
-                return Column(
-                  children: children,
-                );
-              }),
           if (isGroupChats)
-            Padding(
-              padding: EdgeInsets.only(right: 16.0, bottom: 16.0),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                // Floating action button for creating a new group chat, placed at the bottom right.
-                child: FloatingActionButton(
-                  onPressed: () async {
-                    // BabylonUser? zozz = await UserService.getBabylonUser(
-                    //     "GEWO8J4gCYYMYLwG2OmvXPxD8ah2");
-                    // ChatService.createChat(otherUser: zozz);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (final context) => GroupChat()),
-                    );
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => GroupChat()));
+                },
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.add),
+              ),
+            ),
+          if (isGroupChats)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.search, color: Colors.white),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (final context) => SearchGroupChatView()));
                   },
-                  backgroundColor: Colors.blue,
-                  child: Icon(Icons.add),
                 ),
               ),
             ),
@@ -457,6 +438,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
       ),
     );
   }
+
 
   Widget _buildChat({required final Chat chat}) {
     return ListTile(
