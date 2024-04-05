@@ -252,7 +252,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                     setState(() {
                       UserService.removeConnectionRequest(
                           requestUID: request.userUID);
-                      UserService.setUpConnectedBabylonUser(userUID: ConnectedBabylonUser().userUID);
+                      UserService.setUpConnectedBabylonUser(
+                          userUID: ConnectedBabylonUser().userUID);
                       _requests = UserService.getConnectionsRequests();
                     });
                   },
@@ -539,7 +540,13 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                                       person,
                                       pressedProfileButton),
                                   _buttonOption(
-                                      person.friendRequests!.any((userUID) => userUID == ConnectedBabylonUser().userUID) ? "Pending" : "Send Request",
+                                      person.friendRequests!.any(
+                                              (final userUID) =>
+                                                  userUID ==
+                                                  ConnectedBabylonUser()
+                                                      .userUID)
+                                          ? "Pending"
+                                          : "Send Request",
                                       Icons.person_add,
                                       context,
                                       person,
@@ -620,7 +627,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
   void pressedRequestButton(final BabylonUser babylonUser) {
     UserService.sendConnectionRequest(requestUID: babylonUser.userUID);
     setState(() {
-      searchResults.firstWhere((final search) => babylonUser.userUID == search.userUID).friendRequests!.add(ConnectedBabylonUser().userUID);
+      searchResults
+          .firstWhere((final search) => babylonUser.userUID == search.userUID)
+          .friendRequests!
+          .add(ConnectedBabylonUser().userUID);
     });
   }
 

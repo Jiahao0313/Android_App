@@ -102,8 +102,7 @@ class ChatService {
               referenceDirImages.child(imgName);
           await referenceImageToUpload.putFile(image);
           newChatData["iconPath"] = "/images/${imgName}";
-        } else {
-        }
+        } else {}
         if (usersUID.isNotEmpty) {
           newChatData["users"] = FieldValue.arrayUnion(usersUID);
         }
@@ -384,7 +383,7 @@ class ChatService {
     }
   }
 
-  static Future<List<Chat>>? getChatsFromUIDs({
+  static Future<List<Chat>> getChatsFromUIDs({
     required final List<String>? chatUIDList,
   }) async {
     try {
