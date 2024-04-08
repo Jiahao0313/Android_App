@@ -2,18 +2,25 @@ import "package:babylon_app/services/auth/auth_service.dart";
 import "package:babylon_app/services/firebase_options.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/home.dart";
+import "package:babylon_app/views/loading_inital_Screen.dart";
 import "package:babylon_app/views/register/register1.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:firebase_core/firebase_core.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/views/login/login.dart";
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
-}
 
+  runApp(MaterialApp(
+    home: LoadingScreen(
+      onHomeReady: () async {
+        await UserService.setUpConnectedBabylonUser(userUID: FirebaseAuth.instance.currentUser!.uid);
+      },
+    ),
+  ));
+}
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -34,7 +41,7 @@ class MyApp extends StatelessWidget {
           bodyMedium: TextStyle(fontFamily: "Lato"),
         ),
       ),
-      home: currentUser != null ? HomePage() : LogoScreen(),
+      home: LoadingScreen(),
       routes: {
         "/logo/": (final context) => const LogoScreen(),
         "/register/": (final context) => CreateAccountPage()

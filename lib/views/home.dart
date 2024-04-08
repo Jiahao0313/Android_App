@@ -75,9 +75,9 @@ class _HomePageState extends State<HomePage> {
       endDrawer: PublicDrawer(
         onItemSelected: (final index) {
           setState(() {
-            _selectedIndex = index; // Actualiza el índice seleccionado
+            _selectedIndex = index;
           });
-          Navigator.of(context).pop(); // Cierra el drawer
+          Navigator.of(context).pop();
         },
       ),
       // Your already defined Drawer
@@ -156,7 +156,7 @@ class HomeScreenState extends State<HomeScreen> {
                 backgroundImage: user.imagePath.startsWith("http")
                     ? NetworkImage(user.imagePath)
                     : AssetImage(user.imagePath)
-                        as ImageProvider, // Maneja tanto las URL de la red como los assets locales.
+                        as ImageProvider,
                 radius: 50.0,
                 backgroundColor: Colors.transparent,
               ),
@@ -175,7 +175,7 @@ class HomeScreenState extends State<HomeScreen> {
         _buildUpcomingEventsSection(context),
         _buildForumsParticipationSection(context),
         _buildChatsSection(context),
-        // Agrega más secciones o widgets aquí si es necesario
+
       ],
     );
   }
