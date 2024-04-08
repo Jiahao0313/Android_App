@@ -1,12 +1,12 @@
-import 'package:babylon_app/main.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:babylon_app/views/home.dart';
+import "package:babylon_app/main.dart";
+import "package:flutter/material.dart";
+import "package:firebase_auth/firebase_auth.dart";
+import "package:babylon_app/views/home.dart";
 
 class LoadingScreen extends StatefulWidget {
   final Future<void> Function()? onHomeReady;
 
-  LoadingScreen({this.onHomeReady});
+  const LoadingScreen({super.key, this.onHomeReady});
 
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
@@ -29,18 +29,20 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void _checkUserAndNavigate() {
     final User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (final context) => HomePage()));
     } else {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LogoScreen()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (final context) => LogoScreen()));
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFFDFDFD),
       body: Center(
-        child: Image.asset('assets/images/loading.gif'),
+        child: Image.asset("assets/images/loading.gif"),
       ),
     );
   }

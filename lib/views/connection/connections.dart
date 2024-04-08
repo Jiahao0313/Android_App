@@ -9,7 +9,7 @@ import "package:babylon_app/views/chat/create_new_chat.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
 import "package:babylon_app/views/chat/chat_view.dart";
-import "../chat/search_groupchat.dart";
+import "package:babylon_app/views/chat/search_groupchat.dart";
 
 // Define ConnectionsScreen as a StatefulWidget to manage dynamic content.
 class ConnectionsScreen extends StatefulWidget {
@@ -560,7 +560,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                                       person,
                                       pressedProfileButton),
                                   _buttonOption(
-                                      person.conectionRequestsUIDs!.any(
+                                      person.connectionRequestsUIDs!.any(
                                               (final userUID) =>
                                                   userUID ==
                                                   ConnectedBabylonUser()
@@ -649,7 +649,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     setState(() {
       searchResults
           .firstWhere((final search) => babylonUser.userUID == search.userUID)
-          .conectionRequestsUIDs!
+          .connectionRequestsUIDs!
           .add(ConnectedBabylonUser().userUID);
     });
   }

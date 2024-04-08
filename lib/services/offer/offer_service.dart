@@ -1,6 +1,5 @@
 import "package:babylon_app/models/offer.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
-import "package:firebase_storage/firebase_storage.dart";
 
 class OfferService {
   static Future<List<Offer>> getOffers() async {

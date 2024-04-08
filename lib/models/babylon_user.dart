@@ -1,3 +1,4 @@
+import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/event.dart";
 
 class BabylonUser {
@@ -14,11 +15,20 @@ class BabylonUser {
   List<Event>? listedEvents = [];
   List<String>? listedEventsUIDs = [];
 
-  List<BabylonUser>? conectionRequests = [];
-  List<String>? conectionRequestsUIDs = [];
-
   List<BabylonUser>? listedConnections = [];
   List<String>? listedConnectionsUIDs = [];
+
+  List<BabylonUser>? connectionRequests = [];
+  List<String>? connectionRequestsUIDs = [];
+
+  List<BabylonUser>? sentPendingConnectionRequests = [];
+  List<String>? sentPendingConnectionRequestsUIDs = [];
+
+  List<Chat>? groupChatInvitations = [];
+  List<String>? groupChatInvitationsUIDs = [];
+
+  List<Chat>? groupChatJoinRequests = [];
+  List<String>? groupChatJoinRequestsUIDs = [];
 
   // Constructors
 
@@ -35,6 +45,12 @@ class BabylonUser {
       this.listedEventsUIDs,
       this.listedConnections,
       this.listedConnectionsUIDs,
-      this.conectionRequests,
-      this.conectionRequestsUIDs});
+      this.connectionRequests,
+      this.connectionRequestsUIDs,
+      this.sentPendingConnectionRequests,
+      this.sentPendingConnectionRequestsUIDs,
+      this.groupChatInvitations,
+      this.groupChatInvitationsUIDs,
+      this.groupChatJoinRequests,
+      this.groupChatJoinRequestsUIDs});
 }

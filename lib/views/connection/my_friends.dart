@@ -1,6 +1,8 @@
 // my_friends.dart
 import "package:babylon_app/models/babylon_user.dart";
+import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
+import "package:babylon_app/services/chat/chat_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:flutter/material.dart";
 
@@ -12,8 +14,17 @@ class MyFriends extends StatefulWidget {
 }
 
 class MyFriendsState extends State<MyFriends> {
-  Future<List<BabylonUser?>> _requests = UserService.getConnectionsRequests();
-  Future<List<BabylonUser?>> _connections = UserService.getConnections();
+  Future<List<BabylonUser>> _connectionsRequests =
+      UserService.getConnectionsRequests();
+  Future<List<BabylonUser>> _sentConnectionsRequests =
+      UserService.getSentPendingConnectionsRequests();
+  Future<List<BabylonUser>> _connections = UserService.getConnections();
+  Future<List<Chat>> _groupChatJoinRequests =
+      UserService.getGroupChatJoinRequests(
+          userUID: ConnectedBabylonUser().userUID);
+  Future<List<Chat>> _groupChatInvitationRequests =
+      UserService.getGroupChatInvitations(
+          userUID: ConnectedBabylonUser().userUID);
 
   @override
   Widget build(final BuildContext context) {
@@ -27,34 +38,24 @@ class MyFriendsState extends State<MyFriends> {
         child: Column(
           children: [
             _buildSectionTitle("Friend Requests"),
-            _buildRequestsList(context),
+            _buildConnectionRequestsList(context),
+            _buildSectionTitle("Pending sent friend requests"),
+            _buildPendingSentConnectionRequestsList(context),
             _buildSectionTitle("My Friends"),
             _buildConnectionsList(context),
+            _buildSectionTitle("Group chat invitations"),
+            _buildGroupChatInvitationsList(context),
+            _buildSectionTitle("Group chat join requests"),
+            _buildGroupChatJoinRequestsList(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(final String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          title,
-          style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.green.shade900),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRequestsList(final BuildContext context) {
+  Widget _buildConnectionRequestsList(final BuildContext context) {
     return FutureBuilder(
-        future: _requests,
+        future: _connectionsRequests,
         builder: (final BuildContext context,
             final AsyncSnapshot<List<BabylonUser?>> snapshot) {
           List<Widget> children;
@@ -63,7 +64,7 @@ class MyFriendsState extends State<MyFriends> {
               snapshot.data!.isNotEmpty) {
             children = <Widget>[
               ...snapshot.data!.map((final babylonUser) =>
-                  _buildRequestTile(context, babylonUser))
+                  _buildConnectionRequestTile(context, babylonUser))
             ];
           } else {
             children = <Widget>[];
@@ -74,45 +75,70 @@ class MyFriendsState extends State<MyFriends> {
         });
   }
 
-  Widget _buildRequestTile(
-      final BuildContext context, final BabylonUser? request) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage(request!.imagePath),
-      ),
-      title: Text(request.fullName),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: Icon(Icons.check, color: Colors.green),
-            onPressed: () {
-              // Accept join request action
-              setState(() {
-                UserService.addConnectionToUser(requestUID: request.userUID);
-                UserService.setUpConnectedBabylonUser(
-                    userUID: ConnectedBabylonUser().userUID);
-                _connections = UserService.getConnections();
-                _requests = UserService.getConnectionsRequests();
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.cancel, color: Colors.red),
-            onPressed: () {
-              // Cancel join request action
-              setState(() {
-                UserService.removeConnectionRequest(
-                    requestUID: request.userUID);
-                UserService.setUpConnectedBabylonUser(
-                    userUID: ConnectedBabylonUser().userUID);
-                _requests = UserService.getConnectionsRequests();
-              });
-            },
-          ),
-        ],
-      ),
-    );
+  Widget _buildPendingSentConnectionRequestsList(final BuildContext context) {
+    return FutureBuilder(
+        future: _sentConnectionsRequests,
+        builder: (final BuildContext context,
+            final AsyncSnapshot<List<BabylonUser>> snapshot) {
+          List<Widget> children;
+          if (snapshot.hasData &&
+              snapshot.data != null &&
+              snapshot.data!.isNotEmpty) {
+            children = <Widget>[
+              ...snapshot.data!.map((final user) =>
+                  _buildSentConnectionRequestTile(context, user))
+            ];
+          } else {
+            children = <Widget>[];
+          }
+          return Column(
+            children: children,
+          );
+        });
+  }
+
+  Widget _buildGroupChatInvitationsList(final BuildContext context) {
+    return FutureBuilder(
+        future: _groupChatInvitationRequests,
+        builder: (final BuildContext context,
+            final AsyncSnapshot<List<Chat>> snapshot) {
+          List<Widget> children;
+          if (snapshot.hasData &&
+              snapshot.data != null &&
+              snapshot.data!.isNotEmpty) {
+            children = <Widget>[
+              ...snapshot.data!.map((final chat) =>
+                  _buildsentGroupChatInvitationTile(context, chat))
+            ];
+          } else {
+            children = <Widget>[];
+          }
+          return Column(
+            children: children,
+          );
+        });
+  }
+
+  Widget _buildGroupChatJoinRequestsList(final BuildContext context) {
+    return FutureBuilder(
+        future: _groupChatJoinRequests,
+        builder: (final BuildContext context,
+            final AsyncSnapshot<List<Chat>> snapshot) {
+          List<Widget> children;
+          if (snapshot.hasData &&
+              snapshot.data != null &&
+              snapshot.data!.isNotEmpty) {
+            children = <Widget>[
+              ...snapshot.data!.map(
+                  (final chat) => _buildGroupChatJoinRequestTile(context, chat))
+            ];
+          } else {
+            children = <Widget>[];
+          }
+          return Column(
+            children: children,
+          );
+        });
   }
 
   Widget _buildConnectionsList(final BuildContext context) {
@@ -137,6 +163,183 @@ class MyFriendsState extends State<MyFriends> {
             children: children,
           );
         });
+  }
+
+  Widget _buildSectionTitle(final String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.green.shade900),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConnectionRequestTile(
+      final BuildContext context, final BabylonUser? request) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(request!.imagePath),
+      ),
+      title: Text(request.fullName),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(Icons.check, color: Colors.green),
+            onPressed: () {
+              // Accept join request action
+              setState(() {
+                UserService.addConnectionToUser(requestUID: request.userUID);
+                UserService.setUpConnectedBabylonUser(
+                    userUID: ConnectedBabylonUser().userUID);
+                _connections = UserService.getConnections();
+                _connectionsRequests = UserService.getConnectionsRequests();
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.cancel, color: Colors.red),
+            onPressed: () {
+              // Cancel join request action
+              setState(() {
+                UserService.removeConnectionRequest(
+                    requestUID: request.userUID);
+                UserService.setUpConnectedBabylonUser(
+                    userUID: ConnectedBabylonUser().userUID);
+                _connectionsRequests = UserService.getConnectionsRequests();
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSentConnectionRequestTile(
+      final BuildContext context, final BabylonUser request) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(request.imagePath),
+      ),
+      title: Text(request.fullName),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () async {
+              // Cancel join request action
+              try {
+                // await UserService.cancelGroupChatInvitation(
+                //     chatUID: chat.chatUID, userUID: user.userUID);
+                setState(() {
+                  UserService.setUpConnectedBabylonUser(
+                      userUID: ConnectedBabylonUser().userUID);
+                  _sentConnectionsRequests =
+                      UserService.getSentPendingConnectionsRequests();
+                });
+              } catch (e) {
+                rethrow;
+              }
+            },
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.red, fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupChatJoinRequestTile(
+      final BuildContext context, final Chat request) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(request.iconPath!),
+      ),
+      title: Text(request.chatName!),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () async {
+              // Cancel groupchat join request action
+              try {
+                await ChatService.cancelGroupChatJoinRequest(
+                    chatUID: request.chatUID,
+                    userUID: ConnectedBabylonUser().userUID);
+                setState(() {
+                  UserService.setUpConnectedBabylonUser(
+                      userUID: ConnectedBabylonUser().userUID);
+                  _groupChatJoinRequests = UserService.getGroupChatJoinRequests(
+                      userUID: ConnectedBabylonUser().userUID);
+                });
+              } catch (e) {
+                rethrow;
+              }
+            },
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.red, fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildsentGroupChatInvitationTile(
+      final BuildContext context, final Chat request) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(request.iconPath!),
+      ),
+      title: Text(request.chatName!),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(Icons.check, color: Colors.green),
+            onPressed: () {
+              // Accept join request action
+              setState(() {
+                ChatService.acceptGroupChatInvitation(
+                    userUID: ConnectedBabylonUser().userUID,
+                    chatUID: request.chatUID);
+                UserService.setUpConnectedBabylonUser(
+                    userUID: ConnectedBabylonUser().userUID);
+                _groupChatInvitationRequests =
+                    UserService.getGroupChatInvitations(
+                        userUID: ConnectedBabylonUser().userUID);
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.cancel, color: Colors.red),
+            onPressed: () {
+              // Cancel join request action
+              setState(() {
+                ChatService.declineGroupChatInvitation(
+                    userUID: ConnectedBabylonUser().userUID,
+                    chatUID: request.chatUID);
+                UserService.setUpConnectedBabylonUser(
+                    userUID: ConnectedBabylonUser().userUID);
+                _groupChatInvitationRequests =
+                    UserService.getGroupChatInvitations(
+                        userUID: ConnectedBabylonUser().userUID);
+              });
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildConnectionTile(

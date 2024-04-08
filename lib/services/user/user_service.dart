@@ -1,6 +1,8 @@
 import "dart:async";
 import "package:babylon_app/models/babylon_user.dart";
+import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
+import "package:babylon_app/services/chat/chat_service.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_storage/firebase_storage.dart";
@@ -104,6 +106,9 @@ class UserService {
       List<String> eventsListsUIDs = [];
       List<String> connectionsListUIDs = [];
       List<String> connectionRequestsListUIDs = [];
+      List<String> sentPendingConnectionRequestListUIDs = [];
+      List<String> groupChatInvitationsListUIDs = [];
+      List<String> groupChatJoinRequestsListUIDs = [];
 
       final db = FirebaseFirestore.instance;
       final docUser = await db.collection("users").doc(userUID).get();
@@ -123,6 +128,21 @@ class UserService {
               List<String>.from(userData["connectionRequests"]);
         }
 
+        if (userData.containsKey("sentConnectionRequests")) {
+          sentPendingConnectionRequestListUIDs =
+              List<String>.from(userData["sentConnectionRequests"]);
+        }
+
+        if (userData.containsKey("groupChatInvitations")) {
+          groupChatInvitationsListUIDs =
+              List<String>.from(userData["groupChatInvitations"]);
+        }
+
+        if (userData.containsKey("groupChatJoiningRequests")) {
+          groupChatJoinRequestsListUIDs =
+              List<String>.from(userData["groupChatJoiningRequests"]);
+        }
+
         return BabylonUser.withData(
           userUID: docUser.id,
           fullName: userData["Name"] ?? "",
@@ -133,7 +153,11 @@ class UserService {
           dateOfBirth: userData["Date of Birth"],
           listedEventsUIDs: eventsListsUIDs,
           listedConnectionsUIDs: connectionsListUIDs,
-          conectionRequestsUIDs: connectionRequestsListUIDs,
+          connectionRequestsUIDs: connectionRequestsListUIDs,
+          sentPendingConnectionRequestsUIDs:
+              sentPendingConnectionRequestListUIDs,
+          groupChatInvitationsUIDs: groupChatInvitationsListUIDs,
+          groupChatJoinRequestsUIDs: groupChatJoinRequestsListUIDs,
         );
       }
       return null;
@@ -193,7 +217,7 @@ class UserService {
           dateOfBirth: userData["Date of Birth"],
           listedEventsUIDs: eventsListsUIDs,
           listedConnectionsUIDs: connectionsListUIDs,
-          conectionRequestsUIDs: connectionRequestsListUIDs,
+          connectionRequestsUIDs: connectionRequestsListUIDs,
         ));
       }
     } catch (e) {
@@ -242,7 +266,7 @@ class UserService {
           dateOfBirth: userData["Date of Birth"],
           listedEventsUIDs: eventsListsUIDs,
           listedConnectionsUIDs: connectionsListUIDs,
-          conectionRequestsUIDs: connectionRequestsListUIDs,
+          connectionRequestsUIDs: connectionRequestsListUIDs,
         ));
       }
     } catch (e) {
@@ -271,8 +295,18 @@ class UserService {
     try {
       List<BabylonUser> requests = [];
       requests = await getBabylonUsersFromUIDs(
-          userUIDList: ConnectedBabylonUser().listedRequests);
+          userUIDList: ConnectedBabylonUser().connectionRequestsUIDs);
       return requests;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<List<BabylonUser>> getSentPendingConnectionsRequests() async {
+    try {
+      return await getBabylonUsersFromUIDs(
+          userUIDList:
+              ConnectedBabylonUser().sentPendingConnectionRequestsUIDs);
     } catch (e) {
       rethrow;
     }
@@ -314,7 +348,7 @@ class UserService {
           "connectionRequests": FieldValue.arrayRemove([requestUID])
         });
         ConnectedBabylonUser().listedConnectionsUIDs!.add(requestUID);
-        ConnectedBabylonUser().listedRequests.remove(requestUID);
+        ConnectedBabylonUser().connectionRequestsUIDs!.remove(requestUID);
       }
     } catch (e) {
       rethrow;
@@ -328,7 +362,7 @@ class UserService {
       await db.collection("users").doc(ConnectedBabylonUser().userUID).update({
         "connectionRequests": FieldValue.arrayRemove([requestUID])
       });
-      ConnectedBabylonUser().listedRequests.remove(requestUID);
+      ConnectedBabylonUser().connectionRequestsUIDs!.remove(requestUID);
     } catch (e) {
       rethrow;
     }
@@ -351,23 +385,40 @@ class UserService {
       {required final String userUID}) async {
     try {
       final BabylonUser? babylonUser = await getBabylonUser(userUID: userUID);
-      List<String> connectionRequestsList = [];
-
-      final db = FirebaseFirestore.instance;
-      final docsListedConnectionRequests =
-          await db.collection("users").doc(userUID).get();
-      final listedConnectionRequestsData = docsListedConnectionRequests.data();
-      if (listedConnectionRequestsData != null &&
-          listedConnectionRequestsData.containsKey("connectionRequests")) {
-        connectionRequestsList = List<String>.from(
-            listedConnectionRequestsData["connectionRequests"]);
-      }
       if (babylonUser != null) {
         await ConnectedBabylonUser.setConnectedBabylonUser(
             babylonUser: babylonUser);
       }
-      await ConnectedBabylonUser.setConnectionRequests(
-          connectionRequests: connectionRequestsList);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<List<Chat>> getGroupChatInvitations(
+      {required final String userUID}) async {
+    try {
+      final BabylonUser? babylonUser = await getBabylonUser(userUID: userUID);
+      if (babylonUser != null) {
+        return await ChatService.getChatsFromUIDs(
+            chatUIDList: babylonUser.groupChatInvitationsUIDs);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<List<Chat>> getGroupChatJoinRequests(
+      {required final String userUID}) async {
+    try {
+      final BabylonUser? babylonUser = await getBabylonUser(userUID: userUID);
+      if (babylonUser != null) {
+        return await ChatService.getChatsFromUIDs(
+            chatUIDList: babylonUser.groupChatJoinRequestsUIDs);
+      } else {
+        return [];
+      }
     } catch (e) {
       rethrow;
     }

@@ -3,9 +3,6 @@ import "package:babylon_app/models/babylon_user.dart";
 // Singleton class -> we can have only one user connected so we can manage the instance properly
 
 class ConnectedBabylonUser extends BabylonUser {
-  // Attributes
-  List<String> listedRequests = [];
-
   // Intern constructor
   ConnectedBabylonUser._internal() : super();
 
@@ -17,19 +14,19 @@ class ConnectedBabylonUser extends BabylonUser {
 
   static Future<void> setConnectedBabylonUser(
       {required final BabylonUser babylonUser}) async {
-    _instance.imagePath = babylonUser.imagePath;
-    _instance.email = babylonUser.email;
+    _instance.userUID = babylonUser.userUID;
     _instance.fullName = babylonUser.fullName;
+    _instance.email = babylonUser.email;
+    _instance.imagePath = babylonUser.imagePath;
     _instance.dateOfBirth = babylonUser.dateOfBirth;
     _instance.originCountry = babylonUser.originCountry;
     _instance.about = babylonUser.about;
-    _instance.listedEvents = babylonUser.listedEvents;
-    _instance.userUID = babylonUser.userUID;
-    _instance.listedConnections = babylonUser.listedConnections;
-  }
-
-  static Future<void> setConnectionRequests(
-      {required final List<String> connectionRequests}) async {
-    _instance.listedRequests = connectionRequests;
+    _instance.listedEventsUIDs = babylonUser.listedEventsUIDs;
+    _instance.listedConnectionsUIDs = babylonUser.listedConnectionsUIDs;
+    _instance.connectionRequestsUIDs = babylonUser.connectionRequestsUIDs;
+    _instance.sentPendingConnectionRequestsUIDs =
+        babylonUser.sentPendingConnectionRequestsUIDs;
+    _instance.groupChatInvitationsUIDs = babylonUser.groupChatInvitationsUIDs;
+    _instance.groupChatInvitationsUIDs = babylonUser.groupChatJoinRequestsUIDs;
   }
 }

@@ -3,7 +3,6 @@ import "package:babylon_app/services/chat/chat_service.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/views/chat/chat_info.dart";
-import "package:babylon_app/views/chat/chat_view.dart";
 
 class SearchGroupChatView extends StatefulWidget {
   const SearchGroupChatView({super.key});
