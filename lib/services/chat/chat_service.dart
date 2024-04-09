@@ -201,6 +201,16 @@ class ChatService {
   }
 
 // groupchat invitations
+  static Future<List<BabylonUser>> getGroupChatInvitedUsers(
+      {required final Chat chat}) async {
+    try {
+      return await UserService.getBabylonUsersFromUIDs(
+          userUIDList: chat.sentInvitationsUIDs);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   static Future<void> sendGroupChatInvitation(
       {required final String chatUID, required final String userUID}) async {
     try {
@@ -247,6 +257,16 @@ class ChatService {
   }
 
 // groupchat join requests
+  static Future<List<BabylonUser>> getGroupChatJoinRequestsUsers(
+      {required final Chat chat}) async {
+    try {
+      return await UserService.getBabylonUsersFromUIDs(
+          userUIDList: chat.joiningRequestsUIDs);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   static Future<void> sendGroupChatJoinRequest(
       {required final String chatUID, required final String userUID}) async {
     try {

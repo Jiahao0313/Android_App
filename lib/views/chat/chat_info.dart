@@ -40,11 +40,9 @@ class _ChatInfoViewState extends State<ChatInfoView> {
   void fetchUsersData() async {
     final users = await ChatService.getChatUsers(chatUID: chat.chatUID);
     final List<BabylonUser> joiningRequestsData =
-        await UserService.getBabylonUsersFromUIDs(
-            userUIDList: chat.joiningRequestsUIDs);
+        await ChatService.getGroupChatJoinRequestsUsers(chat: chat);
     final List<BabylonUser> sentInvitationsData =
-        await UserService.getBabylonUsersFromUIDs(
-            userUIDList: chat.sentInvitationsUIDs);
+        await ChatService.getGroupChatInvitedUsers(chat: chat);
     setState(() {
       chat.users = users;
       hasUsersLoaded = true;

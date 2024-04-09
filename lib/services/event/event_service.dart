@@ -189,4 +189,14 @@ class EventService {
       rethrow;
     }
   }
+
+  static Future<List<BabylonUser>> getAttendees(
+      {required final Event event}) async {
+    try {
+      return await UserService.getBabylonUsersFromUIDs(
+          userUIDList: event.attendeesUIDs);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

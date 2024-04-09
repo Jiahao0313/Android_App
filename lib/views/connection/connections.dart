@@ -250,7 +250,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                   onPressed: () {
                     // Placeholder for "Decline" action.
                     setState(() {
-                      UserService.removeConnectionRequest(
+                      UserService.declineConnectionRequest(
                           requestUID: request.userUID);
                       UserService.setUpConnectedBabylonUser(
                           userUID: ConnectedBabylonUser().userUID);

@@ -210,7 +210,7 @@ class MyFriendsState extends State<MyFriends> {
             onPressed: () {
               // Cancel join request action
               setState(() {
-                UserService.removeConnectionRequest(
+                UserService.cancelConnectionRequest(
                     requestUID: request.userUID);
                 UserService.setUpConnectedBabylonUser(
                     userUID: ConnectedBabylonUser().userUID);

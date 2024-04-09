@@ -2,7 +2,6 @@ import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/event.dart";
 import "package:babylon_app/services/event/event_service.dart";
-import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/events/update_events_info.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
 import "package:firebase_auth/firebase_auth.dart";
@@ -32,8 +31,8 @@ class EventInfoState extends State<EventInfoScreen> {
 
   void fetchData() async {
     try {
-      final List<BabylonUser> users = await UserService.getBabylonUsersFromUIDs(
-          userUIDList: event.attendeesUIDs);
+      final List<BabylonUser> users =
+          await EventService.getAttendees(event: event);
       setState(() {
         event.attendees = users;
         _isAttending = event.attendees!.any((final anAttendee) =>

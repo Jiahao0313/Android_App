@@ -355,7 +355,7 @@ class UserService {
     }
   }
 
-  static Future<void> removeConnectionRequest(
+  static Future<void> declineConnectionRequest(
       {required final String requestUID}) async {
     try {
       final db = FirebaseFirestore.instance;
@@ -365,6 +365,25 @@ class UserService {
       await db.collection("users").doc(requestUID).update({
         "sentConnectionRequests":
             FieldValue.arrayRemove([ConnectedBabylonUser().userUID])
+      });
+      ConnectedBabylonUser().connectionRequestsUIDs!.remove(requestUID);
+      ConnectedBabylonUser()
+          .sentPendingConnectionRequestsUIDs!
+          .remove(requestUID);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> cancelConnectionRequest(
+      {required final String requestUID}) async {
+    try {
+      final db = FirebaseFirestore.instance;
+      await db.collection("users").doc(ConnectedBabylonUser().userUID).update({
+        "connectionRequests": FieldValue.arrayRemove([requestUID])
+      });
+      await db.collection("users").doc(ConnectedBabylonUser().userUID).update({
+        "sentConnectionRequests": FieldValue.arrayRemove([requestUID])
       });
       ConnectedBabylonUser().connectionRequestsUIDs!.remove(requestUID);
       ConnectedBabylonUser()
