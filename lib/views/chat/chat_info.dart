@@ -6,6 +6,8 @@ import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
 import "package:flutter/material.dart";
 
+import "package:babylon_app/views/chat/Edit_group_chat.dart";
+
 class ChatInfoView extends StatefulWidget {
   final Chat chat;
   const ChatInfoView({super.key, required this.chat});
@@ -80,14 +82,31 @@ class _ChatInfoViewState extends State<ChatInfoView> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          "This group is for testing the group chat!",
+                          chat.chatDescription!,
                           style: TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
                   ),
                   if (isAdmin)
-                    ElevatedButton.icon(
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (final context) => EditGroupChatScreen(chat: chat)),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                      child: Text("Edit Group Chat Info", style: TextStyle(color: Colors.white)),
+                    ),
+                  SizedBox(height: 10),
+                  ElevatedButton.icon(
                       onPressed: () async {
                         _showAddParticipantDialog(context);
                       },

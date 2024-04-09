@@ -5,6 +5,7 @@ class Chat {
   String chatUID;
   String? chatName;
   String? adminUID;
+  String? chatDescription;
   String? iconPath;
   Message? lastMessage;
 
@@ -24,6 +25,7 @@ class Chat {
       {required this.chatUID,
       this.chatName,
       this.adminUID,
+      this.chatDescription,
       this.iconPath,
       this.lastMessage,
       this.users,

@@ -1,5 +1,4 @@
 import "dart:async";
-
 import "dart:io";
 import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/models/chat.dart";
@@ -7,6 +6,7 @@ import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/message.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
+import "package:firebase_auth/firebase_auth.dart";
 import "package:firebase_storage/firebase_storage.dart";
 
 class ChatService {
@@ -325,6 +325,7 @@ class ChatService {
               chatUID: chatSnapshot.id,
               adminUID: chatData["admin"],
               chatName: chatData["chatName"],
+              chatDescription: chatData["chatDescription"] ?? "",
               iconPath: chatData["iconPath"],
               usersUIDs: chatData.containsKey("users")
                   ? List<String>.from(chatData["users"])
@@ -401,4 +402,37 @@ class ChatService {
       rethrow;
     }
   }
+  static Future<void> updateGroupChat({
+    required final String chatUID,
+    final String? chatName,
+    final File? image,
+    final String? chatDescription,
+  }) async {
+    try {
+      final User currUser = FirebaseAuth.instance.currentUser!;
+      final db = FirebaseFirestore.instance;
+      final Reference referenceRoot = FirebaseStorage.instance.ref();
+      final Reference referenceDirImages = referenceRoot.child("chat_images");
+
+      final newChatData = <String, dynamic>{
+        "chatName": chatName,
+        "adminUID": currUser.uid,
+        "chatDescription": chatDescription,
+      };
+
+      if (image != null) {
+        final String imgName = "${DateTime.now().millisecondsSinceEpoch.toString()}.jpg";
+        final Reference referenceImageToUpload = referenceDirImages.child(imgName);
+        await referenceImageToUpload.putFile(image);
+        newChatData["iconPath"] = await referenceImageToUpload.getDownloadURL();
+      }
+
+      await db.collection("chats").doc(chatUID).update(newChatData);
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
 }
+
+

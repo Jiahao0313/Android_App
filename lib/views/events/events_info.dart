@@ -340,7 +340,7 @@ class EventInfoState extends State<EventInfoScreen> {
                 backgroundColor: Colors.green,
                 child: Icon(Icons.close, color: Colors.white),
                 onPressed: () {
-                  Navigator.of(context).pop(); // Close the bottom sheet
+                  Navigator.of(context).pop();
                 },
               ),
             ),
