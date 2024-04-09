@@ -331,7 +331,7 @@ class _ChatInfoViewState extends State<ChatInfoView> {
                         onPressed: () async {
                           // decline join request action
                           try {
-                            await ChatService.declineGroupChatJoinRequest(
+                            await ChatService.removeGroupChatJoinRequest(
                                 chatUID: chat.chatUID, userUID: user.userUID);
                             setState(() {
                               joiningRequests.removeWhere((final anUser) =>
@@ -365,7 +365,7 @@ class _ChatInfoViewState extends State<ChatInfoView> {
                         onTap: () async {
                           // Cancel join request action
                           try {
-                            await ChatService.cancelGroupChatInvitation(
+                            await ChatService.removeGroupChatInvitation(
                                 chatUID: chat.chatUID, userUID: user.userUID);
                             setState(() {
                               invitations.removeWhere((final anUser) =>

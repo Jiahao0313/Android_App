@@ -25,7 +25,6 @@ class _GroupChatState extends State<GroupChat> {
   final List<String> _usersUID = [];
   final List<BabylonUser> _addedUsers = [];
   List<BabylonUser> _filteredUsers = [];
-  bool _isSearching = false;
   List<BabylonUser> _allUsers = [];
 
   Future<void> _pickImage() async {
@@ -136,15 +135,6 @@ class _GroupChatState extends State<GroupChat> {
         );
       },
     );
-  }
-
-  void _filterUsers(final String searchText) {
-    setState(() {
-      _filteredUsers = _allUsers
-          .where((final user) =>
-              user.fullName.toLowerCase().contains(searchText.toLowerCase()))
-          .toList();
-    });
   }
 
   @override

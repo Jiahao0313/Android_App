@@ -215,7 +215,7 @@ class ChatService {
     }
   }
 
-  static Future<void> cancelGroupChatInvitation(
+  static Future<void> removeGroupChatInvitation(
       {required final String chatUID, required final String userUID}) async {
     try {
       await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
@@ -246,20 +246,6 @@ class ChatService {
     }
   }
 
-  static Future<void> declineGroupChatInvitation(
-      {required final String chatUID, required final String userUID}) async {
-    try {
-      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
-        "sentInvitations": FieldValue.arrayRemove([userUID])
-      });
-      await FirebaseFirestore.instance.collection("users").doc(userUID).update({
-        "groupChatInvitations": FieldValue.arrayRemove([chatUID])
-      });
-    } catch (e) {
-      rethrow;
-    }
-  }
-
 // groupchat join requests
   static Future<void> sendGroupChatJoinRequest(
       {required final String chatUID, required final String userUID}) async {
@@ -275,7 +261,7 @@ class ChatService {
     }
   }
 
-  static Future<void> cancelGroupChatJoinRequest(
+  static Future<void> removeGroupChatJoinRequest(
       {required final String chatUID, required final String userUID}) async {
     try {
       await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
@@ -300,20 +286,6 @@ class ChatService {
       });
       await FirebaseFirestore.instance.collection("users").doc(userUID).update({
         "joiningRequests": FieldValue.arrayRemove([chatUID])
-      });
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  static Future<void> declineGroupChatJoinRequest(
-      {required final String chatUID, required final String userUID}) async {
-    try {
-      await FirebaseFirestore.instance.collection("chats").doc(chatUID).update({
-        "joiningRequests": FieldValue.arrayRemove([userUID])
-      });
-      await FirebaseFirestore.instance.collection("users").doc(userUID).update({
-        "groupChatJoiningRequests": FieldValue.arrayRemove([chatUID])
       });
     } catch (e) {
       rethrow;

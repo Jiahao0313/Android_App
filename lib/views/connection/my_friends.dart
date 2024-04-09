@@ -196,7 +196,8 @@ class MyFriendsState extends State<MyFriends> {
             onPressed: () {
               // Accept join request action
               setState(() {
-                UserService.addConnectionToUser(requestUID: request.userUID);
+                UserService.acceptConnectionRequest(
+                    requestUID: request.userUID);
                 UserService.setUpConnectedBabylonUser(
                     userUID: ConnectedBabylonUser().userUID);
                 _connections = UserService.getConnections();
@@ -272,7 +273,7 @@ class MyFriendsState extends State<MyFriends> {
             onTap: () async {
               // Cancel groupchat join request action
               try {
-                await ChatService.cancelGroupChatJoinRequest(
+                await ChatService.removeGroupChatJoinRequest(
                     chatUID: request.chatUID,
                     userUID: ConnectedBabylonUser().userUID);
                 setState(() {
@@ -326,7 +327,7 @@ class MyFriendsState extends State<MyFriends> {
             onPressed: () {
               // Cancel join request action
               setState(() {
-                ChatService.declineGroupChatInvitation(
+                ChatService.removeGroupChatInvitation(
                     userUID: ConnectedBabylonUser().userUID,
                     chatUID: request.chatUID);
                 UserService.setUpConnectedBabylonUser(
@@ -379,7 +380,7 @@ class MyFriendsState extends State<MyFriends> {
               child: Text("Yes"),
               onPressed: () {
                 setState(() {
-                  UserService.removeConnectionToUser(
+                  UserService.removeConnection(
                       connectionUID: connection.userUID);
                   UserService.setUpConnectedBabylonUser(
                       userUID: ConnectedBabylonUser().userUID);

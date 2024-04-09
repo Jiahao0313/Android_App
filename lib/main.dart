@@ -16,11 +16,15 @@ void main() async {
   runApp(MaterialApp(
     home: LoadingScreen(
       onHomeReady: () async {
-        await UserService.setUpConnectedBabylonUser(userUID: FirebaseAuth.instance.currentUser!.uid);
+        if (FirebaseAuth.instance.currentUser != null) {
+          await UserService.setUpConnectedBabylonUser(
+              userUID: FirebaseAuth.instance.currentUser!.uid);
+        }
       },
     ),
   ));
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

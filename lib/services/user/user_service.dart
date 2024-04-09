@@ -312,7 +312,7 @@ class UserService {
     }
   }
 
-  static Future<void> removeConnectionToUser(
+  static Future<void> removeConnection(
       {required final String connectionUID}) async {
     try {
       final db = FirebaseFirestore.instance;
@@ -331,7 +331,7 @@ class UserService {
     }
   }
 
-  static Future<void> addConnectionToUser(
+  static Future<void> acceptConnectionRequest(
       {required final String requestUID}) async {
     try {
       final db = FirebaseFirestore.instance;
@@ -362,7 +362,14 @@ class UserService {
       await db.collection("users").doc(ConnectedBabylonUser().userUID).update({
         "connectionRequests": FieldValue.arrayRemove([requestUID])
       });
+      await db.collection("users").doc(requestUID).update({
+        "sentConnectionRequests":
+            FieldValue.arrayRemove([ConnectedBabylonUser().userUID])
+      });
       ConnectedBabylonUser().connectionRequestsUIDs!.remove(requestUID);
+      ConnectedBabylonUser()
+          .sentPendingConnectionRequestsUIDs!
+          .remove(requestUID);
     } catch (e) {
       rethrow;
     }
@@ -375,6 +382,9 @@ class UserService {
       await db.collection("users").doc(requestUID).update({
         "connectionRequests":
             FieldValue.arrayUnion([ConnectedBabylonUser().userUID])
+      });
+      await db.collection("users").doc(ConnectedBabylonUser().userUID).update({
+        "sentConnectionRequests": FieldValue.arrayUnion([requestUID])
       });
     } catch (e) {
       rethrow;
