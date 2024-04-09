@@ -107,13 +107,14 @@ class ChatService {
           await referenceImageToUpload.putFile(image);
           newChatData["iconPath"] =
               await referenceImageToUpload.getDownloadURL();
-        } else {}
+        }
         if (usersUID.isNotEmpty) {
           newChatData["users"] = FieldValue.arrayUnion(usersUID);
         }
         final newGroupchat = await db.collection("chats").add(newChatData);
         return getChatFromUID(chatUID: newGroupchat.id);
       }
+      return null;
     } catch (e) {
       rethrow;
     }
@@ -407,6 +408,7 @@ class ChatService {
       rethrow;
     }
   }
+
   static Future<void> updateGroupChat({
     required final String chatUID,
     final String? chatName,
@@ -426,8 +428,10 @@ class ChatService {
       };
 
       if (image != null) {
-        final String imgName = "${DateTime.now().millisecondsSinceEpoch.toString()}.jpg";
-        final Reference referenceImageToUpload = referenceDirImages.child(imgName);
+        final String imgName =
+            "${DateTime.now().millisecondsSinceEpoch.toString()}.jpg";
+        final Reference referenceImageToUpload =
+            referenceDirImages.child(imgName);
         await referenceImageToUpload.putFile(image);
         newChatData["iconPath"] = await referenceImageToUpload.getDownloadURL();
       }
@@ -439,5 +443,3 @@ class ChatService {
     }
   }
 }
-
-

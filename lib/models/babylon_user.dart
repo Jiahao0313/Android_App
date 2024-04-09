@@ -43,7 +43,7 @@ class BabylonUser {
       this.dateOfBirth,
       this.originCountry,
       this.about,
-      this.creationTime,
+      required this.creationTime,
       this.listedEvents,
       this.listedEventsUIDs,
       this.listedConnections,

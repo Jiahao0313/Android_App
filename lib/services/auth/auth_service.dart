@@ -86,12 +86,13 @@ class AuthService {
       final docUser = await db.collection("users").doc(currUser.uid).get();
       final userData = docUser.data();
       if (userData == null) {
-        final userNewData = <String, String>{
+        final userNewData = <String, dynamic>{
           "Country of Origin": "",
           "Date of Birth": DateTime.now().toLocal().toString(),
           "Email Address": currUser.email!,
           "Name": currUser.displayName!,
           "About": "",
+          "creationTime": Timestamp.now()
         };
         userNewData["ImageUrl"] = currUser.photoURL!;
         await db.collection("users").doc(currUser.uid).set(userNewData);

@@ -1,6 +1,7 @@
 import "package:babylon_app/services/auth/auth_validator.dart";
 import "package:babylon_app/services/auth/auth_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
+import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/views/register/register2.dart";
@@ -51,11 +52,12 @@ class CreateAccountFormState extends State<CreateAccountForm> {
     "Confirm Password": _rePassword,
   };
 
-  late final Map<String, String> userInfo = {
+  late final Map<String, dynamic> userInfo = {
     "Name": _name.text,
     "Date of Birth": _dateOfBirth.text,
     "Email Address": _email.text,
     "Country of Origin": _country.text,
+    "creationTime": Timestamp.now(),
   };
 
   @override
