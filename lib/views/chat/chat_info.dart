@@ -5,7 +5,6 @@ import "package:babylon_app/services/chat/chat_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/profile/other_profile.dart";
 import "package:flutter/material.dart";
-
 import "package:babylon_app/views/chat/Edit_group_chat.dart";
 
 class ChatInfoView extends StatefulWidget {
