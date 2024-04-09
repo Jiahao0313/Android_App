@@ -21,6 +21,7 @@ class ConnectedBabylonUser extends BabylonUser {
     _instance.dateOfBirth = babylonUser.dateOfBirth;
     _instance.originCountry = babylonUser.originCountry;
     _instance.about = babylonUser.about;
+    _instance.creationTime = babylonUser.creationTime;
     _instance.listedEventsUIDs = babylonUser.listedEventsUIDs;
     _instance.listedConnectionsUIDs = babylonUser.listedConnectionsUIDs;
     _instance.connectionRequestsUIDs = babylonUser.connectionRequestsUIDs;

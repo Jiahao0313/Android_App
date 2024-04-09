@@ -151,6 +151,7 @@ class UserService {
           about: userData["About"],
           originCountry: userData["Country of Origin"],
           dateOfBirth: userData["Date of Birth"],
+          creationTime: userData["creationTime"],
           listedEventsUIDs: eventsListsUIDs,
           listedConnectionsUIDs: connectionsListUIDs,
           connectionRequestsUIDs: connectionRequestsListUIDs,
@@ -193,6 +194,9 @@ class UserService {
         List<String> eventsListsUIDs = [];
         List<String> connectionsListUIDs = [];
         List<String> connectionRequestsListUIDs = [];
+        List<String> sentPendingConnectionRequestListUIDs = [];
+        List<String> groupChatInvitationsListUIDs = [];
+        List<String> groupChatJoinRequestsListUIDs = [];
 
         if (userData.containsKey("connections")) {
           connectionsListUIDs = List<String>.from(userData["connections"]);
@@ -207,6 +211,21 @@ class UserService {
               List<String>.from(userData["connectionRequests"]);
         }
 
+        if (userData.containsKey("sentConnectionRequests")) {
+          sentPendingConnectionRequestListUIDs =
+              List<String>.from(userData["sentConnectionRequests"]);
+        }
+
+        if (userData.containsKey("groupChatInvitations")) {
+          groupChatInvitationsListUIDs =
+              List<String>.from(userData["groupChatInvitations"]);
+        }
+
+        if (userData.containsKey("groupChatJoiningRequests")) {
+          groupChatJoinRequestsListUIDs =
+              List<String>.from(userData["groupChatJoiningRequests"]);
+        }
+
         users.add(BabylonUser.withData(
           userUID: doc.id,
           fullName: userData["Name"] ?? "",
@@ -215,9 +234,14 @@ class UserService {
           about: userData["About"],
           originCountry: userData["Country of Origin"],
           dateOfBirth: userData["Date of Birth"],
+          creationTime: userData["creationTime"],
           listedEventsUIDs: eventsListsUIDs,
           listedConnectionsUIDs: connectionsListUIDs,
           connectionRequestsUIDs: connectionRequestsListUIDs,
+          sentPendingConnectionRequestsUIDs:
+              sentPendingConnectionRequestListUIDs,
+          groupChatInvitationsUIDs: groupChatInvitationsListUIDs,
+          groupChatJoinRequestsUIDs: groupChatJoinRequestsListUIDs,
         ));
       }
     } catch (e) {
@@ -242,6 +266,9 @@ class UserService {
         List<String> eventsListsUIDs = [];
         List<String> connectionsListUIDs = [];
         List<String> connectionRequestsListUIDs = [];
+        List<String> sentPendingConnectionRequestListUIDs = [];
+        List<String> groupChatInvitationsListUIDs = [];
+        List<String> groupChatJoinRequestsListUIDs = [];
 
         if (userData.containsKey("connections")) {
           connectionsListUIDs = List<String>.from(userData["connections"]);
@@ -256,6 +283,21 @@ class UserService {
               List<String>.from(userData["connectionRequests"]);
         }
 
+        if (userData.containsKey("sentConnectionRequests")) {
+          sentPendingConnectionRequestListUIDs =
+              List<String>.from(userData["sentConnectionRequests"]);
+        }
+
+        if (userData.containsKey("groupChatInvitations")) {
+          groupChatInvitationsListUIDs =
+              List<String>.from(userData["groupChatInvitations"]);
+        }
+
+        if (userData.containsKey("groupChatJoiningRequests")) {
+          groupChatJoinRequestsListUIDs =
+              List<String>.from(userData["groupChatJoiningRequests"]);
+        }
+
         searchResults.add(BabylonUser.withData(
           userUID: doc.id,
           fullName: userData["Name"] ?? "",
@@ -264,9 +306,14 @@ class UserService {
           about: userData["About"],
           originCountry: userData["Country of Origin"],
           dateOfBirth: userData["Date of Birth"],
+          creationTime: userData["creationTime"],
           listedEventsUIDs: eventsListsUIDs,
           listedConnectionsUIDs: connectionsListUIDs,
           connectionRequestsUIDs: connectionRequestsListUIDs,
+          sentPendingConnectionRequestsUIDs:
+              sentPendingConnectionRequestListUIDs,
+          groupChatInvitationsUIDs: groupChatInvitationsListUIDs,
+          groupChatJoinRequestsUIDs: groupChatJoinRequestsListUIDs,
         ));
       }
     } catch (e) {

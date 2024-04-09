@@ -65,7 +65,7 @@ class ChatService {
   }
 
   // if otherUser is set, you will create a single chat. If not, you will create a groupchat
-  static Future<void> createChat(
+  static Future<Chat?> createChat(
       {final String? adminUID,
       final String? chatDescription,
       final String? chatName,
@@ -85,6 +85,10 @@ class ChatService {
                   ? "${curr.userUID}_${otherUser.userUID}"
                   : "${otherUser.userUID}_${curr.userUID}";
           await db.collection("chats").doc(chatDocID).set(newChatData);
+          return await getChatFromUID(
+              chatUID: curr.userUID.compareTo(otherUser.userUID) == -1
+                  ? "${curr.userUID}_${otherUser.userUID}"
+                  : "${otherUser.userUID}_${curr.userUID}");
         }
       } else {
         newChatData["chatName"] = chatName;
@@ -107,7 +111,8 @@ class ChatService {
         if (usersUID.isNotEmpty) {
           newChatData["users"] = FieldValue.arrayUnion(usersUID);
         }
-        await db.collection("chats").doc().set(newChatData);
+        final newGroupchat = await db.collection("chats").add(newChatData);
+        return getChatFromUID(chatUID: newGroupchat.id);
       }
     } catch (e) {
       rethrow;

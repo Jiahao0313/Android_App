@@ -330,8 +330,20 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                                 IconButton(
                                   icon: Icon(Icons.chat_bubble_outline,
                                       color: Colors.blue),
-                                  onPressed: () {
-                                    // Placeholder for "Chat" action.
+                                  onPressed: () async {
+                                    final Chat? newChat =
+                                        await ChatService.createChat(
+                                            otherUser: BabylonUser());
+                                    if (newChat != null) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (final context) =>
+                                                ChatView(
+                                                  chat: newChat,
+                                                )),
+                                      );
+                                    }
                                   },
                                 ),
                               ],
