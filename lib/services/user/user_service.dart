@@ -253,6 +253,77 @@ class UserService {
     return users;
   }
 
+  static Future<List<BabylonUser>> getNewUsers({required final number}) async {
+    final List<BabylonUser> users = [];
+    try {
+      final db = FirebaseFirestore.instance;
+      final querySnapshot = await db
+          .collection("users")
+          .orderBy("creationTime", descending: true)
+          .limit(number)
+          .get();
+      for (final doc in querySnapshot.docs) {
+        final userData = doc.data();
+
+        List<String> eventsListsUIDs = [];
+        List<String> connectionsListUIDs = [];
+        List<String> connectionRequestsListUIDs = [];
+        List<String> sentPendingConnectionRequestListUIDs = [];
+        List<String> groupChatInvitationsListUIDs = [];
+        List<String> groupChatJoinRequestsListUIDs = [];
+
+        if (userData.containsKey("connections")) {
+          connectionsListUIDs = List<String>.from(userData["connections"]);
+        }
+
+        if (userData.containsKey("listedEvents")) {
+          eventsListsUIDs = List<String>.from(userData["listedEvents"]);
+        }
+
+        if (userData.containsKey("connectionRequests")) {
+          connectionRequestsListUIDs =
+              List<String>.from(userData["connectionRequests"]);
+        }
+
+        if (userData.containsKey("sentConnectionRequests")) {
+          sentPendingConnectionRequestListUIDs =
+              List<String>.from(userData["sentConnectionRequests"]);
+        }
+
+        if (userData.containsKey("groupChatInvitations")) {
+          groupChatInvitationsListUIDs =
+              List<String>.from(userData["groupChatInvitations"]);
+        }
+
+        if (userData.containsKey("groupChatJoiningRequests")) {
+          groupChatJoinRequestsListUIDs =
+              List<String>.from(userData["groupChatJoiningRequests"]);
+        }
+
+        users.add(BabylonUser.withData(
+          userUID: doc.id,
+          fullName: userData["Name"] ?? "",
+          email: userData["Email Address"] ?? "",
+          imagePath: userData["ImageUrl"] ?? "",
+          about: userData["About"],
+          originCountry: userData["Country of Origin"],
+          dateOfBirth: userData["Date of Birth"],
+          creationTime: userData["creationTime"] ?? Timestamp(1, 1),
+          listedEventsUIDs: eventsListsUIDs,
+          listedConnectionsUIDs: connectionsListUIDs,
+          connectionRequestsUIDs: connectionRequestsListUIDs,
+          sentPendingConnectionRequestsUIDs:
+              sentPendingConnectionRequestListUIDs,
+          groupChatInvitationsUIDs: groupChatInvitationsListUIDs,
+          groupChatJoinRequestsUIDs: groupChatJoinRequestsListUIDs,
+        ));
+      }
+    } catch (e) {
+      print("Error fetching users: $e");
+    }
+    return users;
+  }
+
   static Future<List<BabylonUser>> searchBabylonUsers(
       final String query) async {
     final List<BabylonUser> searchResults = [];
