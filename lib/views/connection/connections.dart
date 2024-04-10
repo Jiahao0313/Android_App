@@ -346,7 +346,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                                           onPressed: () async {
                                             final Chat? newChat =
                                                 await ChatService.createChat(
-                                                    otherUser: BabylonUser());
+                                                    otherUser: newUser);
                                             if (newChat != null) {
                                               Navigator.push(
                                                 context,
@@ -703,8 +703,17 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     });
   }
 
-  void pressedChatButton(final BabylonUser babylonUser) {
-    // TODO(EnzoL): need to access the personal conversation and if it does not exist -> chat request
+  void pressedChatButton(final BabylonUser babylonUser) async {
+    final Chat? newChat = await ChatService.createChat(otherUser: babylonUser);
+    if (newChat != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (final context) => ChatView(
+                  chat: newChat,
+                )),
+      );
+    }
   }
 
 // Additional helper methods for building connection cards, handling accept/decline logic, etc., can be added here.

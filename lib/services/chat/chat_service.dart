@@ -77,7 +77,8 @@ class ChatService {
       final newChatData = <String, dynamic>{};
       final BabylonUser curr = ConnectedBabylonUser();
       if (otherUser != null) {
-        if (otherUser.userUID != ConnectedBabylonUser().userUID) {
+        if (otherUser.userUID != "" &&
+            otherUser.userUID != ConnectedBabylonUser().userUID) {
           newChatData["users"] =
               FieldValue.arrayUnion([curr.userUID, otherUser.userUID]);
           final String chatDocID =
