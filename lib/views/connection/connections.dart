@@ -280,6 +280,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                   .textTheme
                   .titleLarge
                   ?.copyWith(fontWeight: FontWeight.bold)),
+
         ),
         Container(
             height:
@@ -312,10 +313,17 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                                 padding: EdgeInsets.all(8.0),
                                 child: Column(
                                   children: [
-                                    CircleAvatar(
-                                      radius: 40,
-                                      backgroundImage:
-                                          NetworkImage(newUser.imagePath),
+                                    InkWell(
+                                      onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (final context) =>
+                                                OtherProfile(babylonUser: newUser)),
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 40,
+                                        backgroundImage: NetworkImage(newUser.imagePath),
+                                      ),
                                     ),
                                     SizedBox(height: 10),
                                     Text(newUser.fullName,
@@ -392,7 +400,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                 }
                 return Column(
                   children: children,
-                );
+                 );
               },
             )),
       ],
@@ -518,18 +526,35 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       leading: InkWell(
-        onTap: () => chat.adminUID == null || chat.adminUID == ""
-            ? null
-            : Navigator.push(
+        onTap: () async {
+          if(chat.adminUID == null || chat.adminUID == "") {
+            final String otherUserUID = chat.usersUIDs.firstWhere((
+                final userUID) => userUID != ConnectedBabylonUser().userUID);
+            final BabylonUser? otherUser = await UserService.getBabylonUser(
+                userUID: otherUserUID);
+            if (otherUser != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (final context) =>
+                        OtherProfile(babylonUser: otherUser)),
+              );
+            }
+          }
+          else {
+            Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (final context) => ChatInfoView(chat: chat)),
-              ),
-        child: CircleAvatar(
-          backgroundImage:
-              NetworkImage(chat.iconPath!), // Placeholder for group snapshot.
-          radius: 25, // Adjust the size of the CircleAvatar here.
-        ),
+              );
+            }
+          },
+          child: CircleAvatar(
+            backgroundImage:
+            NetworkImage(chat.iconPath!), // Placeholder for group snapshot.
+            radius: 25,
+            // Adjust the size of the CircleAvatar here.
+          ),
       ),
       title:
           Text(chat.chatName!, style: TextStyle(fontWeight: FontWeight.bold)),
@@ -564,21 +589,32 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                   itemBuilder: (final context, final index) {
                     final BabylonUser person = searchResults[index];
                     return Card(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                      margin: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0)),
+                          borderRadius: BorderRadius.circular(8.0)
+                      ),
                       elevation: 3.0,
                       child: IntrinsicHeight(
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: ImageLoader.loadProfilePicture(
-                                  person.imagePath, 30),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (final context) => OtherProfile(babylonUser: person),
+                                  ),
+                                );
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: ImageLoader.loadProfilePicture(person.imagePath, 30),
+                              ),
                             ),
+
                             Expanded(
+
                               child: Padding(
                                 padding: EdgeInsets.only(
                                     top: 10.0, right: 10.0, bottom: 10.0),
