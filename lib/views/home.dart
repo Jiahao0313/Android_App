@@ -155,8 +155,7 @@ class HomeScreenState extends State<HomeScreen> {
               CircleAvatar(
                 backgroundImage: user.imagePath.startsWith("http")
                     ? NetworkImage(user.imagePath)
-                    : AssetImage(user.imagePath)
-                        as ImageProvider,
+                    : AssetImage(user.imagePath) as ImageProvider,
                 radius: 50.0,
                 backgroundColor: Colors.transparent,
               ),
@@ -175,7 +174,6 @@ class HomeScreenState extends State<HomeScreen> {
         _buildUpcomingEventsSection(context),
         _buildForumsParticipationSection(context),
         _buildChatsSection(context),
-
       ],
     );
   }
