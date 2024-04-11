@@ -1,13 +1,13 @@
 import "package:babylon_app/models/connected_babylon_user.dart";
-import "package:babylon_app/models/event.dart";
 import "package:babylon_app/services/event/event_service.dart";
 import "package:babylon_app/utils/image_loader.dart";
+import "package:babylon_app/views/events/create_event.dart";
+import "package:babylon_app/views/events/events_info.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
-import "package:babylon_app/views/events/events_info.dart";
-import "package:babylon_app/views/events/create_event.dart";
 
-// Define the EventsScreen as a StatefulWidget to handle dynamic content like user events.
+import "package:babylon_app/models/event.dart";
+
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
 
@@ -15,24 +15,85 @@ class EventsScreen extends StatefulWidget {
   State<EventsScreen> createState() => _EventsScreenState();
 }
 
-// Define the corresponding State class for EventsScreen with TabController for tab navigation.
 class _EventsScreenState extends State<EventsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final Future<List<Event>> _allEvents = EventService.getUpcomingEvents();
-  final Future<List<Event>> _myEvents =
-      EventService.getListedEventsOfUser(uuid: ConnectedBabylonUser().userUID);
+  late List<Event> loadedEvents = [];
+  late List<Event> loadedMyEvents = [];
+  final scrollController = ScrollController();
+  late bool loadingEvents = false;
+  late bool loadingMyEvents = false;
+
+  late bool loadingMoreEvents = false;
+
+  void getEvents() async {
+    try {
+      loadingEvents = true;
+
+      await EventService.getUpcomingEvents().then((final data) => {
+            setState(() {
+              loadedEvents.addAll(data);
+            }),
+          });
+    } catch (error) {
+      print(error);
+    } finally {
+      loadingEvents = false;
+    }
+  }
+
+  void getMyEvents() async {
+    try {
+      loadingEvents = true;
+
+      await EventService.getListedEventsOfUser(
+              uuid: ConnectedBabylonUser().userUID)
+          .then((final data) => {
+                setState(() {
+                  loadedMyEvents.addAll(data);
+                }),
+              });
+    } catch (error) {
+      print(error);
+    } finally {
+      loadingEvents = false;
+    }
+  }
+
+  void getMoreEventsStartByTheLastVisible(final Event lastVisibleEvent) async {
+    try {
+      setState(() {
+        loadingMoreEvents = true;
+      });
+
+      await EventService.getMoreEvents(lastVisibleEvent).then((final data) => {
+            setState(() {
+              loadedEvents.addAll(data);
+            }),
+          });
+    } catch (error) {
+      print(error);
+    } finally {
+      loadingMoreEvents = false;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-  }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+    getEvents();
+    getMyEvents();
+
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent ==
+          scrollController.position.pixels) {
+        if (_tabController.index == 0 && !loadingEvents && !loadingMoreEvents) {
+          getMoreEventsStartByTheLastVisible(loadedEvents.last);
+        }
+      }
+    });
   }
 
   @override
@@ -76,173 +137,156 @@ class _EventsScreenState extends State<EventsScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [_buildAllEventList(), _buildMyEventList()],
+        children: [_buildUpComingEventList(), _buildMyEventList()],
       ),
     );
   }
 
-  // Method to build a list view of event cards.
-  Widget _buildAllEventList() {
-    return FutureBuilder<List<Event>>(
-        future: _allEvents, // a previously-obtained Future<String> or null
-        builder: (final BuildContext context,
-            final AsyncSnapshot<List<Event>> snapshot) {
-          List<Widget> children;
-          if (snapshot.hasData) {
-            if (snapshot.data != null && snapshot.data!.isNotEmpty) {
-              children = <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(left: 16, top: 16),
-                  child: Text("Upcoming events",
-                      textAlign: TextAlign.left,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+  Widget _buildUpComingEventList() {
+    return Builder(builder: (final BuildContext context) {
+      List<Widget> children;
+      if (loadingEvents) {
+        children = <Widget>[
+          Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: CircularProgressIndicator(color: Color(0xFF006400)),
                 ),
-                ...snapshot.data!
-                    .map((final anEvent) => _buildEventCard(anEvent))
-              ];
-            } else {
-              children = <Widget>[
-                Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        top: 20.0), // Adjust the top margin here
-                    child: Text(
-                      "Event calendar is empty at the moment. Stay tuned for announcements! 📆",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ];
-            }
-          } else if (snapshot.hasError) {
-            children = <Widget>[
-              const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text("Error: ${snapshot.error}"),
+                padding: EdgeInsets.only(top: 16),
+                child: Text("Loading..."),
               ),
-            ];
-          } else {
-            children = <Widget>[
-              Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: SizedBox(
-                      width: 60,
-                      height: 60,
-                      child:
-                          CircularProgressIndicator(color: Color(0xFF006400)),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: Text("Loading..."),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 128),
-                    child: Image.asset("assets/images/logoSquare.png",
-                        height: 185, width: 185),
-                  ),
-                ],
-              )
-            ];
-          }
-          return ListView(
-            children: children,
-          );
-        });
+              Padding(
+                padding: EdgeInsets.only(top: 128),
+                child: Image.asset("assets/images/logoSquare.png",
+                    height: 185, width: 185),
+              ),
+            ],
+          )
+        ];
+      } else if (loadedEvents.isNotEmpty) {
+        children = <Widget>[
+          Padding(
+            padding: EdgeInsets.only(left: 16, top: 16),
+            child: Text("Upcoming events",
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ),
+          ...loadedEvents.map((final anEvent) => _buildEventCard(anEvent)),
+          _buildLoadingIndicator(loadingMoreEvents)
+        ];
+      } else if (loadedEvents.isEmpty) {
+        children = <Widget>[
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 20.0), // Adjust the top margin here
+              child: Text(
+                "Event calendar is empty at the moment. Stay tuned for announcements! 📆",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+            ),
+          ),
+        ];
+      } else {
+        children = <Widget>[
+          const Icon(
+            Icons.error_outline,
+            color: Colors.red,
+            size: 60,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: Text("Error"),
+          ),
+        ];
+      }
+      return ListView(
+        controller: scrollController,
+        children: children,
+      );
+    });
   }
 
   Widget _buildMyEventList() {
-    return FutureBuilder<List<Event>>(
-        future: _myEvents, // a previously-obtained Future<String> or null
-        builder: (final BuildContext context,
-            final AsyncSnapshot<List<Event>> snapshot) {
-          List<Widget> children;
-          if (snapshot.hasData) {
-            if (snapshot.data != null && snapshot.data!.isNotEmpty) {
-              children = <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(left: 16, top: 16),
-                  child: Text("Upcoming events",
-                      textAlign: TextAlign.left,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    return Builder(builder: (final BuildContext context) {
+      List<Widget> children;
+      if (loadingEvents) {
+        children = <Widget>[
+          Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: CircularProgressIndicator(color: Color(0xFF006400)),
                 ),
-                ...snapshot.data!
-                    .map((final anEvent) => _buildEventCard(anEvent))
-              ];
-            } else {
-              children = <Widget>[
-                Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        top: 20.0), // Adjust the top margin here
-                    child: Text(
-                      "Your event list is empty! Time to plan something fun. 🎉",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ];
-            }
-          } else if (snapshot.hasError) {
-            children = <Widget>[
-              const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text("Error: ${snapshot.error}"),
+                padding: EdgeInsets.only(top: 16),
+                child: Text("Loading..."),
               ),
-            ];
-          } else {
-            children = <Widget>[
-              Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: SizedBox(
-                      width: 60,
-                      height: 60,
-                      child:
-                          CircularProgressIndicator(color: Color(0xFF006400)),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: Text("Loading..."),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 128),
-                    child: Image.asset("assets/images/logoSquare.png",
-                        height: 185, width: 185),
-                  ),
-                ],
-              )
-            ];
-          }
-          return ListView(
-            children: children,
-          );
-        });
+              Padding(
+                padding: EdgeInsets.only(top: 128),
+                child: Image.asset("assets/images/logoSquare.png",
+                    height: 185, width: 185),
+              ),
+            ],
+          )
+        ];
+      } else if (loadedMyEvents.isNotEmpty) {
+        children = <Widget>[
+          Padding(
+            padding: EdgeInsets.only(left: 16, top: 16),
+            child: Text("Upcoming events",
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ),
+          ...loadedMyEvents.map((final anEvent) => _buildEventCard(anEvent)),
+        ];
+      } else if (loadedMyEvents.isEmpty) {
+        children = <Widget>[
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 20.0), // Adjust the top margin here
+              child: Text(
+                "Your event list is empty! Time to plan something fun. 🎉",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+            ),
+          ),
+        ];
+      } else {
+        children = <Widget>[
+          const Icon(
+            Icons.error_outline,
+            color: Colors.red,
+            size: 60,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: Text("Error"),
+          ),
+        ];
+      }
+      return ListView(
+        controller: scrollController,
+        children: children,
+      );
+    });
   }
 
-  // Method to build a single event card widget.
   Widget _buildEventCard(final Event event) {
     return Card(
       margin: const EdgeInsets.all(10),
@@ -281,11 +325,23 @@ class _EventsScreenState extends State<EventsScreen>
                   builder: (final context) => EventInfoScreen(event: event),
                 ),
               );
-              setState(() {});
             },
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildLoadingIndicator(final isLoading) {
+    if (isLoading) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: Center(
+          child: CircularProgressIndicator(color: Color(0xFF006400)),
+        ),
+      );
+    } else {
+      return SizedBox.shrink();
+    }
   }
 }

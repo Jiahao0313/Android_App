@@ -1,8 +1,10 @@
 import "package:babylon_app/models/babylon_user.dart";
+import "package:cloud_firestore/cloud_firestore.dart";
 
 class Event {
   // Attributes
 
+  DocumentSnapshot<Object?>? snapshot;
   String eventUID;
   String title;
   String? place;
@@ -22,6 +24,7 @@ class Event {
   Event(
       {required this.eventUID,
       required this.title,
+      this.snapshot,
       this.place,
       this.date,
       this.fullDescription,

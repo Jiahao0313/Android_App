@@ -15,6 +15,8 @@ class EventService {
       final snapShot = await db
           .collection("events")
           .where("date", isGreaterThan: Timestamp.now())
+          .orderBy("date")
+          .limit(5)
           .get();
       await Future.forEach(snapShot.docs, (final snapShot) async {
         List<String> attendeeIDs = [];
@@ -26,6 +28,46 @@ class EventService {
         }
 
         result.add(Event(
+            snapshot: snapShot,
+            eventUID: snapShot.reference.id,
+            title: event["title"] ?? "" ?? "",
+            creatorUID: event["creator"],
+            creator: creator!,
+            place: event["place"] ?? "",
+            date: (event["date"] as Timestamp).toDate(),
+            fullDescription: event["fullDescription"] ?? "",
+            shortDescription: event["shortDescription"] ?? "",
+            pictureURL: event["picture"] ?? "",
+            attendeesUIDs: attendeeIDs));
+      });
+    } catch (error) {
+      print(error);
+    }
+    return result;
+  }
+
+  static Future<List<Event>> getMoreEvents(final Event lastVisibleEvent) async {
+    final List<Event> result = List.empty(growable: true);
+    try {
+      final db = FirebaseFirestore.instance;
+      final snapShot = await db
+          .collection("events")
+          .where("date", isGreaterThan: Timestamp.now())
+          .orderBy("date")
+          .limit(5)
+          .startAfterDocument(lastVisibleEvent.snapshot!)
+          .get();
+      await Future.forEach(snapShot.docs, (final snapShot) async {
+        List<String> attendeeIDs = [];
+        final event = snapShot.data();
+        final BabylonUser? creator =
+            await UserService.getBabylonUser(userUID: event["creator"]);
+        if (event.containsKey("attendees")) {
+          attendeeIDs = List<String>.from(event["attendees"]);
+        }
+
+        result.add(Event(
+            snapshot: snapShot,
             eventUID: snapShot.reference.id,
             title: event["title"] ?? "" ?? "",
             creatorUID: event["creator"],
