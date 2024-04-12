@@ -44,7 +44,7 @@ class _EventsScreenState extends State<EventsScreen>
 
   void getMyEvents() async {
     try {
-      loadingEvents = true;
+      loadingMyEvents = true;
 
       await EventService.getListedEventsOfUser(
               uuid: ConnectedBabylonUser().userUID)
@@ -56,7 +56,7 @@ class _EventsScreenState extends State<EventsScreen>
     } catch (error) {
       print(error);
     } finally {
-      loadingEvents = false;
+      loadingMyEvents = false;
     }
   }
 
@@ -102,10 +102,11 @@ class _EventsScreenState extends State<EventsScreen>
       // Custom drawer widget for navigation.
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(builder: (final context) => CreateEventScreen()),
           );
+          setState(() {});
         },
         backgroundColor: Colors.green,
         child: Icon(Icons.add),
@@ -218,7 +219,7 @@ class _EventsScreenState extends State<EventsScreen>
   Widget _buildMyEventList() {
     return Builder(builder: (final BuildContext context) {
       List<Widget> children;
-      if (loadingEvents) {
+      if (loadingMyEvents) {
         children = <Widget>[
           Column(
             children: [
@@ -298,6 +299,7 @@ class _EventsScreenState extends State<EventsScreen>
               builder: (final context) => EventInfoScreen(event: event),
             ),
           );
+          setState(() {});
         },
         child: ListTile(
           leading: ImageLoader.loadEventPicture(event.pictureURL!),
@@ -325,6 +327,7 @@ class _EventsScreenState extends State<EventsScreen>
                   builder: (final context) => EventInfoScreen(event: event),
                 ),
               );
+              setState(() {});
             },
           ),
         ),
