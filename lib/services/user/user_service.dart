@@ -11,7 +11,7 @@ import "dart:io";
 class UserService {
   static Future<void> fillUser(
       {required final User user,
-      required final Map<String, String> userInfo}) async {
+      required final Map<String, dynamic> userInfo}) async {
     try {
       final db = FirebaseFirestore.instance;
       final docUser = db.collection("users").doc(user.uid);
@@ -92,6 +92,9 @@ class UserService {
               newData.containsKey("birthDate") ? newData["birthDate"] : "",
           "About": newData.containsKey("about") ? newData["about"] : "",
           "Name": newData.containsKey("name") ? newData["name"] : "",
+          "creationTime": newData.containsKey("creationTime")
+              ? newData["creationTime"]
+              : Timestamp(1, 1)
         });
       }
     } catch (e) {
@@ -151,6 +154,7 @@ class UserService {
           about: userData["About"],
           originCountry: userData["Country of Origin"],
           dateOfBirth: userData["Date of Birth"],
+          creationTime: userData["creationTime"] ?? Timestamp(1, 1),
           listedEventsUIDs: eventsListsUIDs,
           listedConnectionsUIDs: connectionsListUIDs,
           connectionRequestsUIDs: connectionRequestsListUIDs,
@@ -193,6 +197,9 @@ class UserService {
         List<String> eventsListsUIDs = [];
         List<String> connectionsListUIDs = [];
         List<String> connectionRequestsListUIDs = [];
+        List<String> sentPendingConnectionRequestListUIDs = [];
+        List<String> groupChatInvitationsListUIDs = [];
+        List<String> groupChatJoinRequestsListUIDs = [];
 
         if (userData.containsKey("connections")) {
           connectionsListUIDs = List<String>.from(userData["connections"]);
@@ -207,6 +214,21 @@ class UserService {
               List<String>.from(userData["connectionRequests"]);
         }
 
+        if (userData.containsKey("sentConnectionRequests")) {
+          sentPendingConnectionRequestListUIDs =
+              List<String>.from(userData["sentConnectionRequests"]);
+        }
+
+        if (userData.containsKey("groupChatInvitations")) {
+          groupChatInvitationsListUIDs =
+              List<String>.from(userData["groupChatInvitations"]);
+        }
+
+        if (userData.containsKey("groupChatJoiningRequests")) {
+          groupChatJoinRequestsListUIDs =
+              List<String>.from(userData["groupChatJoiningRequests"]);
+        }
+
         users.add(BabylonUser.withData(
           userUID: doc.id,
           fullName: userData["Name"] ?? "",
@@ -215,9 +237,85 @@ class UserService {
           about: userData["About"],
           originCountry: userData["Country of Origin"],
           dateOfBirth: userData["Date of Birth"],
+          creationTime: userData["creationTime"] ?? Timestamp(1, 1),
           listedEventsUIDs: eventsListsUIDs,
           listedConnectionsUIDs: connectionsListUIDs,
           connectionRequestsUIDs: connectionRequestsListUIDs,
+          sentPendingConnectionRequestsUIDs:
+              sentPendingConnectionRequestListUIDs,
+          groupChatInvitationsUIDs: groupChatInvitationsListUIDs,
+          groupChatJoinRequestsUIDs: groupChatJoinRequestsListUIDs,
+        ));
+      }
+    } catch (e) {
+      print("Error fetching users: $e");
+    }
+    return users;
+  }
+
+  static Future<List<BabylonUser>> getNewUsers({required final number}) async {
+    final List<BabylonUser> users = [];
+    try {
+      final db = FirebaseFirestore.instance;
+      final querySnapshot = await db
+          .collection("users")
+          .orderBy("creationTime", descending: true)
+          .limit(number)
+          .get();
+      for (final doc in querySnapshot.docs) {
+        final userData = doc.data();
+
+        List<String> eventsListsUIDs = [];
+        List<String> connectionsListUIDs = [];
+        List<String> connectionRequestsListUIDs = [];
+        List<String> sentPendingConnectionRequestListUIDs = [];
+        List<String> groupChatInvitationsListUIDs = [];
+        List<String> groupChatJoinRequestsListUIDs = [];
+
+        if (userData.containsKey("connections")) {
+          connectionsListUIDs = List<String>.from(userData["connections"]);
+        }
+
+        if (userData.containsKey("listedEvents")) {
+          eventsListsUIDs = List<String>.from(userData["listedEvents"]);
+        }
+
+        if (userData.containsKey("connectionRequests")) {
+          connectionRequestsListUIDs =
+              List<String>.from(userData["connectionRequests"]);
+        }
+
+        if (userData.containsKey("sentConnectionRequests")) {
+          sentPendingConnectionRequestListUIDs =
+              List<String>.from(userData["sentConnectionRequests"]);
+        }
+
+        if (userData.containsKey("groupChatInvitations")) {
+          groupChatInvitationsListUIDs =
+              List<String>.from(userData["groupChatInvitations"]);
+        }
+
+        if (userData.containsKey("groupChatJoiningRequests")) {
+          groupChatJoinRequestsListUIDs =
+              List<String>.from(userData["groupChatJoiningRequests"]);
+        }
+
+        users.add(BabylonUser.withData(
+          userUID: doc.id,
+          fullName: userData["Name"] ?? "",
+          email: userData["Email Address"] ?? "",
+          imagePath: userData["ImageUrl"] ?? "",
+          about: userData["About"],
+          originCountry: userData["Country of Origin"],
+          dateOfBirth: userData["Date of Birth"],
+          creationTime: userData["creationTime"] ?? Timestamp(1, 1),
+          listedEventsUIDs: eventsListsUIDs,
+          listedConnectionsUIDs: connectionsListUIDs,
+          connectionRequestsUIDs: connectionRequestsListUIDs,
+          sentPendingConnectionRequestsUIDs:
+              sentPendingConnectionRequestListUIDs,
+          groupChatInvitationsUIDs: groupChatInvitationsListUIDs,
+          groupChatJoinRequestsUIDs: groupChatJoinRequestsListUIDs,
         ));
       }
     } catch (e) {
@@ -242,6 +340,9 @@ class UserService {
         List<String> eventsListsUIDs = [];
         List<String> connectionsListUIDs = [];
         List<String> connectionRequestsListUIDs = [];
+        List<String> sentPendingConnectionRequestListUIDs = [];
+        List<String> groupChatInvitationsListUIDs = [];
+        List<String> groupChatJoinRequestsListUIDs = [];
 
         if (userData.containsKey("connections")) {
           connectionsListUIDs = List<String>.from(userData["connections"]);
@@ -256,6 +357,21 @@ class UserService {
               List<String>.from(userData["connectionRequests"]);
         }
 
+        if (userData.containsKey("sentConnectionRequests")) {
+          sentPendingConnectionRequestListUIDs =
+              List<String>.from(userData["sentConnectionRequests"]);
+        }
+
+        if (userData.containsKey("groupChatInvitations")) {
+          groupChatInvitationsListUIDs =
+              List<String>.from(userData["groupChatInvitations"]);
+        }
+
+        if (userData.containsKey("groupChatJoiningRequests")) {
+          groupChatJoinRequestsListUIDs =
+              List<String>.from(userData["groupChatJoiningRequests"]);
+        }
+
         searchResults.add(BabylonUser.withData(
           userUID: doc.id,
           fullName: userData["Name"] ?? "",
@@ -264,9 +380,14 @@ class UserService {
           about: userData["About"],
           originCountry: userData["Country of Origin"],
           dateOfBirth: userData["Date of Birth"],
+          creationTime: userData["creationTime"] ?? Timestamp(1, 1),
           listedEventsUIDs: eventsListsUIDs,
           listedConnectionsUIDs: connectionsListUIDs,
           connectionRequestsUIDs: connectionRequestsListUIDs,
+          sentPendingConnectionRequestsUIDs:
+              sentPendingConnectionRequestListUIDs,
+          groupChatInvitationsUIDs: groupChatInvitationsListUIDs,
+          groupChatJoinRequestsUIDs: groupChatJoinRequestsListUIDs,
         ));
       }
     } catch (e) {

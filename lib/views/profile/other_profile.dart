@@ -1,8 +1,11 @@
 import "package:babylon_app/models/babylon_user.dart";
+import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
+import "package:babylon_app/services/chat/chat_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/utils/datetime_utils.dart";
 import "package:babylon_app/utils/image_loader.dart";
+import "package:babylon_app/views/chat/chat_view.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/views/profile/full_screen_image.dart";
 
@@ -83,8 +86,18 @@ class OtherProfileState extends State<OtherProfile> {
                 ElevatedButton.icon(
                   icon: Icon(Icons.chat),
                   label: Text("Chat"),
-                  onPressed: () {
-                    // TODO(EnzoL): Implement functionality to start chatting.
+                  onPressed: () async {
+                    final Chat? newChat =
+                        await ChatService.createChat(otherUser: babylonUser);
+                    if (newChat != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (final context) => ChatView(
+                                  chat: newChat,
+                                )),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,

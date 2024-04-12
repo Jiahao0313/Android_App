@@ -28,6 +28,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
   List<BabylonUser> searchResults = []; // Holds the search results.
   final Future<List<Chat>> _myChats =
       ChatService.getUserChats(userUID: ConnectedBabylonUser().userUID);
+  final Future<List<BabylonUser>> _newUsers =
+      UserService.getNewUsers(number: 5);
 
   Future<List<BabylonUser?>> _requests = UserService.getConnectionsRequests();
 
@@ -278,74 +280,129 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                   .textTheme
                   .titleLarge
                   ?.copyWith(fontWeight: FontWeight.bold)),
+
         ),
         Container(
-          height: 200, // Fixed height for the horizontal list of profile cards.
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 5, // Example: Five new user profiles.
-            itemBuilder: (final context, final index) {
-              // Each item is a profile card with image, name, and action buttons for new users.
-              return Container(
-                width: 160, // Fixed width for each profile card.
-                margin: EdgeInsets.only(
-                    left: 16.0,
-                    right: index == 4
-                        ? 16.0
-                        : 0), // Add right margin to the last card.
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                  child: Wrap(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                              radius: 40,
-                              backgroundImage: AssetImage(
-                                  "assets/images/default_user_logo.png"),
-                            ),
-                            SizedBox(height: 10),
-                            Text("New User $index",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center),
-                            ButtonBar(
-                              alignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.remove_red_eye_outlined,
-                                      color: Colors.blue),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (final context) => OtherProfile(
-                                              babylonUser:
-                                                  BabylonUser())), // TODO(EnzoL): To fix by a real BabylonUser
-                                    );
-                                  },
+            height:
+                200, // Fixed height for the horizontal list of profile cards.
+            child: FutureBuilder<List<BabylonUser>>(
+              future: _newUsers,
+              builder: (final BuildContext context,
+                  final AsyncSnapshot<List<BabylonUser>> snapshot) {
+                List<Widget> children;
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: snapshot
+                        .data?.length, // Example: Five new user profiles.
+                    itemBuilder: (final context, final index) {
+                      final BabylonUser newUser = snapshot.data![index];
+                      return Container(
+                        width: 160, // Fixed width for each profile card.
+                        margin: EdgeInsets.only(
+                            left: 16.0,
+                            right: index == 4
+                                ? 16.0
+                                : 0), // Add right margin to the last card.
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0)),
+                          child: Wrap(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    InkWell(
+                                      onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (final context) =>
+                                                OtherProfile(babylonUser: newUser)),
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 40,
+                                        backgroundImage: NetworkImage(newUser.imagePath),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(newUser.fullName,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center),
+                                    ButtonBar(
+                                      alignment: MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(
+                                              Icons.remove_red_eye_outlined,
+                                              color: Colors.blue),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (final context) =>
+                                                      OtherProfile(
+                                                          babylonUser:
+                                                              newUser)), // TODO(EnzoL): To fix by a real BabylonUser
+                                            );
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.chat_bubble_outline,
+                                              color: Colors.blue),
+                                          onPressed: () async {
+                                            final Chat? newChat =
+                                                await ChatService.createChat(
+                                                    otherUser: newUser);
+                                            if (newChat != null) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (final context) =>
+                                                        ChatView(
+                                                          chat: newChat,
+                                                        )),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                IconButton(
-                                  icon: Icon(Icons.chat_bubble_outline,
-                                      color: Colors.blue),
-                                  onPressed: () {
-                                    // Placeholder for "Chat" action.
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
+                      );
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  children = <Widget>[
+                    Icon(Icons.error_outline, color: Colors.red, size: 60),
+                    Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Text("Error: ${snapshot.error}")),
+                  ];
+                } else {
+                  children = <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child:
+                          CircularProgressIndicator(color: Color(0xFF006400)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Text("Loading..."),
+                    ),
+                  ];
+                }
+                return Column(
+                  children: children,
+                 );
+              },
+            )),
       ],
     );
   }
@@ -469,18 +526,35 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       leading: InkWell(
-        onTap: () => chat.adminUID == null || chat.adminUID == ""
-            ? null
-            : Navigator.push(
+        onTap: () async {
+          if(chat.adminUID == null || chat.adminUID == "") {
+            final String otherUserUID = chat.usersUIDs.firstWhere((
+                final userUID) => userUID != ConnectedBabylonUser().userUID);
+            final BabylonUser? otherUser = await UserService.getBabylonUser(
+                userUID: otherUserUID);
+            if (otherUser != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (final context) =>
+                        OtherProfile(babylonUser: otherUser)),
+              );
+            }
+          }
+          else {
+            Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (final context) => ChatInfoView(chat: chat)),
-              ),
-        child: CircleAvatar(
-          backgroundImage:
-              NetworkImage(chat.iconPath!), // Placeholder for group snapshot.
-          radius: 25, // Adjust the size of the CircleAvatar here.
-        ),
+              );
+            }
+          },
+          child: CircleAvatar(
+            backgroundImage:
+            NetworkImage(chat.iconPath!), // Placeholder for group snapshot.
+            radius: 25,
+            // Adjust the size of the CircleAvatar here.
+          ),
       ),
       title:
           Text(chat.chatName!, style: TextStyle(fontWeight: FontWeight.bold)),
@@ -515,21 +589,32 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
                   itemBuilder: (final context, final index) {
                     final BabylonUser person = searchResults[index];
                     return Card(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                      margin: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0)),
+                          borderRadius: BorderRadius.circular(8.0)
+                      ),
                       elevation: 3.0,
                       child: IntrinsicHeight(
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: ImageLoader.loadProfilePicture(
-                                  person.imagePath, 30),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (final context) => OtherProfile(babylonUser: person),
+                                  ),
+                                );
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: ImageLoader.loadProfilePicture(person.imagePath, 30),
+                              ),
                             ),
+
                             Expanded(
+
                               child: Padding(
                                 padding: EdgeInsets.only(
                                     top: 10.0, right: 10.0, bottom: 10.0),
@@ -654,8 +739,17 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
     });
   }
 
-  void pressedChatButton(final BabylonUser babylonUser) {
-    // TODO(EnzoL): need to access the personal conversation and if it does not exist -> chat request
+  void pressedChatButton(final BabylonUser babylonUser) async {
+    final Chat? newChat = await ChatService.createChat(otherUser: babylonUser);
+    if (newChat != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (final context) => ChatView(
+                  chat: newChat,
+                )),
+      );
+    }
   }
 
 // Additional helper methods for building connection cards, handling accept/decline logic, etc., can be added here.

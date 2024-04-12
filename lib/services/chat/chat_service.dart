@@ -65,7 +65,7 @@ class ChatService {
   }
 
   // if otherUser is set, you will create a single chat. If not, you will create a groupchat
-  static Future<void> createChat(
+  static Future<Chat?> createChat(
       {final String? adminUID,
       final String? chatDescription,
       final String? chatName,
@@ -77,7 +77,8 @@ class ChatService {
       final newChatData = <String, dynamic>{};
       final BabylonUser curr = ConnectedBabylonUser();
       if (otherUser != null) {
-        if (otherUser.userUID != ConnectedBabylonUser().userUID) {
+        if (otherUser.userUID != "" &&
+            otherUser.userUID != ConnectedBabylonUser().userUID) {
           newChatData["users"] =
               FieldValue.arrayUnion([curr.userUID, otherUser.userUID]);
           final String chatDocID =
@@ -85,6 +86,10 @@ class ChatService {
                   ? "${curr.userUID}_${otherUser.userUID}"
                   : "${otherUser.userUID}_${curr.userUID}";
           await db.collection("chats").doc(chatDocID).set(newChatData);
+          return await getChatFromUID(
+              chatUID: curr.userUID.compareTo(otherUser.userUID) == -1
+                  ? "${curr.userUID}_${otherUser.userUID}"
+                  : "${otherUser.userUID}_${curr.userUID}");
         }
       } else {
         newChatData["chatName"] = chatName;
@@ -103,12 +108,14 @@ class ChatService {
           await referenceImageToUpload.putFile(image);
           newChatData["iconPath"] =
               await referenceImageToUpload.getDownloadURL();
-        } else {}
+        }
         if (usersUID.isNotEmpty) {
           newChatData["users"] = FieldValue.arrayUnion(usersUID);
         }
-        await db.collection("chats").doc().set(newChatData);
+        final newGroupchat = await db.collection("chats").add(newChatData);
+        return getChatFromUID(chatUID: newGroupchat.id);
       }
+      return null;
     } catch (e) {
       rethrow;
     }
@@ -402,6 +409,7 @@ class ChatService {
       rethrow;
     }
   }
+
   static Future<void> updateGroupChat({
     required final String chatUID,
     final String? chatName,
@@ -421,8 +429,10 @@ class ChatService {
       };
 
       if (image != null) {
-        final String imgName = "${DateTime.now().millisecondsSinceEpoch.toString()}.jpg";
-        final Reference referenceImageToUpload = referenceDirImages.child(imgName);
+        final String imgName =
+            "${DateTime.now().millisecondsSinceEpoch.toString()}.jpg";
+        final Reference referenceImageToUpload =
+            referenceDirImages.child(imgName);
         await referenceImageToUpload.putFile(image);
         newChatData["iconPath"] = await referenceImageToUpload.getDownloadURL();
       }
@@ -434,5 +444,3 @@ class ChatService {
     }
   }
 }
-
-

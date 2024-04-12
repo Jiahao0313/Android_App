@@ -1,5 +1,6 @@
 import "package:babylon_app/models/chat.dart";
 import "package:babylon_app/models/event.dart";
+import "package:cloud_firestore/cloud_firestore.dart";
 
 class BabylonUser {
   // Attributes
@@ -11,6 +12,7 @@ class BabylonUser {
   String? dateOfBirth;
   String? originCountry;
   String? about;
+  Timestamp? creationTime;
 
   List<Event>? listedEvents = [];
   List<String>? listedEventsUIDs = [];
@@ -41,6 +43,7 @@ class BabylonUser {
       this.dateOfBirth,
       this.originCountry,
       this.about,
+      required this.creationTime,
       this.listedEvents,
       this.listedEventsUIDs,
       this.listedConnections,
