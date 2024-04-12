@@ -91,7 +91,8 @@ class EventService {
       final eventSnapshot = await db.collection("events").doc(eventUID).get();
       final eventData = eventSnapshot.data();
       List<String> attendeeIDs = [];
-      if (eventData != null) {
+      if (eventData != null &&
+          eventData["date"].toDate().isAfter(DateTime.now())) {
         final BabylonUser? creator =
             await UserService.getBabylonUser(userUID: eventData["creator"]);
 
