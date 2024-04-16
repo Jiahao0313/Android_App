@@ -1,18 +1,15 @@
 import "package:flutter/material.dart";
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class EventDetail extends StatelessWidget {
+  const EventDetail({super.key});
 
   @override
   Widget build(final BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text("Home"),
-      ),
+      appBar: AppBar(title: const Text("EventDetail")),
       body: Center(
           child: Column(children: [
-        const Text("Home"),
+        const Text("EventDetail"),
         ElevatedButton(
             onPressed: () {
               Navigator.of(context).pushNamed("events");

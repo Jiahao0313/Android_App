@@ -8,7 +8,7 @@
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
 
-import "package:babylon_app/main.dart";
+import "package:babylon_app/legacy/views/main.dart";
 
 void main() {
   testWidgets("Counter increments smoke test",
