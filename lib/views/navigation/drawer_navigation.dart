@@ -1,10 +1,38 @@
 import "package:babylon_app/routes/navigation_keys.dart";
+import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 
 class DrawerNavigation extends StatelessWidget {
   final Function updateSelectedMenuIndexCallback;
   const DrawerNavigation(
       {super.key, required this.updateSelectedMenuIndexCallback});
+
+  Future<bool> showLogOutDialog(final BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (final context) {
+            return AlertDialog(
+              title: const Text("Log out"),
+              content: const Text("Are you sure you want to log out?"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text("Log out"),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
 
   @override
   Widget build(final BuildContext context) {
@@ -96,12 +124,16 @@ class DrawerNavigation extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text("Logout"),
-            onTap: () {
-              navigatorKey.currentState!.pushNamedAndRemoveUntil(
-                  "home",
-                  (final Route<dynamic> route) =>
-                      route.settings.name == "home");
-              layoutKey.currentState!.closeEndDrawer();
+            onTap: () async {
+              final shouldLogout = await showLogOutDialog(context);
+              if (shouldLogout) {
+                await FirebaseAuth.instance.signOut();
+                if (!context.mounted) return;
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    "launch",
+                    (final Route<dynamic> route) =>
+                        route.settings.name == "launch");
+              }
             },
           ),
         ],
