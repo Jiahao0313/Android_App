@@ -17,10 +17,9 @@ class BottomNavigation extends StatelessWidget {
         if (navigatorKey.currentState != null) {
           switch (index) {
             case 0:
-              navigatorKey.currentState!.pushNamedAndRemoveUntil(
-                  "home",
-                  (final Route<dynamic> route) =>
-                      route.settings.name == "home");
+              navigatorKey.currentState!.pushNamedAndRemoveUntil("home",
+                  (final Route<dynamic> route) => route.settings.name == "home",
+                  arguments: updateSelectedMenuIndexCallback);
               updateSelectedMenuIndexCallback(index);
               break;
             case 1:

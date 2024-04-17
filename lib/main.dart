@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       onGenerateRoute: CustomRouter.generatePreLoginRoutes,
       theme: CustomThemes.lightTheme,
       home: Splash(loadCurrentUserData: loadCurrentUserData),

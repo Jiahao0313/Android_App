@@ -1,5 +1,6 @@
 import "package:babylon_app/routes/custom_router.dart";
 import "package:babylon_app/routes/navigation_keys.dart";
+import "package:babylon_app/views/home.dart";
 import "package:babylon_app/views/navigation/bottom_navigation.dart";
 import "package:babylon_app/views/navigation/drawer_navigation.dart";
 import "package:flutter/material.dart";
@@ -23,18 +24,29 @@ class _Layout extends State<Layout> {
     super.initState();
   }
 
+  // the layout is used to show bottom nav bar and hold end drawer
+  // it contains navigation related states and callbacks
   @override
   Widget build(final BuildContext context) {
+    print(ModalRoute.of(context)?.settings.name);
     return Scaffold(
         key: layoutKey,
-        bottomNavigationBar: BottomNavigation(
-            selectedIndex: selectedMenuIndex,
-            updateSelectedMenuIndexCallback: updateSelectedMenuIndex),
+        // if in home screen dont show bottomNavBar
+        bottomNavigationBar: selectedMenuIndex == 0
+            ? null
+            : BottomNavigation(
+                selectedIndex: selectedMenuIndex,
+                updateSelectedMenuIndexCallback: updateSelectedMenuIndex),
         endDrawer: DrawerNavigation(
             updateSelectedMenuIndexCallback: updateSelectedMenuIndex),
         body: Navigator(
             key: navigatorKey,
-            initialRoute: "home",
+            onGenerateInitialRoutes: ((final navigator, final initialRoute) => [
+                  MaterialPageRoute(
+                      builder: (final _) => Home(
+                          updateSelectedMenuIndexCallback:
+                              updateSelectedMenuIndex))
+                ]),
             onGenerateRoute: CustomRouter.generatePostLoginRoutes));
   }
 }

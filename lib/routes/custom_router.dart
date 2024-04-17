@@ -28,81 +28,74 @@ import "package:babylon_app/views/radio/radio_screen.dart";
 import "package:flutter/material.dart";
 
 class CustomRouter {
-  static Route<dynamic> generatePreLoginRoutes(final RouteSettings settings) {
-    late Map<dynamic, dynamic>? arguments;
-    if (settings.arguments != null) arguments = settings.arguments as Map;
-    Route<dynamic> newRoute =
-        CustomPageRoute(builder: (final _) => const Launch());
+  static Route<dynamic>? generatePreLoginRoutes(final RouteSettings settings) {
+    CustomPageRoute(builder: (final _) => const Launch());
     switch (settings.name) {
       case "launch":
-        newRoute = CustomPageRoute(builder: (final _) => const Launch());
+        return CustomPageRoute(builder: (final _) => const Launch());
       case "registerForm":
-        newRoute = CustomPageRoute(builder: (final _) => const RegisterForm());
+        return CustomPageRoute(builder: (final _) => const RegisterForm());
       case "registerPicture":
-        newRoute =
-            CustomPageRoute(builder: (final _) => const RegisterPicture());
+        return CustomPageRoute(builder: (final _) => const RegisterPicture());
       case "registerAdditional":
-        newRoute =
-            CustomPageRoute(builder: (final _) => const RegisterAdditional());
+        return CustomPageRoute(
+            builder: (final _) => const RegisterAdditional());
       case "loginForm":
-        newRoute = CustomPageRoute(builder: (final _) => const LoginForm());
+        return CustomPageRoute(builder: (final _) => const LoginForm());
       case "layout":
-        newRoute = CustomPageRoute(builder: (final _) => const Layout());
+        return CustomPageRoute(builder: (final _) => const Layout());
     }
-    return newRoute;
+    return null;
   }
 
-  static Route<dynamic> generatePostLoginRoutes(final RouteSettings settings) {
-    late Map<dynamic, dynamic>? arguments;
-    if (settings.arguments != null) arguments = settings.arguments as Map;
-    Route<dynamic> newRoute =
-        CustomPageRoute(builder: (final _) => const Home());
+  static Route<dynamic>? generatePostLoginRoutes(final RouteSettings settings) {
     switch (settings.name) {
       case "home":
-        newRoute = CustomPageRoute(builder: (final _) => const Home());
+        return CustomPageRoute(
+            builder: (final _) => Home(
+                updateSelectedMenuIndexCallback:
+                    settings.arguments as Function));
       case "events":
-        newRoute = CustomPageRoute(builder: (final _) => const Events());
+        return CustomPageRoute(builder: (final _) => const Events());
       case "eventDetail":
-        newRoute = CustomPageRoute(builder: (final _) => const EventDetail());
+        return CustomPageRoute(builder: (final _) => const EventDetail());
       case "eventCreateForm":
-        newRoute =
-            CustomPageRoute(builder: (final _) => const EventCreateForm());
+        return CustomPageRoute(builder: (final _) => const EventCreateForm());
       case "eventUpdateForm":
-        newRoute =
-            CustomPageRoute(builder: (final _) => const EventUpdateForm());
+        return CustomPageRoute(builder: (final _) => const EventUpdateForm());
       case "myProfile":
-        newRoute = CustomPageRoute(builder: (final _) => const MyProfile());
+        return CustomPageRoute(builder: (final _) => const MyProfile());
       case "myAccount":
-        newRoute = CustomPageRoute(builder: (final _) => const MyAccount());
+        return CustomPageRoute(builder: (final _) => const MyAccount());
       case "userProfile":
-        newRoute = CustomPageRoute(builder: (final _) => const UserProfile());
+        return CustomPageRoute(builder: (final _) => const UserProfile());
       case "fullScreenPFP":
-        newRoute = CustomPageRoute(builder: (final _) => const FullScreenPFP());
+        return CustomPageRoute(builder: (final _) => const FullScreenPFP());
       case "offers":
-        newRoute = CustomPageRoute(builder: (final _) => const Offers());
+        return CustomPageRoute(builder: (final _) => const Offers());
       case "news":
-        newRoute = CustomPageRoute(builder: (final _) => const News());
+        return CustomPageRoute(builder: (final _) => const News());
       case "radio":
-        newRoute = CustomPageRoute(builder: (final _) => const RadioScreen());
+        return CustomPageRoute(builder: (final _) => const RadioScreen());
       case "forum":
-        newRoute = CustomPageRoute(builder: (final _) => const Forum());
+        return CustomPageRoute(builder: (final _) => const Forum());
       case "forumTopic":
-        newRoute = CustomPageRoute(builder: (final _) => const ForumTopic());
+        return CustomPageRoute(builder: (final _) => const ForumTopic());
       case "community":
-        newRoute = CustomPageRoute(builder: (final _) => const Community());
+        return CustomPageRoute(builder: (final _) => const Community());
       case "chatting":
-        newRoute = CustomPageRoute(builder: (final _) => const Chatting());
+        return CustomPageRoute(builder: (final _) => const Chatting());
       case "groupchatInfo":
-        newRoute = CustomPageRoute(builder: (final _) => const GroupchatInfo());
+        return CustomPageRoute(builder: (final _) => const GroupchatInfo());
       case "groupchatCreateForm":
-        CustomPageRoute(builder: (final _) => const GroupchatCreateForm());
+        return CustomPageRoute(
+            builder: (final _) => const GroupchatCreateForm());
       case "groupchatUpdateForm":
-        CustomPageRoute(builder: (final _) => const GroupchatUpdateForm());
+        return CustomPageRoute(
+            builder: (final _) => const GroupchatUpdateForm());
       case "groupchatSearch":
-        newRoute =
-            CustomPageRoute(builder: (final _) => const GroupchatSearch());
+        return CustomPageRoute(builder: (final _) => const GroupchatSearch());
     }
-
-    return newRoute;
+    return null;
   }
 }

@@ -47,6 +47,7 @@ class DrawerNavigation extends StatelessWidget {
               updateSelectedMenuIndexCallback(0);
               navigatorKey.currentState!.pushNamedAndRemoveUntil(
                   "home",
+                  arguments: updateSelectedMenuIndexCallback,
                   (final Route<dynamic> route) =>
                       route.settings.name == "home");
               layoutKey.currentState!.closeEndDrawer();
