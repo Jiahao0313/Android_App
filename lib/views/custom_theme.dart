@@ -47,21 +47,37 @@ class CustomThemes {
       ),
     ),
     textTheme: TextTheme(
-      displayLarge: GoogleFonts.robotoCondensed(fontWeight: FontWeight.bold),
-      displayMedium: GoogleFonts.robotoCondensed(fontWeight: FontWeight.bold),
-      displaySmall: GoogleFonts.robotoCondensed(fontWeight: FontWeight.bold),
-      headlineLarge: GoogleFonts.robotoCondensed(fontWeight: FontWeight.bold),
-      headlineMedium: GoogleFonts.robotoCondensed(fontWeight: FontWeight.bold),
-      headlineSmall: GoogleFonts.robotoCondensed(fontWeight: FontWeight.bold),
-      titleLarge: GoogleFonts.robotoCondensed(fontWeight: FontWeight.bold),
-      titleMedium: GoogleFonts.robotoCondensed(fontWeight: FontWeight.bold),
-      titleSmall: GoogleFonts.robotoCondensed(fontWeight: FontWeight.bold),
-      bodyLarge: GoogleFonts.robotoCondensed(fontWeight: FontWeight.normal),
-      bodyMedium: GoogleFonts.robotoCondensed(fontWeight: FontWeight.normal),
-      bodySmall: GoogleFonts.robotoCondensed(fontWeight: FontWeight.normal),
-      labelLarge: GoogleFonts.robotoCondensed(fontWeight: FontWeight.normal),
-      labelMedium: GoogleFonts.robotoCondensed(fontWeight: FontWeight.normal),
-      labelSmall: GoogleFonts.robotoCondensed(fontWeight: FontWeight.normal),
+      displayLarge: GoogleFonts.robotoCondensed(
+        fontWeight: FontWeight.bold,
+      ),
+      displayMedium: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.bold, color: Colors.black),
+      displaySmall: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.bold, color: Colors.black),
+      headlineLarge: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.bold, color: Colors.black),
+      headlineMedium: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.bold, color: Colors.black),
+      headlineSmall: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.bold, color: Colors.black),
+      titleLarge: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.bold, color: Colors.black),
+      titleMedium: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.bold, color: Colors.black),
+      titleSmall: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.bold, color: Colors.black),
+      bodyLarge: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.normal, color: Colors.black),
+      bodyMedium: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.normal, color: Colors.black),
+      bodySmall: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.normal, color: Colors.black),
+      labelLarge: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.normal, color: Colors.black),
+      labelMedium: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.normal, color: Colors.black),
+      labelSmall: GoogleFonts.robotoCondensed(
+          fontWeight: FontWeight.normal, color: Colors.black),
     ),
   );
 

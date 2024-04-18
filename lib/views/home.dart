@@ -1,5 +1,5 @@
-import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/routes/navigation_keys.dart";
+import "package:babylon_app/views/navigation/custom_app_bar.dart";
 import "package:flutter/material.dart";
 
 class Home extends StatefulWidget {
@@ -15,37 +15,7 @@ class _Home extends State<Home> {
   Widget build(final BuildContext context) {
     return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          toolbarHeight: 90,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leadingWidth: 100,
-          leading: Container(
-              padding: EdgeInsets.only(left: 10, bottom: 5),
-              child: Image(
-                  image: AssetImage("assets/images/blackLogoSquare.png"),
-                  fit: BoxFit.cover)),
-          actions: [
-            Container(
-                padding: EdgeInsets.only(right: 20),
-                child: InkWell(
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(ConnectedBabylonUser().imagePath),
-                        minRadius: 30,
-                      ),
-                      Text(
-                        "My profile",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      )
-                    ],
-                  ),
-                ))
-          ],
-        ),
+        appBar: CustomAppBar(isHome: true),
         body: Column(
           children: [
             Expanded(
@@ -85,7 +55,6 @@ class _Home extends State<Home> {
                             ),
                             Text(
                               "Community",
-                              style: TextStyle(color: Colors.black),
                             )
                           ]),
                           onTap: () {
@@ -108,7 +77,6 @@ class _Home extends State<Home> {
                             ),
                             Text(
                               "Events",
-                              style: TextStyle(color: Colors.black),
                             )
                           ]),
                           onTap: () {
@@ -129,8 +97,9 @@ class _Home extends State<Home> {
                                 Icons.chat,
                                 size: 40.0,
                               ),
-                              Text("Chats",
-                                  style: TextStyle(color: Colors.black)),
+                              Text(
+                                "Chats",
+                              )
                             ]),
                             onTap: () {
                               widget.updateSelectedMenuIndexCallback(4);
@@ -156,7 +125,6 @@ class _Home extends State<Home> {
                             ),
                             Text(
                               "Market",
-                              style: TextStyle(color: Colors.black),
                             )
                           ]),
                           onTap: () {
@@ -177,7 +145,9 @@ class _Home extends State<Home> {
                               Icons.newspaper,
                               size: 40.0,
                             ),
-                            Text("News", style: TextStyle(color: Colors.black)),
+                            Text(
+                              "News",
+                            ),
                           ]),
                           onTap: () {
                             widget.updateSelectedMenuIndexCallback(3);
@@ -197,8 +167,9 @@ class _Home extends State<Home> {
                                 Icons.control_point,
                                 size: 40.0,
                               ),
-                              Text("Chats",
-                                  style: TextStyle(color: Colors.black)),
+                              Text(
+                                "Chats",
+                              )
                             ]),
                             onTap: () {
                               layoutKey.currentState!.openEndDrawer();
