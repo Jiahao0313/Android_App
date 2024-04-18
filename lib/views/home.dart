@@ -15,7 +15,10 @@ class _Home extends State<Home> {
   Widget build(final BuildContext context) {
     return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: CustomAppBar(isHome: true),
+        appBar: CustomAppBar(
+          isHome: true,
+          title: "",
+        ),
         body: Column(
           children: [
             Expanded(

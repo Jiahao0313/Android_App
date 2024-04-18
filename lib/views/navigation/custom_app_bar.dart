@@ -3,7 +3,8 @@ import "package:flutter/material.dart";
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isHome;
-  const CustomAppBar({super.key, this.isHome = false});
+  final String title;
+  const CustomAppBar({super.key, required this.title, this.isHome = false});
 
   @override
   Widget build(final BuildContext context) {
@@ -13,18 +14,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       surfaceTintColor: Colors.white,
       elevation: isHome ? null : 5,
       toolbarHeight: isHome ? 90 : 120,
-      leadingWidth: isHome ? 90 : 200,
-      leading: isHome
+      title: isHome
           ? Container(
               padding: EdgeInsets.only(left: 10, bottom: 5),
               child: Image(
+                  width: 80,
                   image: AssetImage("assets/images/blackLogoSquare.png"),
                   fit: BoxFit.cover))
           : Container(
               alignment: Alignment.centerLeft,
-              margin: EdgeInsets.only(left: 30),
+              margin: EdgeInsets.only(left: 20),
               child: Text(
-                "Events",
+                title,
                 style: Theme.of(context).textTheme.headlineLarge,
               )),
       actions: [
@@ -41,7 +42,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                       Text(
                         "My profile",
-                        style: Theme.of(context).textTheme.displaySmall,
+                        style: Theme.of(context).textTheme.titleLarge,
                       )
                     ],
                   ),
