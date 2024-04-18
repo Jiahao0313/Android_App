@@ -1,3 +1,4 @@
+import "package:babylon_app/views/navigation/custom_app_bar.dart";
 import "package:flutter/material.dart";
 
 class Events extends StatelessWidget {
@@ -6,7 +7,7 @@ class Events extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Events")),
+      appBar: CustomAppBar(),
       body: Center(
           child: Column(children: [
         const Text("Events"),
@@ -14,7 +15,9 @@ class Events extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).pushNamed("eventDetail");
             },
-            child: const Text("Event"))
+            child: const Text(
+              "Event",
+            ))
       ])),
     );
   }

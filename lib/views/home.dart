@@ -44,7 +44,7 @@ class _Home extends State<Home> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         InkWell(
-                          child: Column(children: const [
+                          child: Column(children: [
                             SizedBox(
                               width: 100,
                               height: 0,
@@ -53,9 +53,8 @@ class _Home extends State<Home> {
                               Icons.groups,
                               size: 40.0,
                             ),
-                            Text(
-                              "Community",
-                            )
+                            Text("Community",
+                                style: Theme.of(context).textTheme.bodyMedium)
                           ]),
                           onTap: () {
                             widget.updateSelectedMenuIndexCallback(1);
@@ -66,7 +65,7 @@ class _Home extends State<Home> {
                           },
                         ),
                         InkWell(
-                          child: Column(children: const [
+                          child: Column(children: [
                             SizedBox(
                               width: 100,
                               height: 0,
@@ -75,9 +74,8 @@ class _Home extends State<Home> {
                               Icons.calendar_month,
                               size: 40.0,
                             ),
-                            Text(
-                              "Events",
-                            )
+                            Text("Events",
+                                style: Theme.of(context).textTheme.bodyMedium)
                           ]),
                           onTap: () {
                             widget.updateSelectedMenuIndexCallback(2);
@@ -88,7 +86,7 @@ class _Home extends State<Home> {
                           },
                         ),
                         InkWell(
-                            child: Column(children: const [
+                            child: Column(children: [
                               SizedBox(
                                 width: 100,
                                 height: 0,
@@ -99,6 +97,7 @@ class _Home extends State<Home> {
                               ),
                               Text(
                                 "Chats",
+                                style: Theme.of(context).textTheme.bodyMedium,
                               )
                             ]),
                             onTap: () {
@@ -114,7 +113,7 @@ class _Home extends State<Home> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         InkWell(
-                          child: Column(children: const [
+                          child: Column(children: [
                             SizedBox(
                               width: 100,
                               height: 0,
@@ -123,9 +122,8 @@ class _Home extends State<Home> {
                               Icons.store,
                               size: 40.0,
                             ),
-                            Text(
-                              "Market",
-                            )
+                            Text("Market",
+                                style: Theme.of(context).textTheme.bodyMedium)
                           ]),
                           onTap: () {
                             widget.updateSelectedMenuIndexCallback(4);
@@ -136,7 +134,7 @@ class _Home extends State<Home> {
                           },
                         ),
                         InkWell(
-                          child: Column(children: const [
+                          child: Column(children: [
                             SizedBox(
                               width: 100,
                               height: 0,
@@ -145,9 +143,8 @@ class _Home extends State<Home> {
                               Icons.newspaper,
                               size: 40.0,
                             ),
-                            Text(
-                              "News",
-                            ),
+                            Text("News",
+                                style: Theme.of(context).textTheme.bodyMedium),
                           ]),
                           onTap: () {
                             widget.updateSelectedMenuIndexCallback(3);
@@ -158,7 +155,7 @@ class _Home extends State<Home> {
                           },
                         ),
                         InkWell(
-                            child: Column(children: const [
+                            child: Column(children: [
                               SizedBox(
                                 width: 100,
                                 height: 0,
@@ -167,9 +164,8 @@ class _Home extends State<Home> {
                                 Icons.control_point,
                                 size: 40.0,
                               ),
-                              Text(
-                                "Chats",
-                              )
+                              Text("Chats",
+                                  style: Theme.of(context).textTheme.bodyMedium)
                             ]),
                             onTap: () {
                               layoutKey.currentState!.openEndDrawer();

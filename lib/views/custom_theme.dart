@@ -46,6 +46,7 @@ class CustomThemes {
         foregroundColor: MaterialStatePropertyAll(Colors.white),
       ),
     ),
+    appBarTheme: AppBarTheme(),
     textTheme: TextTheme(
       displayLarge: GoogleFonts.robotoCondensed(
         fontWeight: FontWeight.bold,
@@ -53,9 +54,9 @@ class CustomThemes {
       displayMedium: GoogleFonts.robotoCondensed(
           fontWeight: FontWeight.bold, color: Colors.black),
       displaySmall: GoogleFonts.robotoCondensed(
-          fontWeight: FontWeight.bold, color: Colors.black),
+          fontWeight: FontWeight.bold, color: Colors.black, fontSize: 20),
       headlineLarge: GoogleFonts.robotoCondensed(
-          fontWeight: FontWeight.bold, color: Colors.black),
+          fontWeight: FontWeight.bold, color: Color(0xFF018301)),
       headlineMedium: GoogleFonts.robotoCondensed(
           fontWeight: FontWeight.bold, color: Colors.black),
       headlineSmall: GoogleFonts.robotoCondensed(
