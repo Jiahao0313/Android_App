@@ -69,7 +69,7 @@ class DrawerNavigation extends StatelessWidget {
             leading: const Icon(Icons.newspaper),
             title: const Text("News"),
             onTap: () {
-              updateSelectedMenuIndexCallback(2);
+              updateSelectedMenuIndexCallback(3);
               navigatorKey.currentState!.pushNamedAndRemoveUntil(
                   "news",
                   (final Route<dynamic> route) =>
@@ -81,7 +81,7 @@ class DrawerNavigation extends StatelessWidget {
             leading: const Icon(Icons.calendar_month),
             title: const Text("Events"),
             onTap: () {
-              updateSelectedMenuIndexCallback(3);
+              updateSelectedMenuIndexCallback(2);
               navigatorKey.currentState!.pushNamedAndRemoveUntil(
                   "events",
                   (final Route<dynamic> route) =>
@@ -93,6 +93,7 @@ class DrawerNavigation extends StatelessWidget {
             leading: const Icon(Icons.radio),
             title: const Text("Radio"),
             onTap: () {
+              updateSelectedMenuIndexCallback(4);
               navigatorKey.currentState!.pushNamedAndRemoveUntil(
                   "radio",
                   (final Route<dynamic> route) =>
@@ -104,6 +105,7 @@ class DrawerNavigation extends StatelessWidget {
             leading: const Icon(Icons.business),
             title: const Text("Offers"),
             onTap: () {
+              updateSelectedMenuIndexCallback(4);
               navigatorKey.currentState!.pushNamedAndRemoveUntil(
                   "offers",
                   (final Route<dynamic> route) =>
@@ -115,6 +117,7 @@ class DrawerNavigation extends StatelessWidget {
             leading: const Icon(Icons.person),
             title: const Text("My account"),
             onTap: () {
+              updateSelectedMenuIndexCallback(4);
               navigatorKey.currentState!.pushNamedAndRemoveUntil(
                   "myAccount",
                   (final Route<dynamic> route) =>
@@ -126,6 +129,7 @@ class DrawerNavigation extends StatelessWidget {
             leading: const Icon(Icons.logout),
             title: const Text("Logout"),
             onTap: () async {
+              updateSelectedMenuIndexCallback(4);
               final shouldLogout = await showLogOutDialog(context);
               if (shouldLogout) {
                 await FirebaseAuth.instance.signOut();

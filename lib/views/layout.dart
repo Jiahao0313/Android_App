@@ -28,7 +28,6 @@ class _Layout extends State<Layout> {
   // it contains navigation related states and callbacks
   @override
   Widget build(final BuildContext context) {
-    print(ModalRoute.of(context)?.settings.name);
     return Scaffold(
         key: layoutKey,
         // if in home screen dont show bottomNavBar
