@@ -56,15 +56,15 @@ class BottomNavigation extends StatelessWidget {
           label: "Home",
         ),
         NavigationDestination(
-          icon: Icon(Icons.groups),
+          icon: Icon(Icons.groups_2_outlined),
           label: "Community",
         ),
         NavigationDestination(
-          icon: Icon(Icons.calendar_month),
+          icon: Icon(Icons.calendar_month_outlined),
           label: "Events",
         ),
         NavigationDestination(
-          icon: Icon(Icons.newspaper),
+          icon: Icon(Icons.newspaper_outlined),
           label: "News",
         ),
         NavigationDestination(

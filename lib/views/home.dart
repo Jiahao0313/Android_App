@@ -53,7 +53,7 @@ class _Home extends State<Home> {
                               height: 0,
                             ),
                             Icon(
-                              Icons.groups,
+                              Icons.groups_2_outlined,
                               size: 40.0,
                             ),
                             Text("Community",
@@ -74,7 +74,7 @@ class _Home extends State<Home> {
                               height: 0,
                             ),
                             Icon(
-                              Icons.calendar_month,
+                              Icons.calendar_month_outlined,
                               size: 40.0,
                             ),
                             Text("Events",
@@ -95,7 +95,7 @@ class _Home extends State<Home> {
                                 height: 0,
                               ),
                               Icon(
-                                Icons.chat,
+                                Icons.chat_outlined,
                                 size: 40.0,
                               ),
                               Text(
@@ -122,7 +122,7 @@ class _Home extends State<Home> {
                               height: 0,
                             ),
                             Icon(
-                              Icons.store,
+                              Icons.store_outlined,
                               size: 40.0,
                             ),
                             Text("Market",
@@ -143,7 +143,7 @@ class _Home extends State<Home> {
                               height: 0,
                             ),
                             Icon(
-                              Icons.newspaper,
+                              Icons.newspaper_outlined,
                               size: 40.0,
                             ),
                             Text("News",

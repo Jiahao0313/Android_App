@@ -27,10 +27,10 @@ class ImageLoader {
         future: _futureAssetForEventPicture(imagePath),
         builder: (final BuildContext context, final snapshot) => ConstrainedBox(
           constraints: BoxConstraints(
-            minWidth: 70,
-            minHeight: 70,
-            maxWidth: 70,
-            maxHeight: 70,
+            minWidth: 100,
+            minHeight: 100,
+            maxWidth: 100,
+            maxHeight: 100,
           ),
           child: snapshot.data ??
               Image(

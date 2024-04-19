@@ -99,9 +99,25 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
   Widget build(final BuildContext context) {
     return Scaffold(
         appBar: CustomAppBar(title: "Events"),
-        body: TabBarView(
-          controller: _tabController,
-          children: [_buildUpComingEventList(), _buildMyEventList()],
+        body: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            TabBar(
+              controller: _tabController,
+              labelColor: Color(0xFF018301),
+              indicatorWeight: 10,
+              tabs: const [
+                Tab(text: "Upcoming events"),
+                Tab(text: "My events")
+              ],
+              // Color of the text of selected tabs
+            ),
+            Expanded(
+                child: TabBarView(
+              controller: _tabController,
+              children: [_buildUpComingEventList(), _buildMyEventList()],
+            ))
+          ],
         ));
   }
 
@@ -134,12 +150,6 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
         ];
       } else if (loadedUpcomingEvents.isNotEmpty) {
         children = <Widget>[
-          Padding(
-            padding: EdgeInsets.only(left: 16, top: 16),
-            child: Text("Upcoming events",
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          ),
           ...loadedUpcomingEvents
               .map((final anEvent) => _buildEventCard(anEvent)),
           _buildLoadingIndicator(loadingMoreEvents)
@@ -151,10 +161,6 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
               padding: EdgeInsets.only(top: 20.0), // Adjust the top margin here
               child: Text(
                 "Event calendar is empty at the moment. Stay tuned for announcements! 📆",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                ),
               ),
             ),
           ),
@@ -208,31 +214,39 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
         ];
       } else if (loadedMyEvents.isNotEmpty) {
         children = <Widget>[
-          Padding(
-            padding: EdgeInsets.only(left: 16, top: 16),
-            child: Text("Upcoming events",
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(top: 20),
+            child: ElevatedButton(
+                onPressed: () => {}, child: Text("ADD NEW EVENT")),
           ),
           ...loadedMyEvents.map((final anEvent) => _buildEventCard(anEvent)),
         ];
       } else if (loadedMyEvents.isEmpty) {
         children = <Widget>[
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(top: 20),
+            child: ElevatedButton(
+                onPressed: () => {}, child: Text("ADD NEW EVENT")),
+          ),
           Center(
             child: Padding(
               padding: EdgeInsets.only(top: 20.0), // Adjust the top margin here
               child: Text(
                 "Your event list is empty! Time to plan something fun. 🎉",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                ),
               ),
             ),
           ),
         ];
       } else {
         children = <Widget>[
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(top: 20),
+            child: ElevatedButton(
+                onPressed: () => {}, child: Text("ADD NEW EVENT")),
+          ),
           const Icon(
             Icons.error_outline,
             color: Colors.red,
@@ -253,48 +267,109 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
 
   Widget _buildEventCard(final Event event) {
     return Card(
+      surfaceTintColor: Colors.white,
+      elevation: 10,
+      shape:
+          BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.zero)),
       margin: const EdgeInsets.all(10),
       child: InkWell(
-        onTap: () async {
-          // await Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (final context) => EventInfoScreen(event: event),
+          onTap: () async {
+            // await Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (final context) => EventInfoScreen(event: event),
+            //   ),
+            // );
+            setState(() {});
+          },
+          child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: ImageLoader.loadEventPicture(event.pictureURL!),
+                  ),
+                  Expanded(
+                      flex: 5,
+                      child: Container(
+                          padding: EdgeInsets.only(left: 16, right: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(bottom: 8),
+                                child: Text(event.title,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium),
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                      Icons.calendar_month_outlined,
+                                      color: Color(0xFF018301),
+                                    ),
+                                  ),
+                                  Text(DateFormat("dd/mm/yyyy | H:mm")
+                                      .format(event.date!)),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                      Icons.person_2_outlined,
+                                      color: Color(0xFF018301),
+                                    ),
+                                  ),
+                                  Text("Host: ${event.creator!.fullName}"),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                      Icons.place_outlined,
+                                      color: Color(0xFF018301),
+                                    ),
+                                  ),
+                                  Text("Location: ${event.place}"),
+                                ],
+                              )
+                            ],
+                          ))),
+                  Icon(
+                    Icons.chevron_right_outlined,
+                    color: Color(0xFF018301),
+                  ),
+                ],
+              ))
+          // ListTile(
+          //   leading: ImageLoader.loadEventPicture(event.pictureURL!),
+          //   title: Column(
+          //     children: [],
           //   ),
-          // );
-          setState(() {});
-        },
-        child: ListTile(
-          leading: ImageLoader.loadEventPicture(event.pictureURL!),
-          title: Text(event.title),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                  "${DateFormat("dd MMMM yyyy").format(event.date!)} at ${DateFormat("hh:mm aaa").format(event.date!)}"),
-              Text(event.shortDescription!,
-                  maxLines: 3, overflow: TextOverflow.ellipsis),
-              Text(
-                  "Host: ${event.creator!.fullName}"), // Display the host of the event.
-              Text(
-                  "Location: ${event.place}"), // Display the location of the event.
-            ],
+          //   trailing: IconButton(
+          //     icon: const Icon(Icons.chevron_right_sharp),
+          //     onPressed: () async {
+          //       // When the info button is pressed, navigate to the EvonPentInfoScreen.
+          //       // await Navigator.push(
+          //       //   context,
+          //       //   MaterialPageRoute(
+          //       //     builder: (final context) => EventInfoScreen(event: event),
+          //       //   ),
+          //       // );
+          //       setState(() {});
+          //     },
+          //   ),
+          // ),
           ),
-          trailing: IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () async {
-              // When the info button is pressed, navigate to the EvonPentInfoScreen.
-              // await Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (final context) => EventInfoScreen(event: event),
-              //   ),
-              // );
-              setState(() {});
-            },
-          ),
-        ),
-      ),
     );
   }
 

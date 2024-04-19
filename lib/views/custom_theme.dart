@@ -47,6 +47,15 @@ class CustomThemes {
       ),
     ),
     appBarTheme: AppBarTheme(),
+    tabBarTheme: TabBarTheme(
+      labelColor: Color(0xFF018301),
+      unselectedLabelColor: Colors.black,
+      indicatorColor: Color(0xFF018301),
+      indicatorSize: TabBarIndicatorSize.tab,
+      labelPadding: EdgeInsets.symmetric(vertical: 8),
+    ),
+    listTileTheme: ListTileThemeData(iconColor: Color(0xFF018301)),
+    cardTheme: CardTheme(surfaceTintColor: Colors.white, elevation: 10),
     textTheme: TextTheme(
       displayLarge: GoogleFonts.robotoCondensed(
         fontWeight: FontWeight.bold,
@@ -64,7 +73,7 @@ class CustomThemes {
       titleLarge: GoogleFonts.robotoCondensed(
           fontWeight: FontWeight.bold, color: Colors.black),
       titleMedium: GoogleFonts.robotoCondensed(
-          fontWeight: FontWeight.bold, color: Colors.black),
+          fontWeight: FontWeight.bold, color: Color(0xFF018301)),
       titleSmall: GoogleFonts.robotoCondensed(
           fontWeight: FontWeight.bold, color: Colors.black),
       bodyLarge: GoogleFonts.robotoCondensed(

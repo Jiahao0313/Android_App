@@ -41,7 +41,7 @@ class DrawerNavigation extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         children: <Widget>[
           ListTile(
-            leading: const Icon(Icons.home),
+            leading: const Icon(Icons.home_filled),
             title: const Text("Home"),
             onTap: () {
               updateSelectedMenuIndexCallback(0);
@@ -54,7 +54,7 @@ class DrawerNavigation extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.group),
+            leading: const Icon(Icons.groups_2_outlined),
             title: const Text("Community"),
             onTap: () {
               updateSelectedMenuIndexCallback(1);
@@ -66,7 +66,7 @@ class DrawerNavigation extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.newspaper),
+            leading: const Icon(Icons.newspaper_outlined),
             title: const Text("News"),
             onTap: () {
               updateSelectedMenuIndexCallback(3);
@@ -78,7 +78,7 @@ class DrawerNavigation extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.calendar_month),
+            leading: const Icon(Icons.calendar_month_outlined),
             title: const Text("Events"),
             onTap: () {
               updateSelectedMenuIndexCallback(2);
@@ -90,7 +90,7 @@ class DrawerNavigation extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.radio),
+            leading: const Icon(Icons.radio_outlined),
             title: const Text("Radio"),
             onTap: () {
               updateSelectedMenuIndexCallback(4);
@@ -102,7 +102,7 @@ class DrawerNavigation extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.business),
+            leading: const Icon(Icons.business_outlined),
             title: const Text("Offers"),
             onTap: () {
               updateSelectedMenuIndexCallback(4);
@@ -114,7 +114,7 @@ class DrawerNavigation extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.person),
+            leading: const Icon(Icons.person_2_outlined),
             title: const Text("My account"),
             onTap: () {
               updateSelectedMenuIndexCallback(4);
@@ -126,7 +126,7 @@ class DrawerNavigation extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.logout),
+            leading: const Icon(Icons.logout_outlined),
             title: const Text("Logout"),
             onTap: () async {
               updateSelectedMenuIndexCallback(4);
