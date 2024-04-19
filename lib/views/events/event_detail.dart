@@ -199,13 +199,11 @@ class _EventDetail extends State<EventDetail> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                child: Text(
-                  "People Attending",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge, // Larger text for the section title.
-                ),
+              Text(
+                "People Attending",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge, // Larger text for the section title.
               ),
               // Horizontally scrollable list of avatars with an overlap effect.
               Container(

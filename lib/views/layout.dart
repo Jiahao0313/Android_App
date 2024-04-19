@@ -1,6 +1,6 @@
 import "package:babylon_app/routes/custom_router.dart";
 import "package:babylon_app/routes/navigation_keys.dart";
-import "package:babylon_app/views/home.dart";
+import "package:babylon_app/views/home/home.dart";
 import "package:babylon_app/views/navigation/bottom_navigation.dart";
 import "package:babylon_app/views/navigation/drawer_navigation.dart";
 import "package:flutter/material.dart";

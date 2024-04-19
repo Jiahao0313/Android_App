@@ -400,10 +400,8 @@ class UserService {
     try {
       List<BabylonUser> connections = [];
       final BabylonUser currUser = ConnectedBabylonUser();
-      if (currUser.listedConnectionsUIDs != null) {
-        connections = await getBabylonUsersFromUIDs(
-            userUIDList: currUser.listedConnectionsUIDs);
-      }
+      connections = await getBabylonUsersFromUIDs(
+          userUIDList: currUser.listedConnectionsUIDs);
       connections.sort((final connection1, final connection2) =>
           connection1.fullName.compareTo(connection2.fullName));
       return connections;
@@ -438,15 +436,13 @@ class UserService {
     try {
       final db = FirebaseFirestore.instance;
       final BabylonUser currUser = ConnectedBabylonUser();
-      if (currUser.listedConnectionsUIDs != null) {
-        db.collection("users").doc(currUser.userUID).update({
-          "connections": FieldValue.arrayRemove([connectionUID])
-        });
-        db.collection("users").doc(connectionUID).update({
-          "connections": FieldValue.arrayRemove([currUser.userUID])
-        });
-        ConnectedBabylonUser().listedConnectionsUIDs!.remove(connectionUID);
-      }
+      db.collection("users").doc(currUser.userUID).update({
+        "connections": FieldValue.arrayRemove([connectionUID])
+      });
+      db.collection("users").doc(connectionUID).update({
+        "connections": FieldValue.arrayRemove([currUser.userUID])
+      });
+      ConnectedBabylonUser().listedConnectionsUIDs.remove(connectionUID);
     } catch (e) {
       rethrow;
     }
@@ -468,8 +464,8 @@ class UserService {
         db.collection("users").doc(userUID).update({
           "connectionRequests": FieldValue.arrayRemove([requestUID])
         });
-        ConnectedBabylonUser().listedConnectionsUIDs!.add(requestUID);
-        ConnectedBabylonUser().connectionRequestsUIDs!.remove(requestUID);
+        ConnectedBabylonUser().listedConnectionsUIDs.add(requestUID);
+        ConnectedBabylonUser().connectionRequestsUIDs.remove(requestUID);
       }
     } catch (e) {
       rethrow;
@@ -487,9 +483,9 @@ class UserService {
         "sentConnectionRequests":
             FieldValue.arrayRemove([ConnectedBabylonUser().userUID])
       });
-      ConnectedBabylonUser().connectionRequestsUIDs!.remove(requestUID);
+      ConnectedBabylonUser().connectionRequestsUIDs.remove(requestUID);
       ConnectedBabylonUser()
-          .sentPendingConnectionRequestsUIDs!
+          .sentPendingConnectionRequestsUIDs
           .remove(requestUID);
     } catch (e) {
       rethrow;
@@ -506,9 +502,9 @@ class UserService {
       await db.collection("users").doc(ConnectedBabylonUser().userUID).update({
         "sentConnectionRequests": FieldValue.arrayRemove([requestUID])
       });
-      ConnectedBabylonUser().connectionRequestsUIDs!.remove(requestUID);
+      ConnectedBabylonUser().connectionRequestsUIDs.remove(requestUID);
       ConnectedBabylonUser()
-          .sentPendingConnectionRequestsUIDs!
+          .sentPendingConnectionRequestsUIDs
           .remove(requestUID);
     } catch (e) {
       rethrow;

@@ -126,8 +126,8 @@ class EventService {
       final BabylonUser? babylonUser =
           await UserService.getBabylonUser(userUID: uuid);
 
-      if (babylonUser != null && babylonUser.listedEventsUIDs != null) {
-        await Future.forEach(babylonUser.listedEventsUIDs!,
+      if (babylonUser != null) {
+        await Future.forEach(babylonUser.listedEventsUIDs,
             (final anEventUID) async {
           final Event? anEvent = await getEvent(eventUID: anEventUID);
           if (anEvent != null) result.add(anEvent);

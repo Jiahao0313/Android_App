@@ -2,7 +2,7 @@ import "package:babylon_app/routes/custom_router.dart";
 import "package:babylon_app/services/firebase_options.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/custom_theme.dart";
-import "package:babylon_app/views/splash.dart";
+import "package:babylon_app/views/launch/splash.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:firebase_core/firebase_core.dart";
 import "package:flutter/material.dart";

@@ -2,6 +2,7 @@ import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/event.dart";
 import "package:babylon_app/services/event/event_service.dart";
 import "package:babylon_app/utils/image_loader.dart";
+import "package:babylon_app/views/loading.dart";
 import "package:babylon_app/views/navigation/custom_app_bar.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
@@ -125,34 +126,11 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
     return Builder(builder: (final BuildContext context) {
       List<Widget> children;
       if (loadingEvents) {
-        children = <Widget>[
-          Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: CircularProgressIndicator(color: Color(0xFF006400)),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text("Loading..."),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 128),
-                child: Image.asset("assets/images/logoSquare.png",
-                    height: 185, width: 185),
-              ),
-            ],
-          )
-        ];
+        children = [Loading()];
       } else if (loadedUpcomingEvents.isNotEmpty) {
         children = <Widget>[
           ...loadedUpcomingEvents
               .map((final anEvent) => _buildEventCard(anEvent)),
-          _buildLoadingIndicator(loadingMoreEvents)
         ];
       } else if (loadedUpcomingEvents.isEmpty) {
         children = <Widget>[
@@ -189,29 +167,7 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
     return Builder(builder: (final BuildContext context) {
       List<Widget> children;
       if (loadingMyEvents) {
-        children = <Widget>[
-          Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: CircularProgressIndicator(color: Color(0xFF006400)),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text("Loading..."),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 128),
-                child: Image.asset("assets/images/logoSquare.png",
-                    height: 185, width: 185),
-              ),
-            ],
-          )
-        ];
+        children = [Loading()];
       } else if (loadedMyEvents.isNotEmpty) {
         children = <Widget>[
           Container(
@@ -374,18 +330,5 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
           // ),
           ),
     );
-  }
-
-  Widget _buildLoadingIndicator(final isLoading) {
-    if (isLoading) {
-      return Padding(
-        padding: EdgeInsets.symmetric(vertical: 20),
-        child: Center(
-          child: CircularProgressIndicator(color: Color(0xFF006400)),
-        ),
-      );
-    } else {
-      return SizedBox.shrink();
-    }
   }
 }
