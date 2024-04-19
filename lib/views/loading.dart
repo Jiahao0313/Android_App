@@ -6,8 +6,12 @@ class Loading extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     return Container(
-        padding: EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.all(32),
+        alignment: Alignment.center,
         child: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: const [
             CircularProgressIndicator(color: Color(0xFF006400)),
             Text("Loading..."),

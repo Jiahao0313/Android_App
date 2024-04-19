@@ -2,6 +2,7 @@ import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/event.dart";
 import "package:babylon_app/services/event/event_service.dart";
+import "package:babylon_app/views/loading.dart";
 import "package:babylon_app/views/navigation/custom_app_bar.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
@@ -62,7 +63,7 @@ class _EventDetail extends State<EventDetail> {
                           _buildEditBtn(context)
                       ],
                     )))
-            : null);
+            : Loading());
   }
 
   Widget _buildHero(final BuildContext context) {
