@@ -1,3 +1,5 @@
+import "package:babylon_app/models/babylon_user.dart";
+import "package:babylon_app/models/event.dart";
 import "package:babylon_app/routes/custom_page_route.dart";
 import "package:babylon_app/views/authentication/login_form.dart";
 import "package:babylon_app/views/authentication/register_additional.dart";
@@ -58,7 +60,10 @@ class CustomRouter {
       case "events":
         return CustomPageRoute(builder: (final _) => const Events());
       case "eventDetail":
-        return CustomPageRoute(builder: (final _) => const EventDetail());
+        return CustomPageRoute(
+            builder: (final _) => EventDetail(
+                  event: settings.arguments as Event,
+                ));
       case "eventCreateForm":
         return CustomPageRoute(builder: (final _) => const EventCreateForm());
       case "eventUpdateForm":
@@ -68,7 +73,10 @@ class CustomRouter {
       case "myAccount":
         return CustomPageRoute(builder: (final _) => const MyAccount());
       case "userProfile":
-        return CustomPageRoute(builder: (final _) => const UserProfile());
+        return CustomPageRoute(
+            builder: (final _) => UserProfile(
+                  user: settings.arguments as BabylonUser,
+                ));
       case "fullScreenPFP":
         return CustomPageRoute(builder: (final _) => const FullScreenPFP());
       case "offers":

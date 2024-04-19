@@ -15,22 +15,22 @@ class BabylonUser {
   Timestamp? creationTime;
 
   List<Event>? listedEvents = [];
-  List<String>? listedEventsUIDs = [];
+  List<String> listedEventsUIDs = [];
 
   List<BabylonUser>? listedConnections = [];
-  List<String>? listedConnectionsUIDs = [];
+  List<String> listedConnectionsUIDs = [];
 
   List<BabylonUser>? connectionRequests = [];
-  List<String>? connectionRequestsUIDs = [];
+  List<String> connectionRequestsUIDs = [];
 
   List<BabylonUser>? sentPendingConnectionRequests = [];
-  List<String>? sentPendingConnectionRequestsUIDs = [];
+  List<String> sentPendingConnectionRequestsUIDs = [];
 
   List<Chat>? groupChatInvitations = [];
-  List<String>? groupChatInvitationsUIDs = [];
+  List<String> groupChatInvitationsUIDs = [];
 
   List<Chat>? groupChatJoinRequests = [];
-  List<String>? groupChatJoinRequestsUIDs = [];
+  List<String> groupChatJoinRequestsUIDs = [];
 
   // Constructors
 
@@ -45,15 +45,15 @@ class BabylonUser {
       this.about,
       required this.creationTime,
       this.listedEvents,
-      this.listedEventsUIDs,
+      required this.listedEventsUIDs,
       this.listedConnections,
-      this.listedConnectionsUIDs,
+      required this.listedConnectionsUIDs,
       this.connectionRequests,
-      this.connectionRequestsUIDs,
+      required this.connectionRequestsUIDs,
       this.sentPendingConnectionRequests,
-      this.sentPendingConnectionRequestsUIDs,
+      required this.sentPendingConnectionRequestsUIDs,
       this.groupChatInvitations,
-      this.groupChatInvitationsUIDs,
+      required this.groupChatInvitationsUIDs,
       this.groupChatJoinRequests,
-      this.groupChatJoinRequestsUIDs});
+      required this.groupChatJoinRequestsUIDs});
 }

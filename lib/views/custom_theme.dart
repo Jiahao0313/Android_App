@@ -40,11 +40,13 @@ class CustomThemes {
     ),
     outlinedButtonTheme: const OutlinedButtonThemeData(
       style: ButtonStyle(
-        textStyle:
-            MaterialStatePropertyAll(TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: MaterialStatePropertyAll(Color(0xFFF77600)),
-        foregroundColor: MaterialStatePropertyAll(Colors.white),
-      ),
+          textStyle:
+              MaterialStatePropertyAll(TextStyle(fontWeight: FontWeight.bold)),
+          backgroundColor: MaterialStatePropertyAll(Colors.white),
+          foregroundColor: MaterialStatePropertyAll(Color(0xFF018301)),
+          side: MaterialStatePropertyAll(
+            BorderSide(color: Colors.green),
+          )),
     ),
     appBarTheme: AppBarTheme(),
     tabBarTheme: TabBarTheme(
@@ -71,7 +73,7 @@ class CustomThemes {
       headlineSmall: GoogleFonts.robotoCondensed(
           fontWeight: FontWeight.bold, color: Colors.black),
       titleLarge: GoogleFonts.robotoCondensed(
-          fontWeight: FontWeight.bold, color: Colors.black),
+          fontWeight: FontWeight.bold, color: Color(0xFF018301)),
       titleMedium: GoogleFonts.robotoCondensed(
           fontWeight: FontWeight.bold, color: Color(0xFF018301)),
       titleSmall: GoogleFonts.robotoCondensed(

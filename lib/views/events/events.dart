@@ -218,7 +218,10 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
             alignment: Alignment.center,
             padding: EdgeInsets.only(top: 20),
             child: ElevatedButton(
-                onPressed: () => {}, child: Text("ADD NEW EVENT")),
+                onPressed: () => {
+                      // TODO
+                    },
+                child: Text("ADD NEW EVENT")),
           ),
           ...loadedMyEvents.map((final anEvent) => _buildEventCard(anEvent)),
         ];
@@ -274,13 +277,13 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
       margin: const EdgeInsets.all(10),
       child: InkWell(
           onTap: () async {
-            // await Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (final context) => EventInfoScreen(event: event),
-            //   ),
-            // );
-            setState(() {});
+            await Navigator.pushNamed(context, "eventDetail", arguments: event);
+            setState(() {
+              loadedMyEvents = [];
+              loadedUpcomingEvents = [];
+            });
+            getUpcomingEvents();
+            getMyEvents();
           },
           child: Container(
               margin: EdgeInsets.symmetric(horizontal: 30, vertical: 20),

@@ -1,6 +1,7 @@
 import "dart:io";
 
 import "package:babylon_app/models/babylon_user.dart";
+import "package:babylon_app/models/connected_babylon_user.dart";
 import "package:babylon_app/models/event.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
@@ -141,14 +142,16 @@ class EventService {
 
   static Future<bool> addUserToEvent({required final Event event}) async {
     try {
-      final User currUser = FirebaseAuth.instance.currentUser!;
+      final BabylonUser currUser = ConnectedBabylonUser();
+      currUser.listedEventsUIDs.add(event.eventUID);
       final db = FirebaseFirestore.instance;
-      await db.collection("users").doc(currUser.uid).update({
+      await db.collection("users").doc(currUser.userUID).update({
         "listedEvents": FieldValue.arrayUnion([event.eventUID])
       });
       await db.collection("events").doc(event.eventUID).update({
-        "attendees": FieldValue.arrayUnion([currUser.uid])
+        "attendees": FieldValue.arrayUnion([currUser.userUID])
       });
+      ConnectedBabylonUser.setConnectedBabylonUser(babylonUser: currUser);
       return true;
     } catch (e) {
       print(e);

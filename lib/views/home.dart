@@ -22,10 +22,9 @@ class _Home extends State<Home> {
         body: Column(
           children: [
             Expanded(
-                child: Image(
-              fit: BoxFit.cover,
-              image: AssetImage("assets/images/home-image.jpg"),
-            )),
+              child: Image.asset("assets/images/home-image.jpg",
+                  fit: BoxFit.cover),
+            ),
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,

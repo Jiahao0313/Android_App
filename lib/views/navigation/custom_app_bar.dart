@@ -13,7 +13,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       shadowColor: Colors.black,
       surfaceTintColor: Colors.white,
       elevation: isHome ? null : 5,
-      toolbarHeight: isHome ? 90 : 120,
+      toolbarHeight: 90,
       title: isHome
           ? Container(
               padding: EdgeInsets.only(left: 10, bottom: 5),
@@ -50,7 +50,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             : Container(
                 padding: EdgeInsets.only(right: 30),
                 child: Image(
-                    width: 80,
+                    width: 60,
                     image: AssetImage("assets/images/logoSquare.png"),
                     fit: BoxFit.cover))
       ],
@@ -58,5 +58,5 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(isHome ? 90 : 120);
+  Size get preferredSize => Size.fromHeight(90);
 }
