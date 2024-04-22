@@ -77,7 +77,8 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                       ]),
                   child: TextFormField(
                     controller: _nameController,
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                     decoration: InputDecoration(
                       hintText: "Event Name*",
                       hintStyle: Theme.of(context).textTheme.labelLarge,
@@ -118,7 +119,7 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                   height: 200,
                   child: _image == null && _eventImgURL == ""
                       ? Icon(Icons.camera_alt,
-                          color: Theme.of(context).primaryColor)
+                          color: Theme.of(context).colorScheme.primary)
                       : _image == null
                           ? Image.network(_eventImgURL!, fit: BoxFit.cover)
                           : Image.file(File(_image!.path), fit: BoxFit.cover),
@@ -137,7 +138,8 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                       ]),
                   child: TextFormField(
                     controller: _placeController,
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                     decoration: InputDecoration(
                       hintText: "Location",
                       hintStyle: Theme.of(context).textTheme.labelLarge,
@@ -156,7 +158,8 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                       ]),
                   child: TextFormField(
                     controller: _descriptionShortController,
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                     decoration: InputDecoration(
                       hintText: "Short Description",
                       hintStyle: Theme.of(context).textTheme.labelLarge,
@@ -174,7 +177,8 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                       ]),
                   child: TextFormField(
                     controller: _descriptionController,
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                     decoration: InputDecoration(
                       hintText: "Full Description",
                       hintStyle: Theme.of(context).textTheme.labelLarge,
@@ -235,7 +239,7 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                     },
                     style: ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll(
-                            Theme.of(context).primaryColor)),
+                            Theme.of(context).colorScheme.primary)),
                     child: Text("UPDATE"),
                   ),
                 ],

@@ -125,7 +125,7 @@ class _RegisterPage3State extends State<RegisterPage3> {
                 selectedLanguages.isNotEmpty
                     ? selectedLanguages.join(", ")
                     : "None selected",
-                style: TextStyle(color: Theme.of(context).primaryColor),
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
               ),
               onTap: () => _showMultiSelectLanguages(context),
             ),

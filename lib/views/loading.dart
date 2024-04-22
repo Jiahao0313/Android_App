@@ -12,9 +12,10 @@ class Loading extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             CircularProgressIndicator(color: Color(0xFF006400)),
-            Text("Loading..."),
+            Container(
+                padding: EdgeInsets.only(top: 8), child: Text("Loading...")),
           ],
         ));
   }

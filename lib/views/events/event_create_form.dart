@@ -58,7 +58,8 @@ class _EventCreateForm extends State<EventCreateForm> {
                       ]),
                   child: TextFormField(
                     controller: _nameController,
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                     decoration: InputDecoration(
                       hintText: "Event Name*",
                       hintStyle: Theme.of(context).textTheme.labelLarge,
@@ -99,7 +100,7 @@ class _EventCreateForm extends State<EventCreateForm> {
                   height: 200,
                   child: _image == null
                       ? Icon(Icons.camera_alt,
-                          color: Theme.of(context).primaryColor)
+                          color: Theme.of(context).colorScheme.primary)
                       : Image.file(File(_image!.path), fit: BoxFit.cover),
                 ),
               ),
@@ -116,7 +117,8 @@ class _EventCreateForm extends State<EventCreateForm> {
                       ]),
                   child: TextFormField(
                     controller: _placeController,
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                     decoration: InputDecoration(
                       hintText: "Location",
                       hintStyle: Theme.of(context).textTheme.labelLarge,
@@ -135,7 +137,8 @@ class _EventCreateForm extends State<EventCreateForm> {
                       ]),
                   child: TextFormField(
                     controller: _descriptionShortController,
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                     decoration: InputDecoration(
                       hintText: "Short Description",
                       hintStyle: Theme.of(context).textTheme.labelLarge,
@@ -153,7 +156,8 @@ class _EventCreateForm extends State<EventCreateForm> {
                       ]),
                   child: TextFormField(
                     controller: _descriptionController,
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                     decoration: InputDecoration(
                       hintText: "Full Description",
                       hintStyle: Theme.of(context).textTheme.labelLarge,
@@ -212,7 +216,7 @@ class _EventCreateForm extends State<EventCreateForm> {
                     },
                     style: ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll(
-                            Theme.of(context).primaryColor)),
+                            Theme.of(context).colorScheme.primary)),
                     child: Text("CREATE"),
                   ),
                 ],

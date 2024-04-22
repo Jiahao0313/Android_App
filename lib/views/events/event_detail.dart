@@ -359,8 +359,8 @@ class _EventDetail extends State<EventDetail> {
           style: ButtonStyle(
               foregroundColor: MaterialStatePropertyAll(
                   Theme.of(context).colorScheme.background),
-              backgroundColor:
-                  MaterialStatePropertyAll(Theme.of(context).primaryColor)),
+              backgroundColor: MaterialStatePropertyAll(
+                  Theme.of(context).colorScheme.primary)),
           child: Row(mainAxisSize: MainAxisSize.min, children: const [
             Icon(Icons.edit),
             SizedBox(
