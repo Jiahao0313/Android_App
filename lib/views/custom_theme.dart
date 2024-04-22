@@ -58,6 +58,50 @@ class CustomThemes {
     ),
     listTileTheme: ListTileThemeData(iconColor: Color(0xFF018301)),
     cardTheme: CardTheme(surfaceTintColor: Colors.white, elevation: 10),
+    popupMenuTheme: PopupMenuThemeData(
+      color: Colors.white,
+      iconColor: Color(0xFF018301),
+    ),
+    datePickerTheme: DatePickerThemeData(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      cancelButtonStyle:
+          ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.red)),
+      confirmButtonStyle: ButtonStyle(
+          backgroundColor: MaterialStatePropertyAll(Color(0xFF018301))),
+      todayBorder: BorderSide(color: Color(0xFF018301), width: 1),
+      todayForegroundColor: MaterialStateProperty.resolveWith(
+        (final states) {
+          if (states.contains(MaterialState.selected)) {
+            return Colors.white;
+          }
+          return Color(0xFF018301);
+        },
+      ),
+      todayBackgroundColor: MaterialStateProperty.resolveWith(
+        (final states) {
+          if (states.contains(MaterialState.selected)) {
+            return Color(0xFF018301);
+          }
+          return Colors.white;
+        },
+      ),
+      dayBackgroundColor: MaterialStateProperty.resolveWith(
+        (final states) {
+          if (states.contains(MaterialState.selected)) {
+            return Color(0xFF018301);
+          }
+          return Colors.white;
+        },
+      ),
+    ),
+    timePickerTheme: TimePickerThemeData(
+      backgroundColor: Colors.white,
+      cancelButtonStyle:
+          ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.red)),
+      confirmButtonStyle: ButtonStyle(
+          backgroundColor: MaterialStatePropertyAll(Color(0xFF018301))),
+    ),
     inputDecorationTheme: InputDecorationTheme(
       fillColor: Color(0xFF018301),
       enabledBorder: OutlineInputBorder(
@@ -70,6 +114,18 @@ class CustomThemes {
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(color: Colors.transparent)),
     ),
+    colorScheme: ColorScheme(
+        brightness: Brightness.light,
+        primary: Color(0xFF018301),
+        onPrimary: Colors.white,
+        secondary: Color(0xFFF77600),
+        onSecondary: Colors.white,
+        error: Colors.red,
+        onError: Colors.white,
+        background: Colors.white,
+        onBackground: Colors.black,
+        surface: Colors.white,
+        onSurface: Colors.black),
     textTheme: TextTheme(
       displayLarge: GoogleFonts.robotoCondensed(
         fontWeight: FontWeight.bold,

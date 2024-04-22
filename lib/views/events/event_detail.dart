@@ -20,20 +20,22 @@ class EventDetail extends StatefulWidget {
 class _EventDetail extends State<EventDetail> {
   bool _hasDataLoaded = false;
   bool _isAttending = false;
+  late Event eventState;
 
   @override
   void initState() {
     super.initState();
+    eventState = widget.event;
     fetchData();
   }
 
   void fetchData() async {
     try {
       final List<BabylonUser> users =
-          await EventService.getAttendees(event: widget.event);
+          await EventService.getAttendees(event: eventState);
       setState(() {
-        widget.event.attendees = users;
-        _isAttending = widget.event.attendees!.any((final anAttendee) =>
+        eventState.attendees = users;
+        _isAttending = eventState.attendees!.any((final anAttendee) =>
             anAttendee.userUID == FirebaseAuth.instance.currentUser!.uid);
         _hasDataLoaded = true;
       });
@@ -42,10 +44,30 @@ class _EventDetail extends State<EventDetail> {
     }
   }
 
+  void reloadData() async {
+    try {
+      setState(() {
+        _hasDataLoaded = false;
+      });
+      final reloadedEvent =
+          await EventService.getEvent(eventUID: eventState.eventUID);
+      if (reloadedEvent != null) {
+        reloadedEvent.attendees =
+            await EventService.getAttendees(event: reloadedEvent);
+        setState(() {
+          eventState = reloadedEvent;
+          _hasDataLoaded = true;
+        });
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   @override
   Widget build(final BuildContext context) {
     return Scaffold(
-        appBar: CustomAppBar(title: widget.event.title),
+        appBar: CustomAppBar(title: eventState.title),
         body: _hasDataLoaded
             ? SingleChildScrollView(
                 child: Container(
@@ -59,7 +81,7 @@ class _EventDetail extends State<EventDetail> {
                         _buildAttendBtn(context),
                         _buildAttendees(context),
                         if (ConnectedBabylonUser().userUID ==
-                            widget.event.creatorUID)
+                            eventState.creatorUID)
                           _buildEditBtn(context)
                       ],
                     )))
@@ -72,29 +94,29 @@ class _EventDetail extends State<EventDetail> {
           margin: EdgeInsets.symmetric(vertical: 24),
           child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: widget.event.pictureURL != "" &&
-                      widget.event.pictureURL != null
-                  ? Image.network(
-                      widget.event.pictureURL!,
-                      fit: BoxFit.cover,
-                      height: 200,
-                      width: MediaQuery.of(context).size.width,
-                    )
-                  : Image.asset(
-                      "assets/images/logoSquare.png",
-                      fit: BoxFit.cover,
-                      height: 200,
-                      width: MediaQuery.of(context).size.width,
-                    ))),
+              child:
+                  eventState.pictureURL != "" && eventState.pictureURL != null
+                      ? Image.network(
+                          eventState.pictureURL!,
+                          fit: BoxFit.cover,
+                          height: 200,
+                          width: MediaQuery.of(context).size.width,
+                        )
+                      : Image.asset(
+                          "assets/images/logoSquare.png",
+                          fit: BoxFit.cover,
+                          height: 200,
+                          width: MediaQuery.of(context).size.width,
+                        ))),
       Text(
-        widget.event.title,
+        eventState.title,
         style: Theme.of(context).textTheme.titleLarge,
       ),
-      if (widget.event.fullDescription != null)
+      if (eventState.fullDescription != null)
         Container(
             margin: EdgeInsets.only(top: 12),
             child: Text(
-              widget.event.fullDescription!,
+              eventState.fullDescription!,
             ))
     ]);
   }
@@ -114,10 +136,10 @@ class _EventDetail extends State<EventDetail> {
                   ),
                 ),
                 Text(
-                    "${DateFormat("dd MMMM yyyy").format(widget.event.date!)} at ${DateFormat("KK:mm a").format(widget.event.date!)}"),
+                    "${DateFormat("dd MMMM yyyy").format(eventState.date!)} at ${DateFormat("KK:mm a").format(eventState.date!)}"),
               ],
             )),
-        if (widget.event.place != null)
+        if (eventState.place != null)
           Container(
               margin: EdgeInsets.only(top: 8),
               child: Row(
@@ -129,7 +151,7 @@ class _EventDetail extends State<EventDetail> {
                       color: Color(0xFF018301),
                     ),
                   ),
-                  Text(widget.event.place!),
+                  Text(eventState.place!),
                 ],
               )),
         Container(
@@ -150,7 +172,7 @@ class _EventDetail extends State<EventDetail> {
                 InkWell(
                   onTap: () => {
                     Navigator.pushNamed(context, "userProfile",
-                        arguments: widget.event.creator)
+                        arguments: eventState.creator)
                   },
                   child: Row(
                     children: [
@@ -158,10 +180,10 @@ class _EventDetail extends State<EventDetail> {
                           padding: EdgeInsets.symmetric(horizontal: 12),
                           child: CircleAvatar(
                             backgroundImage:
-                                NetworkImage(widget.event.creator!.imagePath),
+                                NetworkImage(eventState.creator!.imagePath),
                           )),
                       Text(
-                        widget.event.creator!.fullName,
+                        eventState.creator!.fullName,
                         style: TextStyle(fontStyle: FontStyle.italic),
                       )
                     ],
@@ -180,11 +202,11 @@ class _EventDetail extends State<EventDetail> {
             onPressed: () async {
               if (!_isAttending) {
                 final bool added =
-                    await EventService.addUserToEvent(event: widget.event);
+                    await EventService.addUserToEvent(event: eventState);
                 if (added) {
                   setState(() {
                     _isAttending = true;
-                    widget.event.attendees!.add(ConnectedBabylonUser());
+                    eventState.attendees!.add(ConnectedBabylonUser());
                   });
                 }
               }
@@ -212,7 +234,7 @@ class _EventDetail extends State<EventDetail> {
                 height: 70, // Adjusted height to accommodate the border.
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: widget.event.attendees!
+                  itemCount: eventState.attendees!
                       .length, // The total number of avatars to display.
                   itemBuilder: (final context, final index) {
                     // Wrapping each avatar with a Transform.translate to create an overlap effect.
@@ -221,7 +243,7 @@ class _EventDetail extends State<EventDetail> {
                           0), // Shifts each avatar to the left; adjust the multiplier as needed.
                       child: Container(
                         margin: EdgeInsets.only(
-                            right: index != widget.event.attendees!.length - 1
+                            right: index != eventState.attendees!.length - 1
                                 ? 20
                                 : 0), // Adjust the right margin to control the overlap
                         decoration: BoxDecoration(
@@ -232,7 +254,7 @@ class _EventDetail extends State<EventDetail> {
                         ),
                         child: CircleAvatar(
                           backgroundImage: NetworkImage(
-                              widget.event.attendees![index].imagePath),
+                              eventState.attendees![index].imagePath),
                           radius: 30, // The radius of avatars.
                         ),
                       ),
@@ -247,7 +269,7 @@ class _EventDetail extends State<EventDetail> {
                     SizedBox(
                       width: 8,
                     ),
-                    Text("See all (${widget.event.attendees!.length})")
+                    Text("See all (${eventState.attendees!.length})")
                   ]))
             ],
           ),
@@ -289,19 +311,19 @@ class _EventDetail extends State<EventDetail> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
               ),
               child: ListView.builder(
-                itemCount: widget.event.attendees!.length,
+                itemCount: eventState.attendees!.length,
                 itemBuilder: (final BuildContext context, final int index) {
                   return ListTile(
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(
-                            widget.event.attendees![index].imagePath),
+                            eventState.attendees![index].imagePath),
                         radius: 20,
                       ),
-                      title: Text(widget.event.attendees![index].fullName,
+                      title: Text(eventState.attendees![index].fullName,
                           style: TextStyle(fontSize: 16)),
                       onTap: () => {
                             Navigator.pushNamed(context, "userProfile",
-                                arguments: widget.event.attendees![index])
+                                arguments: eventState.attendees![index])
                           });
                 },
               ),
@@ -328,8 +350,10 @@ class _EventDetail extends State<EventDetail> {
         alignment: Alignment.center,
         padding: EdgeInsets.only(top: 12, bottom: 12),
         child: OutlinedButton(
-          onPressed: () => {
-            // TODO
+          onPressed: () async {
+            await Navigator.pushNamed(context, "eventUpdateForm",
+                arguments: eventState);
+            reloadData();
           },
           style: ButtonStyle(
               foregroundColor: MaterialStatePropertyAll(Colors.white),

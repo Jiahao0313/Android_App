@@ -67,7 +67,9 @@ class CustomRouter {
       case "eventCreateForm":
         return CustomPageRoute(builder: (final _) => const EventCreateForm());
       case "eventUpdateForm":
-        return CustomPageRoute(builder: (final _) => const EventUpdateForm());
+        return CustomPageRoute(
+            builder: (final _) =>
+                EventUpdateForm(event: settings.arguments as Event));
       case "myProfile":
         return CustomPageRoute(builder: (final _) => const MyProfile());
       case "myAccount":

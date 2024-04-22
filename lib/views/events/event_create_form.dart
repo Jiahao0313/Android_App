@@ -151,7 +151,6 @@ class _EventCreateForm extends State<EventCreateForm> {
                             blurRadius: 2,
                             offset: Offset(0, 1))
                       ]),
-                  margin: EdgeInsets.only(bottom: 16),
                   child: TextFormField(
                     controller: _descriptionController,
                     style: TextStyle(color: Theme.of(context).primaryColor),
@@ -169,6 +168,12 @@ class _EventCreateForm extends State<EventCreateForm> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStatePropertyAll(Colors.red)),
+                    child: Text("CANCEL"),
+                  ),
                   ElevatedButton(
                     onPressed: () async {
                       try {
@@ -207,12 +212,6 @@ class _EventCreateForm extends State<EventCreateForm> {
                         backgroundColor: MaterialStatePropertyAll(
                             Theme.of(context).primaryColor)),
                     child: Text("CREATE"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(Colors.red)),
-                    child: Text("CANCEL"),
                   ),
                 ],
               ),
