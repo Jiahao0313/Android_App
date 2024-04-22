@@ -137,11 +137,11 @@ class _NewsState extends State<News> {
   }
 
   Widget _buildNewsCard(final Post aPost) {
-    return GestureDetector(
-        onTap: () => goToUrl(
-            "https://babylonradio.com/${aPost.url}"), // Acción al tocar la tarjeta completa.
-        child: Container(
-          margin: const EdgeInsets.all(10),
+    return Container(
+        margin: const EdgeInsets.all(10),
+        child: InkWell(
+          onTap: () => goToUrl(
+              "https://babylonradio.com/${aPost.url}"), // Acción al tocar la tarjeta completa.
           child: Card(
             surfaceTintColor: Theme.of(context).colorScheme.background,
             elevation: 10,
