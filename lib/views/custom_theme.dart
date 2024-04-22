@@ -58,6 +58,18 @@ class CustomThemes {
     ),
     listTileTheme: ListTileThemeData(iconColor: Color(0xFF018301)),
     cardTheme: CardTheme(surfaceTintColor: Colors.white, elevation: 10),
+    inputDecorationTheme: InputDecorationTheme(
+      fillColor: Color(0xFF018301),
+      enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: Colors.transparent)),
+      focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: Colors.transparent)),
+      border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: Colors.transparent)),
+    ),
     textTheme: TextTheme(
       displayLarge: GoogleFonts.robotoCondensed(
         fontWeight: FontWeight.bold,
@@ -85,7 +97,10 @@ class CustomThemes {
       bodySmall: GoogleFonts.robotoCondensed(
           fontWeight: FontWeight.normal, color: Colors.black),
       labelLarge: GoogleFonts.robotoCondensed(
-          fontWeight: FontWeight.normal, color: Colors.black),
+        fontWeight: FontWeight.w500,
+        color: Color(0xFF018301),
+        fontSize: 18,
+      ),
       labelMedium: GoogleFonts.robotoCondensed(
           fontWeight: FontWeight.normal, color: Colors.black),
       labelSmall: GoogleFonts.robotoCondensed(

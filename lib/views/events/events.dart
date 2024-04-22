@@ -22,6 +22,50 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
   late bool loadingMyEvents = false;
   late bool loadingMoreEvents = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+
+    getUpcomingEvents();
+    getMyEvents();
+
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent ==
+          scrollController.position.pixels) {
+        if (_tabController.index == 0 && !loadingEvents && !loadingMoreEvents) {
+          getMoreEventsStartByTheLastVisible(loadedUpcomingEvents.last);
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(final BuildContext context) {
+    return Scaffold(
+        appBar: CustomAppBar(title: "Events"),
+        body: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            TabBar(
+              controller: _tabController,
+              labelColor: Color(0xFF018301),
+              indicatorWeight: 10,
+              tabs: const [
+                Tab(text: "Upcoming events"),
+                Tab(text: "My events")
+              ],
+              // Color of the text of selected tabs
+            ),
+            Expanded(
+                child: TabBarView(
+              controller: _tabController,
+              children: [_buildUpComingEventList(), _buildMyEventList()],
+            ))
+          ],
+        ));
+  }
+
   void getUpcomingEvents() async {
     try {
       setState(() {
@@ -78,48 +122,13 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-
+  void reloadData() async {
+    setState(() {
+      loadedMyEvents = [];
+      loadedUpcomingEvents = [];
+    });
     getUpcomingEvents();
     getMyEvents();
-
-    scrollController.addListener(() {
-      if (scrollController.position.maxScrollExtent ==
-          scrollController.position.pixels) {
-        if (_tabController.index == 0 && !loadingEvents && !loadingMoreEvents) {
-          getMoreEventsStartByTheLastVisible(loadedUpcomingEvents.last);
-        }
-      }
-    });
-  }
-
-  @override
-  Widget build(final BuildContext context) {
-    return Scaffold(
-        appBar: CustomAppBar(title: "Events"),
-        body: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            TabBar(
-              controller: _tabController,
-              labelColor: Color(0xFF018301),
-              indicatorWeight: 10,
-              tabs: const [
-                Tab(text: "Upcoming events"),
-                Tab(text: "My events")
-              ],
-              // Color of the text of selected tabs
-            ),
-            Expanded(
-                child: TabBarView(
-              controller: _tabController,
-              children: [_buildUpComingEventList(), _buildMyEventList()],
-            ))
-          ],
-        ));
   }
 
   Widget _buildUpComingEventList() {
@@ -174,9 +183,10 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
             alignment: Alignment.center,
             padding: EdgeInsets.only(top: 20),
             child: ElevatedButton(
-                onPressed: () => {
-                      // TODO
-                    },
+                onPressed: () async {
+                  await Navigator.pushNamed(context, "eventCreateForm");
+                  reloadData();
+                },
                 child: Text("ADD NEW EVENT")),
           ),
           ...loadedMyEvents.map((final anEvent) => _buildEventCard(anEvent)),
@@ -234,12 +244,7 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
       child: InkWell(
           onTap: () async {
             await Navigator.pushNamed(context, "eventDetail", arguments: event);
-            setState(() {
-              loadedMyEvents = [];
-              loadedUpcomingEvents = [];
-            });
-            getUpcomingEvents();
-            getMyEvents();
+            reloadData();
           },
           child: Container(
               margin: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
@@ -273,7 +278,7 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
                                       color: Color(0xFF018301),
                                     ),
                                   ),
-                                  Text(DateFormat("dd/mm/yyyy | H:mm")
+                                  Text(DateFormat("dd/MM/yyyy | H:mm")
                                       .format(event.date!)),
                                 ],
                               ),
@@ -308,27 +313,7 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
                     color: Color(0xFF018301),
                   ),
                 ],
-              ))
-          // ListTile(
-          //   leading: ImageLoader.loadEventPicture(event.pictureURL!),
-          //   title: Column(
-          //     children: [],
-          //   ),
-          //   trailing: IconButton(
-          //     icon: const Icon(Icons.chevron_right_sharp),
-          //     onPressed: () async {
-          //       // When the info button is pressed, navigate to the EvonPentInfoScreen.
-          //       // await Navigator.push(
-          //       //   context,
-          //       //   MaterialPageRoute(
-          //       //     builder: (final context) => EventInfoScreen(event: event),
-          //       //   ),
-          //       // );
-          //       setState(() {});
-          //     },
-          //   ),
-          // ),
-          ),
+              ))),
     );
   }
 }
