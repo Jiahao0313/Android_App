@@ -27,7 +27,7 @@ class _Home extends State<Home> {
             ),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.background,
                 boxShadow: const [
                   BoxShadow(
                       color: Color.fromARGB(255, 26, 25, 25),

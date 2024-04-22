@@ -68,7 +68,7 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                   margin: EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.background,
                       boxShadow: const [
                         BoxShadow(
                             color: Colors.black87,
@@ -87,7 +87,7 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                   margin: EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.background,
                       boxShadow: const [
                         BoxShadow(
                             color: Colors.black87,
@@ -108,7 +108,7 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.background,
                       boxShadow: const [
                         BoxShadow(
                             color: Colors.black87,
@@ -128,7 +128,7 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                   margin: EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.background,
                       boxShadow: const [
                         BoxShadow(
                             color: Colors.black87,
@@ -147,7 +147,7 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                   margin: EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.background,
                       boxShadow: const [
                         BoxShadow(
                             color: Colors.black87,
@@ -165,7 +165,7 @@ class _EventUpdateForm extends State<EventUpdateForm> {
               Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.background,
                       boxShadow: const [
                         BoxShadow(
                             color: Colors.black87,
@@ -184,7 +184,8 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                   padding: EdgeInsets.symmetric(vertical: 8),
                   child: Text(
                     _error!,
-                    style: TextStyle(color: Colors.red),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.error),
                   )),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -192,7 +193,8 @@ class _EventUpdateForm extends State<EventUpdateForm> {
                   ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(Colors.red)),
+                        backgroundColor: MaterialStatePropertyAll(
+                            Theme.of(context).colorScheme.error)),
                     child: Text("CANCEL"),
                   ),
                   ElevatedButton(

@@ -154,9 +154,9 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
         ];
       } else {
         children = <Widget>[
-          const Icon(
+          Icon(
             Icons.error_outline,
-            color: Colors.red,
+            color: Theme.of(context).colorScheme.error,
             size: 60,
           ),
           Padding(
@@ -216,9 +216,9 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
             child: ElevatedButton(
                 onPressed: () => {}, child: Text("ADD NEW EVENT")),
           ),
-          const Icon(
+          Icon(
             Icons.error_outline,
-            color: Colors.red,
+            color: Theme.of(context).colorScheme.error,
             size: 60,
           ),
           Padding(
@@ -236,7 +236,7 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
 
   Widget _buildEventCard(final Event event) {
     return Card(
-      surfaceTintColor: Colors.white,
+      surfaceTintColor: Theme.of(context).colorScheme.background,
       elevation: 10,
       shape:
           BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.zero)),

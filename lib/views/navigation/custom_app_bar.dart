@@ -9,9 +9,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(final BuildContext context) {
     return AppBar(
-      backgroundColor: isHome ? Colors.transparent : Colors.white,
-      shadowColor: Colors.black,
-      surfaceTintColor: Colors.white,
+      backgroundColor: isHome
+          ? Colors.transparent
+          : Theme.of(context).colorScheme.background,
+      shadowColor: Theme.of(context).colorScheme.onBackground,
+      surfaceTintColor: Theme.of(context).colorScheme.background,
       elevation: isHome ? null : 5,
       toolbarHeight: 90,
       title: isHome

@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _screens = [
     HomeScreen(), // Your main Home screen
     ConnectionsScreen(), // Placeholder for Community
-    NewsScreen(), // Placeholder for News
+    // NewsScreen(), // Placeholder for News
     EventsScreen(),
     ForumScreen(),
     OffersScreen(),

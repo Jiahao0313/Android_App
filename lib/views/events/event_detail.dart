@@ -249,7 +249,7 @@ class _EventDetail extends State<EventDetail> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.background,
                               width: 3), // White border around the avatar
                         ),
                         child: CircleAvatar(
@@ -307,7 +307,7 @@ class _EventDetail extends State<EventDetail> {
               margin:
                   EdgeInsets.only(top: screenSize.height - bottomSheetHeight),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.background,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
               ),
               child: ListView.builder(
@@ -332,8 +332,9 @@ class _EventDetail extends State<EventDetail> {
             Positioned(
               top: screenSize.height - bottomSheetHeight - 30,
               child: FloatingActionButton(
-                backgroundColor: Colors.green,
-                child: Icon(Icons.close, color: Colors.white),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: Icon(Icons.close,
+                    color: Theme.of(context).colorScheme.background),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -356,7 +357,8 @@ class _EventDetail extends State<EventDetail> {
             reloadData();
           },
           style: ButtonStyle(
-              foregroundColor: MaterialStatePropertyAll(Colors.white),
+              foregroundColor: MaterialStatePropertyAll(
+                  Theme.of(context).colorScheme.background),
               backgroundColor:
                   MaterialStatePropertyAll(Theme.of(context).primaryColor)),
           child: Row(mainAxisSize: MainAxisSize.min, children: const [

@@ -55,7 +55,9 @@ class Launch extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontFamily: "Lato",
-                  color: Colors.white, // Text color of the button
+                  color: Theme.of(context)
+                      .colorScheme
+                      .background, // Text color of the button
                 ),
               ),
             ),
@@ -103,7 +105,7 @@ class Launch extends StatelessWidget {
                           } catch (e) {
                             print(e.toString());
                           }
-                        }, 55)),
+                        }, 55, context)),
                     Flexible(
                         flex: 1,
                         child: _buildSocialButton(
@@ -112,7 +114,7 @@ class Launch extends StatelessWidget {
                           try {} catch (e) {
                             print(e.toString());
                           }
-                        }, 55))
+                        }, 55, context))
                   ])),
         ],
       ),
@@ -120,12 +122,12 @@ class Launch extends StatelessWidget {
   }
 
   Widget _buildSocialButton(final String iconPath, final VoidCallback onPressed,
-      final double height) {
+      final double height, final BuildContext context) {
     return Container(
       height: height,
       child: FloatingActionButton(
         onPressed: onPressed, // The social icon
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.background,
         elevation: 0,
         child: Image.asset(iconPath), // Remove shadow
       ),
