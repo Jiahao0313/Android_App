@@ -1,7 +1,6 @@
 import "package:babylon_app/models/post.dart";
 import "package:babylon_app/services/wpGraphQL/wp_graphql_service.dart";
 import "package:babylon_app/utils/html_strip.dart";
-import "package:babylon_app/utils/image_loader.dart";
 import "package:babylon_app/utils/launch_url.dart";
 import "package:babylon_app/views/loading.dart";
 import "package:babylon_app/views/navigation/custom_app_bar.dart";
@@ -16,7 +15,7 @@ class News extends StatefulWidget {
 
 class _NewsState extends State<News> {
   final scrollController = ScrollController();
-  late TabController _tabController;
+  // late TabController _tabController;
   late List<Post> loadedPosts = [];
   late bool loadingPosts = false;
   late bool loadingMorePosts = false;

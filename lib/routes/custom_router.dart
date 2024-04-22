@@ -15,8 +15,6 @@ import "package:babylon_app/views/events/event_create_form.dart";
 import "package:babylon_app/views/events/event_detail.dart";
 import "package:babylon_app/views/events/event_update_form.dart";
 import "package:babylon_app/views/events/events.dart";
-import "package:babylon_app/views/forum/forum.dart";
-import "package:babylon_app/views/forum/forum_topic.dart";
 import "package:babylon_app/views/home/home.dart";
 import "package:babylon_app/views/launch/launch.dart";
 import "package:babylon_app/views/layout.dart";
@@ -87,10 +85,6 @@ class CustomRouter {
         return CustomPageRoute(builder: (final _) => const News());
       case "radio":
         return CustomPageRoute(builder: (final _) => const RadioScreen());
-      case "forum":
-        return CustomPageRoute(builder: (final _) => const Forum());
-      case "forumTopic":
-        return CustomPageRoute(builder: (final _) => const ForumTopic());
       case "community":
         return CustomPageRoute(builder: (final _) => const Community());
       case "chatting":
