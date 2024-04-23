@@ -189,7 +189,26 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
                 },
                 child: Text("ADD NEW EVENT")),
           ),
-          ...loadedMyEvents.map((final anEvent) => _buildEventCard(anEvent)),
+          Container(
+              padding: EdgeInsets.only(left: 24, right: 24, top: 24),
+              child: Text(
+                "My hosted events",
+                style: Theme.of(context).textTheme.titleSmall,
+              )),
+          ...loadedMyEvents
+              .where((final anEvent) =>
+                  anEvent.creatorUID == ConnectedBabylonUser().userUID)
+              .map((final anEvent) => _buildEventCard(anEvent)),
+          Container(
+              padding: EdgeInsets.only(left: 24, right: 24, top: 24),
+              child: Text(
+                "My upcoming events",
+                style: Theme.of(context).textTheme.titleSmall,
+              )),
+          ...loadedMyEvents
+              .where((final anEvent) =>
+                  anEvent.creatorUID != ConnectedBabylonUser().userUID)
+              .map((final anEvent) => _buildEventCard(anEvent)),
         ];
       } else if (loadedMyEvents.isEmpty) {
         children = <Widget>[
