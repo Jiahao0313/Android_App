@@ -1,3 +1,5 @@
+import "dart:math";
+
 import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/loading.dart";
@@ -99,10 +101,12 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
             ],
           ),
           Expanded(
+              child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: TabBarView(
                 controller: _tabController,
                 children: [_buildMyConnections(), Text("o")]),
-          )
+          ))
         ]));
   }
 
@@ -122,6 +126,7 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
 
   Widget _buildRecievedFriendRequestList() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (recievedFriendRequests.isNotEmpty) ...{
           Container(
@@ -151,6 +156,7 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
 
   Widget _buildSentFriendRequestList() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (sentFriendRequests.isNotEmpty) ...{
           Container(
@@ -218,8 +224,12 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
                 padding: EdgeInsets.symmetric(vertical: 20, horizontal: 28),
                 child: Column(
                   children: [
-                    CircleAvatar(foregroundImage: NetworkImage(user.imagePath)),
-                    Text(user.fullName),
+                    CircleAvatar(
+                        foregroundImage: NetworkImage(user.imagePath),
+                        radius: 40),
+                    Container(
+                        margin: EdgeInsets.symmetric(vertical: 8),
+                        child: Text(user.fullName)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
