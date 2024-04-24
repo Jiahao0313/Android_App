@@ -102,10 +102,10 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
           ),
           Expanded(
               child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            margin: EdgeInsets.only(right: 16, left: 16, bottom: 16),
             child: TabBarView(
                 controller: _tabController,
-                children: [_buildMyConnections(), Text("o")]),
+                children: [_buildMyConnections(), _buildDiscoverPeople()]),
           ))
         ]));
   }
@@ -113,13 +113,14 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
   Widget _buildMyConnections() {
     return SingleChildScrollView(
         child: Column(
-      mainAxisSize: MainAxisSize.max,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        isMyConnectionsDataLoading
-            ? Expanded(child: Center(child: Loading()))
-            : _buildRecievedFriendRequestList(),
-        _buildSentFriendRequestList(),
-        _buildFriendsGrid()
+        if (!isMyConnectionsDataLoading) ...{
+          _buildRecievedFriendRequestList(),
+          _buildSentFriendRequestList(),
+          _buildFriendsGrid()
+        } else
+          Center(child: Loading())
       ],
     ));
   }
@@ -133,7 +134,7 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.only(left: 24, right: 24, top: 24),
               child: Text(
-                "Sent friend requests",
+                "Recieved friend requests",
                 style: Theme.of(context).textTheme.titleMedium,
               )),
           Container(
@@ -142,10 +143,10 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               children: [
-                ...sentFriendRequests.map((final aSentFriendRequest) =>
+                ...recievedFriendRequests.map((final aRecievedFriendRequest) =>
                     _buildUserTile(
-                        user: aSentFriendRequest,
-                        userTile: UserTile.sentFriendRequest))
+                        user: aRecievedFriendRequest,
+                        userTile: UserTile.recievedFriendRequest))
               ],
             ),
           )
@@ -234,8 +235,8 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         InkWell(
-                          onTap: () {
-                            // TODO
+                          onTap: () async {
+                            await _userPopup(popupType: userTile, user: user);
                           },
                           child: Icon(
                             Icons.visibility_outlined,
@@ -259,8 +260,8 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
                             child: Icon(Icons.chat_outlined,
                                 color: Theme.of(context).colorScheme.secondary),
                           ),
-                        },
-                        if (userTile == UserTile.recievedFriendRequest) ...{
+                        } else if (userTile ==
+                            UserTile.recievedFriendRequest) ...{
                           InkWell(
                             onTap: () {
                               // TODO
@@ -275,8 +276,7 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
                             child: Icon(Icons.cancel_outlined,
                                 color: Theme.of(context).colorScheme.error),
                           )
-                        },
-                        if (userTile == UserTile.sentFriendRequest)
+                        } else if (userTile == UserTile.sentFriendRequest)
                           InkWell(
                             onTap: () {
                               // TODO
@@ -288,5 +288,157 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
                     )
                   ],
                 ))));
+  }
+
+  Future<void> _userPopup(
+      {required final UserTile popupType,
+      required final BabylonUser user}) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (final BuildContext context) {
+        return Dialog(
+          child: Container(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              margin: EdgeInsets.only(top: 16, right: 16),
+              alignment: Alignment.topRight,
+              child: InkWell(
+                onTap: () => Navigator.pop(context),
+                child: Icon(
+                  color: Theme.of(context).colorScheme.primary,
+                  Icons.close,
+                  size: 30,
+                ),
+              ),
+            ),
+            CircleAvatar(
+              radius: 100,
+              foregroundImage: user.imagePath != ""
+                  ? NetworkImage(user.imagePath)
+                  : AssetImage("assets/images/default_user_logo.png")
+                      as ImageProvider,
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 12),
+              child: Text(
+                user.fullName,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            if (user.originCountry != null || user.originCountry == "")
+              Container(
+                margin: EdgeInsets.only(top: 12),
+                child: Text(user.originCountry!),
+              ),
+            if (user.dateOfBirth != null || user.dateOfBirth == "")
+              Container(
+                margin: EdgeInsets.only(top: 12),
+                child: Text(user.dateOfBirth!),
+              ),
+            if (user.about != null || user.about == "") ...{
+              Container(
+                margin: EdgeInsets.only(top: 24),
+                child: Text("About me",
+                    style: Theme.of(context).textTheme.titleSmall),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 4),
+                child: Text(user.about!),
+              )
+            },
+            Container(
+                margin: EdgeInsets.only(top: 12, bottom: 18),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    if (popupType == UserTile.friend) ...{
+                      InkWell(
+                          onTap: () {
+                            // TODO
+                          },
+                          child: Column(
+                            children: [
+                              Icon(Icons.person_remove_outlined,
+                                  color: Theme.of(context).colorScheme.error),
+                              Text(
+                                "Remove Friend",
+                                style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error),
+                              )
+                            ],
+                          )),
+                      InkWell(
+                          onTap: () {
+                            // TODO
+                          },
+                          child: Column(
+                            children: [
+                              Icon(Icons.chat_outlined,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary),
+                              Text(
+                                "Start a Chat",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                              )
+                            ],
+                          )),
+                    } else if (popupType == UserTile.recievedFriendRequest) ...{
+                      InkWell(
+                          onTap: () {
+                            // TODO
+                          },
+                          child: Column(
+                            children: [
+                              Icon(Icons.check_circle_outline,
+                                  color: Theme.of(context).colorScheme.primary),
+                              Text(
+                                "Accept",
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                              )
+                            ],
+                          )),
+                      InkWell(
+                          onTap: () {
+                            // TODO
+                          },
+                          child: Column(
+                            children: [
+                              Icon(Icons.cancel_outlined,
+                                  color: Theme.of(context).colorScheme.error),
+                              Text(
+                                "Decline",
+                                style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error),
+                              )
+                            ],
+                          ))
+                    } else if (popupType == UserTile.sentFriendRequest)
+                      InkWell(
+                          onTap: () {
+                            // TODO
+                          },
+                          child: Column(
+                            children: [
+                              Icon(Icons.cancel_schedule_send_outlined,
+                                  color: Theme.of(context).colorScheme.error),
+                              Text(
+                                "Cancel",
+                                style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error),
+                              )
+                            ],
+                          )),
+                  ],
+                ))
+          ])),
+        );
+      },
+    );
   }
 }

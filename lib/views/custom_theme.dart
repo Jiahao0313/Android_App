@@ -102,6 +102,7 @@ class CustomThemes {
       confirmButtonStyle: ButtonStyle(
           backgroundColor: MaterialStatePropertyAll(Color(0xFF018301))),
     ),
+    dialogTheme: DialogTheme(surfaceTintColor: Colors.white),
     inputDecorationTheme: InputDecorationTheme(
       fillColor: Color(0xFF018301),
       enabledBorder: OutlineInputBorder(
