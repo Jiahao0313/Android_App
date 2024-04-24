@@ -216,7 +216,11 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
             alignment: Alignment.center,
             padding: EdgeInsets.only(top: 20),
             child: ElevatedButton(
-                onPressed: () => {}, child: Text("ADD NEW EVENT")),
+                onPressed: () async {
+                  await Navigator.pushNamed(context, "eventCreateForm");
+                  reloadData();
+                },
+                child: Text("ADD NEW EVENT")),
           ),
           Center(
             child: Padding(
@@ -233,7 +237,11 @@ class _Events extends State<Events> with SingleTickerProviderStateMixin {
             alignment: Alignment.center,
             padding: EdgeInsets.only(top: 20),
             child: ElevatedButton(
-                onPressed: () => {}, child: Text("ADD NEW EVENT")),
+                onPressed: () async {
+                  await Navigator.pushNamed(context, "eventCreateForm");
+                  reloadData();
+                },
+                child: Text("ADD NEW EVENT")),
           ),
           Icon(
             Icons.error_outline,

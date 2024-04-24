@@ -143,7 +143,7 @@ class CustomThemes {
       titleLarge: GoogleFonts.robotoCondensed(
           fontWeight: FontWeight.bold, color: Color(0xFF018301)),
       titleMedium: GoogleFonts.robotoCondensed(
-          fontWeight: FontWeight.bold, color: Color(0xFF018301)),
+          fontWeight: FontWeight.w500, color: Color(0xFF018301)),
       titleSmall: GoogleFonts.robotoCondensed(
           fontWeight: FontWeight.bold, color: Colors.black),
       bodyLarge: GoogleFonts.robotoCondensed(
