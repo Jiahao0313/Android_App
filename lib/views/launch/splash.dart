@@ -26,7 +26,7 @@ class _Splash extends State<Splash> {
       if (currentUser != null) {
         Navigator.of(context).pushReplacementNamed("layout");
       } else {
-        Navigator.of(context).pushReplacementNamed("lauch");
+        Navigator.of(context).pushReplacementNamed("launch");
       }
     } catch (e) {
       rethrow;

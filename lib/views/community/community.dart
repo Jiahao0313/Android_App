@@ -1,12 +1,10 @@
-import "dart:math";
-
 import "package:babylon_app/models/babylon_user.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/views/loading.dart";
 import "package:babylon_app/views/navigation/custom_app_bar.dart";
 import "package:flutter/material.dart";
 
-enum UserTile { friend, recievedFriendRequest, sentFriendRequest }
+enum UserTile { friend, recievedFriendRequest, sentFriendRequest, newUser }
 
 class Community extends StatefulWidget {
   const Community({super.key});
@@ -17,9 +15,12 @@ class Community extends StatefulWidget {
 class _Community extends State<Community> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final scrollController = ScrollController();
+  final TextEditingController searchController = TextEditingController();
   late List<BabylonUser> myFriends = [];
   late List<BabylonUser> recievedFriendRequests = [];
   late List<BabylonUser> sentFriendRequests = [];
+  late List<BabylonUser> newUsers = [];
+  late List<BabylonUser> searchResults = [];
   late bool isMyConnectionsDataLoading;
 
   @override
@@ -30,6 +31,7 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
     fetchMyFriends();
     fetchRecievedFriendRequests();
     fetchSentFriendRequests();
+    fetchNewUsers();
   }
 
   void fetchMyFriends() async {
@@ -88,6 +90,18 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
     }
   }
 
+  void fetchNewUsers() async {
+    try {
+      final List<BabylonUser> fetchedNewUsers =
+          await UserService.getNewUsers(number: 5);
+      setState(() {
+        newUsers.addAll(fetchedNewUsers);
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   @override
   Widget build(final BuildContext context) {
     return Scaffold(
@@ -119,6 +133,20 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
           _buildRecievedFriendRequestList(),
           _buildSentFriendRequestList(),
           _buildFriendsGrid()
+        } else
+          Center(child: Loading())
+      ],
+    ));
+  }
+
+  Widget _buildDiscoverPeople() {
+    return SingleChildScrollView(
+        child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (!isMyConnectionsDataLoading) ...{
+          _buildSearchBtn(),
+          _buildNewUsers(),
         } else
           Center(child: Loading())
       ],
@@ -212,8 +240,39 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _buildDiscoverPeople() {
-    return Text("Discover");
+  Widget _buildSearchBtn() {
+    return ElevatedButton.icon(
+        onPressed: () => _searchPopup(),
+        icon: Icon(Icons.search_outlined),
+        label: Text("Search"));
+  }
+
+  Widget _buildNewUsers() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (recievedFriendRequests.isNotEmpty) ...{
+          Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(left: 24, right: 24, top: 24),
+              child: Text(
+                "Recieved friend requests",
+                style: Theme.of(context).textTheme.titleMedium,
+              )),
+          Container(
+            height: 200,
+            child: ListView(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              children: [
+                ...newUsers.map((final aNewUser) =>
+                    _buildUserTile(user: aNewUser, userTile: UserTile.newUser))
+              ],
+            ),
+          )
+        }
+      ],
+    );
   }
 
   Widget _buildUserTile(
@@ -438,6 +497,31 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
                 ))
           ])),
         );
+      },
+    );
+  }
+
+  Future<void> _searchPopup() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (final BuildContext context) {
+        return Dialog(
+            child: Container(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Container(
+            margin: EdgeInsets.only(top: 16, right: 16),
+            alignment: Alignment.topRight,
+            child: InkWell(
+              onTap: () => Navigator.pop(context),
+              child: Icon(
+                color: Theme.of(context).colorScheme.primary,
+                Icons.close,
+                size: 30,
+              ),
+            ),
+          ),
+        ])));
       },
     );
   }
