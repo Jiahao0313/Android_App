@@ -1,8 +1,19 @@
+import "package:babylon_app/legacy/views/chat/chat_view.dart";
+import "package:babylon_app/legacy/views/profile/other_profile.dart";
 import "package:babylon_app/models/babylon_user.dart";
+import "package:babylon_app/models/chat.dart";
+import "package:babylon_app/models/connected_babylon_user.dart";
+import "package:babylon_app/services/chat/chat_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
+import "package:babylon_app/utils/image_loader.dart";
 import "package:babylon_app/views/loading.dart";
 import "package:babylon_app/views/navigation/custom_app_bar.dart";
+import "package:flutter/animation.dart";
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
+import 'dart:ui';
+
+import "package:flutter/widgets.dart";
 
 enum UserTile { friend, recievedFriendRequest, sentFriendRequest, newUser }
 
@@ -32,6 +43,12 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
     fetchRecievedFriendRequests();
     fetchSentFriendRequests();
     fetchNewUsers();
+  }
+
+  void dispose() {
+    _tabController.dispose();
+    searchController.dispose();
+    super.dispose();
   }
 
   void fetchMyFriends() async {
@@ -99,6 +116,64 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
       });
     } catch (e) {
       rethrow;
+    }
+  }
+
+  void fetchSearchUsers(final String query) async {
+    if(query.isEmpty) {
+      final allUsers = await UserService.getAllBabylonUsers();
+      final currentUserUID = ConnectedBabylonUser().userUID;
+
+      setState(() {
+        searchResults = allUsers
+            .where((final user) => user.userUID != currentUserUID)
+            .toList();
+      }); 
+    } else {
+      // print for TEST
+      print("!!!!!!!!!!!!Searching for $query!!!!!!!!!!!!!!!!!!!!");
+      final searchResultsTemp = await UserService.searchBabylonUsers(query);
+      final currentUserUID = ConnectedBabylonUser().userUID;
+
+      setState(() {
+        // print for TEST
+        print("----------------------------Have Added--------------------------");
+        searchResults = searchResultsTemp
+            .where((final user) => user.userUID != currentUserUID)
+            .toList();
+        print(searchResults);
+      });
+    }
+  }
+
+    void pressedProfileButton(final BabylonUser babylonUser) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (final context) => OtherProfile(babylonUser: babylonUser)),
+    );
+  }
+
+  void pressedRequestButton(final BabylonUser babylonUser) {
+    UserService.sendConnectionRequest(requestUID: babylonUser.userUID);
+    setState(() {
+      searchResults
+          .firstWhere((final search) => babylonUser.userUID == search.userUID)
+          .connectionRequestsUIDs!
+          .add(ConnectedBabylonUser().userUID);
+    });
+  }
+
+  void pressedChatButton(final BabylonUser babylonUser) async {
+    final Chat? newChat = await ChatService.createChat(otherUser: babylonUser);
+    if (newChat != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (final context) => ChatView(
+                  chat: newChat,
+                )),
+      );
     }
   }
 
@@ -275,8 +350,155 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
     );
   }
 
+  // Creating the search bar for discovering people
+  Widget _buildSearchBar() {
+    return Container(
+      margin: EdgeInsets.only(top: 8, left: 10, bottom: 8),
+      width: 250,
+      height: 30,
+      child: SearchBar(
+        autoFocus: true,
+        onChanged: fetchSearchUsers,
+        controller: searchController,
+
+      ),
+    ); 
+  }
+
+  // If no result is not found, then display
+  // Design change
+  Widget _buildNoResultsFoundMessage() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off, size: 80, color: Colors.grey[600]),
+          SizedBox(
+              height: 20), // Provides spacing between the icon and the text.
+          Text(
+            "No people found with that name.",
+            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+    Widget _buttonOption(
+      final String title,
+      final IconData icon,
+      final BuildContext context,
+      final BabylonUser person,
+      final void Function(BabylonUser) pressedFunction) {
+    // Function to create a small, styled button for each action.
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 2.0),
+      child: ElevatedButton.icon(
+        onPressed: () {
+          pressedFunction(person);
+        },
+        icon: Icon(icon, size: 18.0),
+        label: Text(title, style: TextStyle(fontSize: 12.0)),
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.blue.shade200, // Text color
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+                15.0), // Rounded corners for a modern look
+          ),
+          textStyle: TextStyle(
+            fontWeight: FontWeight.bold, // Bold text for clarity
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Display related users under search bar
+  Widget _displaySearchedUsers(final index){
+  final BabylonUser person = searchResults[index];
+    return Card(
+      margin: 
+        EdgeInsets.symmetric(horizontal:12.0, vertical: 6.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0)),
+      elevation: 3.0,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(
+                    builder: (final context) => 
+                        OtherProfile(babylonUser: person))
+                );
+              },
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: ImageLoader.loadProfilePicture(person.imagePath, 30),
+              ),
+            ),
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: 10.0, right: 10.0, bottom: 10.0
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(person.fullName,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0
+                )),
+                SizedBox(height: 5),
+                Text(person.about ?? "",
+                    style: TextStyle(fontSize: 14.0))
+              ],
+            ),
+          ),
+        ),
+        // VerticalDivider(),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buttonOption(
+                  "View Profile",
+                  Icons.visibility,
+                  context,
+                  person,
+                  pressedProfileButton),
+              _buttonOption(
+                  person.connectionRequestsUIDs!.any(
+                          (final userUID) =>
+                              userUID ==
+                              ConnectedBabylonUser()
+                                  .userUID)
+                      ? "Pending"
+                      : "Send Request",
+                  Icons.person_add,
+                  context,
+                  person,
+                  pressedRequestButton),
+              _buttonOption("Chat", Icons.chat, context,
+                  person, pressedChatButton),
+            ],
+          ),
+        )
+        ])),
+    );
+  }
+
   Widget _buildUserTile(
-      {required final BabylonUser user, required final UserTile userTile}) {
+      {required final BabylonUser user, required final UserTile userTile}
+  ){
     return SizedBox(
         width: 200,
         child: Card(
@@ -506,22 +728,39 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
       context: context,
       barrierDismissible: true,
       builder: (final BuildContext context) {
+
+      final bool hasSearchQuery = searchController.text.isNotEmpty;
         return Dialog(
-            child: Container(
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Container(
-            margin: EdgeInsets.only(top: 16, right: 16),
-            alignment: Alignment.topRight,
-            child: InkWell(
-              onTap: () => Navigator.pop(context),
-              child: Icon(
-                color: Theme.of(context).colorScheme.primary,
-                Icons.close,
-                size: 30,
-              ),
-            ),
+          child: Container(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Row(children: [
+                Expanded(child:_buildSearchBar()), // Search Bar  
+                Container(
+                  margin: EdgeInsets.only(left: 8, top: 8, bottom: 8),
+                  alignment: Alignment.topRight,
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                      child: 
+                        Icon(
+                          color: Theme.of(context).colorScheme.primary,
+                          Icons.close,
+                          size: 30,
+                        )
+                  ),
+                ),
+              ]),
+              Expanded(
+                child: searchResults.isEmpty && hasSearchQuery
+                  ? _buildNoResultsFoundMessage()
+                  : ListView.builder(
+                    itemCount: searchResults.length,
+                    itemBuilder: (final context, final index){
+                      return _displaySearchedUsers(index);
+                    })
+              )
+            ]
           ),
-        ])));
+        ));
       },
     );
   }
