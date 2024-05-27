@@ -1,244 +1,346 @@
-import 'package:babylon_app/models/event.dart';
-import 'package:babylon_app/services/event/eventService.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'events-info.dart';
-import 'create_event.dart';
-import 'package:babylon_app/views/navigation_menu.dart';
+import "package:babylon_app/models/connected_babylon_user.dart";
+import "package:babylon_app/models/event.dart";
+import "package:babylon_app/services/event/event_service.dart";
+import "package:babylon_app/utils/image_loader.dart";
+import "package:babylon_app/views/loading.dart";
+import "package:babylon_app/views/navigation/custom_app_bar.dart";
+import "package:flutter/material.dart";
+import "package:intl/intl.dart";
 
-
-// Define the EventsScreen as a StatefulWidget to handle dynamic content like user events.
-class EventsScreen extends StatefulWidget {
-  const EventsScreen({Key? key}) : super(key: key);
-
+class Events extends StatefulWidget {
+  const Events({super.key});
   @override
-  State<EventsScreen> createState() => _EventsScreenState();
+  State<Events> createState() => _Events();
 }
 
-// Define the corresponding State class for EventsScreen with TabController for tab navigation.
-class _EventsScreenState extends State<EventsScreen> with SingleTickerProviderStateMixin {
+class _Events extends State<Events> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final Future<List<Event>> _allEvents = EventService.getEvents();
-  final Future<List<Event>> _myEvents = EventService.getListedEventsOfUser(FirebaseAuth.instance.currentUser!.uid);
+  late List<Event> loadedUpcomingEvents = [];
+  late List<Event> loadedMyEvents = [];
+  final scrollController = ScrollController();
+  late bool loadingEvents = false;
+  late bool loadingMyEvents = false;
+  late bool loadingMoreEvents = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-  }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+    getUpcomingEvents();
+    getMyEvents();
 
-  @override
-  Widget build(BuildContext context){
-    return Scaffold(
-       // Custom drawer widget for navigation.
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CreateEventScreen()),
-          );
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.green,
-        // Alineación en la parte inferior izquierda
-
-      ),
-
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            const Text('Events'),
-            SizedBox(
-              height: 55,
-              width: 55,
-              child: Image.asset('assets/images/logowhite.png'), // Your logo asset.
-            ),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'UPCOMING EVENTS'),
-            Tab(text: 'MY EVENTS'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildAllEventList(),
-          _buildMyEventList()
-        ],
-      ),
-    );
-  }
-
-  // Method to build a list view of event cards.
-  Widget _buildAllEventList() {
-    return FutureBuilder<List<Event>>(
-      future: _allEvents, // a previously-obtained Future<String> or null
-      builder:
-          (BuildContext context, AsyncSnapshot<List<Event>> snapshot) {
-        List<Widget> children;
-        if (snapshot.hasData) {
-          children = <Widget>[
-            Padding(
-                padding: EdgeInsets.only(left: 16, top: 16),
-                child: Text("Upcoming events",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-              ...snapshot.data!.map((anEvent) => _buildEventCard(anEvent) )
-          ];
-        } else if (snapshot.hasError) {
-            children = <Widget>[
-              const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text('Error: ${snapshot.error}'),
-              ),
-            ];
-          } else {
-            children = <Widget>[
-              Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: CircularProgressIndicator(
-                          color: Color(0xFF006400)),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: Text('Loading...'),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 128),
-                    child: Image.asset('assets/images/logoSquare.png',
-                        height: 185, width: 185),
-                  ),
-                ],
-              )
-            ];
-          }
-        return ListView(
-          children: children,
-        );
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent ==
+          scrollController.position.pixels) {
+        if (_tabController.index == 0 && !loadingEvents && !loadingMoreEvents) {
+          getMoreEventsStartByTheLastVisible(loadedUpcomingEvents.last);
+        }
       }
-    );
+    });
   }
 
+  @override
+  Widget build(final BuildContext context) {
+    return Scaffold(
+        appBar: CustomAppBar(title: "Events"),
+        body: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            TabBar(
+              controller: _tabController,
+              labelColor: Color(0xFF018301),
+              indicatorWeight: 10,
+              tabs: const [
+                Tab(text: "Upcoming events"),
+                Tab(text: "My events")
+              ],
+              // Color of the text of selected tabs
+            ),
+            Expanded(
+                child: TabBarView(
+              controller: _tabController,
+              children: [_buildUpComingEventList(), _buildMyEventList()],
+            ))
+          ],
+        ));
+  }
+
+  void getUpcomingEvents() async {
+    try {
+      setState(() {
+        loadingEvents = true;
+      });
+      final List<Event> upcomingEvents = await EventService.getUpcomingEvents();
+      setState(() {
+        loadedUpcomingEvents.addAll(upcomingEvents);
+      });
+    } catch (error) {
+      print(error);
+    } finally {
+      setState(() {
+        loadingEvents = false;
+      });
+    }
+  }
+
+  void getMyEvents() async {
+    try {
+      setState(() {
+        loadingMyEvents = true;
+      });
+      final List<Event> myEvents = await EventService.getListedEventsOfUser(
+          uuid: ConnectedBabylonUser().userUID);
+      setState(() {
+        loadedMyEvents.addAll(myEvents);
+      });
+    } catch (error) {
+      print(error);
+    } finally {
+      setState(() {
+        loadingMyEvents = false;
+      });
+    }
+  }
+
+  void getMoreEventsStartByTheLastVisible(final Event lastVisibleEvent) async {
+    try {
+      setState(() {
+        loadingMoreEvents = true;
+      });
+      final List<Event> moreEvents =
+          await EventService.getMoreEvents(lastVisibleEvent);
+      setState(() {
+        loadedUpcomingEvents.addAll(moreEvents);
+      });
+    } catch (error) {
+      print(error);
+    } finally {
+      setState(() {
+        loadingMoreEvents = false;
+      });
+    }
+  }
+
+  void reloadData() async {
+    setState(() {
+      loadedMyEvents = [];
+      loadedUpcomingEvents = [];
+    });
+    getUpcomingEvents();
+    getMyEvents();
+  }
+
+  Widget _buildUpComingEventList() {
+    return Builder(builder: (final BuildContext context) {
+      List<Widget> children;
+      if (loadingEvents) {
+        children = [Loading()];
+      } else if (loadedUpcomingEvents.isNotEmpty) {
+        children = <Widget>[
+          ...loadedUpcomingEvents
+              .map((final anEvent) => _buildEventCard(anEvent)),
+        ];
+      } else if (loadedUpcomingEvents.isEmpty) {
+        children = <Widget>[
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 20.0), // Adjust the top margin here
+              child: Text(
+                "Event calendar is empty at the moment. Stay tuned for announcements! 📆",
+              ),
+            ),
+          ),
+        ];
+      } else {
+        children = <Widget>[
+          Icon(
+            Icons.error_outline,
+            color: Theme.of(context).colorScheme.error,
+            size: 60,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: Text("Error"),
+          ),
+        ];
+      }
+      return ListView(
+        controller: scrollController,
+        children: children,
+      );
+    });
+  }
 
   Widget _buildMyEventList() {
-    return FutureBuilder<List<Event>>(
-      future: _myEvents, // a previously-obtained Future<String> or null
-      builder:
-          (BuildContext context, AsyncSnapshot<List<Event>> snapshot) {
-        List<Widget> children;
-        if (snapshot.hasData) {
-          children = <Widget>[
-            Padding(
-                padding: EdgeInsets.only(left: 16, top: 16),
-                child: Text("Upcoming events",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
+    return Builder(builder: (final BuildContext context) {
+      List<Widget> children;
+      if (loadingMyEvents) {
+        children = [Loading()];
+      } else if (loadedMyEvents.isNotEmpty) {
+        children = <Widget>[
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(top: 20),
+            child: ElevatedButton(
+                onPressed: () async {
+                  await Navigator.pushNamed(context, "eventCreateForm");
+                  reloadData();
+                },
+                child: Text("ADD NEW EVENT")),
+          ),
+          Container(
+              padding: EdgeInsets.only(left: 24, right: 24, top: 24),
+              child: Text(
+                "My hosted events",
+                style: Theme.of(context).textTheme.titleSmall,
+              )),
+          ...loadedMyEvents
+              .where((final anEvent) =>
+                  anEvent.creatorUID == ConnectedBabylonUser().userUID)
+              .map((final anEvent) => _buildEventCard(anEvent)),
+          Container(
+              padding: EdgeInsets.only(left: 24, right: 24, top: 24),
+              child: Text(
+                "My upcoming events",
+                style: Theme.of(context).textTheme.titleSmall,
+              )),
+          ...loadedMyEvents
+              .where((final anEvent) =>
+                  anEvent.creatorUID != ConnectedBabylonUser().userUID)
+              .map((final anEvent) => _buildEventCard(anEvent)),
+        ];
+      } else if (loadedMyEvents.isEmpty) {
+        children = <Widget>[
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(top: 20),
+            child: ElevatedButton(
+                onPressed: () async {
+                  await Navigator.pushNamed(context, "eventCreateForm");
+                  reloadData();
+                },
+                child: Text("ADD NEW EVENT")),
+          ),
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 20.0), // Adjust the top margin here
+              child: Text(
+                "Your event list is empty! Time to plan something fun. 🎉",
               ),
-              ...snapshot.data!.map((anEvent) => _buildEventCard(anEvent) )
-          ];
-        } else if (snapshot.hasError) {
-            children = <Widget>[
-              const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text('Error: ${snapshot.error}'),
-              ),
-            ];
-          } else {
-            children = <Widget>[
-              Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: CircularProgressIndicator(
-                          color: Color(0xFF006400)),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: Text('Loading...'),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 128),
-                    child: Image.asset('assets/images/logoSquare.png',
-                        height: 185, width: 185),
-                  ),
-                ],
-              )
-            ];
-          }
-        return ListView(
-          children: children,
-        );
+            ),
+          ),
+        ];
+      } else {
+        children = <Widget>[
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(top: 20),
+            child: ElevatedButton(
+                onPressed: () async {
+                  await Navigator.pushNamed(context, "eventCreateForm");
+                  reloadData();
+                },
+                child: Text("ADD NEW EVENT")),
+          ),
+          Icon(
+            Icons.error_outline,
+            color: Theme.of(context).colorScheme.error,
+            size: 60,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: Text("Error"),
+          ),
+        ];
       }
-    );
+      return ListView(
+        controller: scrollController,
+        children: children,
+      );
+    });
   }
 
-
-  // Method to build a single event card widget.
-  Widget _buildEventCard(Event event) {
+  Widget _buildEventCard(final Event event) {
     return Card(
+      surfaceTintColor: Theme.of(context).colorScheme.background,
+      elevation: 10,
+      shape:
+          BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.zero)),
       margin: const EdgeInsets.all(10),
-      child: ListTile(
-        leading: Image.network(event.PictureURL!),
-        title: Text(event.Title!),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${DateFormat('dd MMMM yyyy').format(event.Date!)} at ${DateFormat('hh:mm aaa').format(event.Date!)}'),
-            Text(event.ShortDescription!, maxLines: 3, overflow: TextOverflow.ellipsis),
-            Text('Host: ${event.Creator!.fullName}'), // Display the host of the event.
-            Text('Location: ${event.Place}'), // Display the location of the event.
-          ],
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.info_outline),
-          onPressed: () async{
-            // When the info button is pressed, navigate to the EvonPentInfoScreen.
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EventInfoScreen(event: event),
-              ),
-            );
-            setState(() {});
+      child: InkWell(
+          onTap: () async {
+            await Navigator.pushNamed(context, "eventDetail", arguments: event);
+            reloadData();
           },
-        ),
-      ),
+          child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: ImageLoader.loadEventPicture(event.pictureURL!),
+                  ),
+                  Expanded(
+                      flex: 5,
+                      child: Container(
+                          padding: EdgeInsets.only(left: 16, right: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(bottom: 8),
+                                child: Text(event.title,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium),
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                      Icons.calendar_month_outlined,
+                                      color: Color(0xFF018301),
+                                    ),
+                                  ),
+                                  Text(DateFormat("dd/MM/yyyy | H:mm")
+                                      .format(event.date!)),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                      Icons.person_2_outlined,
+                                      color: Color(0xFF018301),
+                                    ),
+                                  ),
+                                  Text("Host: ${event.creator!.fullName}"),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                      Icons.place_outlined,
+                                      color: Color(0xFF018301),
+                                    ),
+                                  ),
+                                  Text("Location: ${event.place}"),
+                                ],
+                              )
+                            ],
+                          ))),
+                  Icon(
+                    Icons.chevron_right_outlined,
+                    color: Color(0xFF018301),
+                  ),
+                ],
+              ))),
     );
   }
 }
