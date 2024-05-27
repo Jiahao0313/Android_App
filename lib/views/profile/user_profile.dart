@@ -19,3 +19,6 @@ class _UserProfile extends State<UserProfile> {
     );
   }
 }
+
+// Display the user information in a pop up after searching
+// class UserProfileCard 
