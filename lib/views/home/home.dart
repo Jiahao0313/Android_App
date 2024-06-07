@@ -166,7 +166,7 @@ class _Home extends State<Home> {
                                 Icons.control_point,
                                 size: 40.0,
                               ),
-                              Text("Chats",
+                              Text("More",
                                   style: Theme.of(context).textTheme.bodyMedium)
                             ]),
                             onTap: () {

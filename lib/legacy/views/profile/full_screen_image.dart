@@ -15,9 +15,10 @@ class FullScreenImage extends StatelessWidget {
     return Scaffold(
       // AppBar configuration
       appBar: AppBar(
-        title: Text(name), // Display the person"s name in the AppBar.
-        backgroundColor:
-            Colors.green, // Sets the AppBar"s background color to green.
+        title: 
+        Text(name,
+          style: TextStyle(color: Colors.green),
+        ), // Display the person"s name in the AppBar.
         leading: IconButton(
           icon: Icon(Icons.arrow_back), // Icon for the back button.
           onPressed: () => Navigator.pop(

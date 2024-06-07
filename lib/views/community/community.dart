@@ -169,7 +169,7 @@ class _Community extends State<Community> with SingleTickerProviderStateMixin {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (final context) => UserProfile(user: babylonUser)),
+            builder: (final context) => UserProfileDialog(user: babylonUser)),
       );
     }
 

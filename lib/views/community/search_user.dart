@@ -40,7 +40,6 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
     fetchMyFriends();
   }
 
@@ -69,16 +68,17 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
   }
 
   // Buttons for check users details
-  void pressedProfileButton(final BabylonUser babylonUser) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (final context) => UserProfile(user: babylonUser)
-      ),
+  void pressedProfileButton(final BuildContext context, final BabylonUser babylonUser) {
+    showDialog(
+      context: context,
+      builder: (final BuildContext context) {
+        return UserProfileDialog(user: babylonUser);
+      },
     );
   }
 
-  void pressedRequestButton(final BabylonUser babylonUser) {
+
+  void pressedRequestButton(BuildContext context, BabylonUser babylonUser) {
     UserService.sendConnectionRequest(requestUID: babylonUser.userUID);
     setState(() {
       searchResults
@@ -88,7 +88,7 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
     });
   }
 
-  void pressedChatButton(final BabylonUser babylonUser) async {
+  void pressedChatButton(BuildContext context, BabylonUser babylonUser) async {
     final Chat? newChat = await ChatService.createChat(otherUser: babylonUser);
     if (newChat != null) {
       Navigator.push(
@@ -149,14 +149,12 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
     final IconData icon,
     final BuildContext context,
     final BabylonUser person,
-    final void Function(BabylonUser) pressedFunction) {
+    final void Function(BuildContext, BabylonUser) pressedFunction) {
     // Function to create a small, styled button for each action.
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 2.0),
       child: ElevatedButton.icon(
-        onPressed: () {
-          pressedFunction(person);
-        },
+        onPressed: () => pressedFunction(context, person),
         icon: Icon(icon, size: 18.0),
         label: Text(title, style: TextStyle(fontSize: 12.0)),
         style: ElevatedButton.styleFrom(
@@ -234,6 +232,7 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
                   context,
                   person,
                   pressedProfileButton),
+
               _buttonOption(
                   person.connectionRequestsUIDs.any(
                           (final userUID) =>
@@ -246,6 +245,7 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
                   context,
                   person,
                   pressedRequestButton),
+
               _buttonOption("Chat", Icons.chat, context,
                   person, pressedChatButton),
             ],
@@ -270,7 +270,7 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
         barrierDismissible: true,
         builder: (final BuildContext context) {
             return StatefulBuilder(
-                builder: (BuildContext context, StateSetter dialogSetState) {
+                builder: (final BuildContext context, final StateSetter dialogSetState) {
                     return Dialog(
                         child: Column(
                             mainAxisSize: MainAxisSize.min,
