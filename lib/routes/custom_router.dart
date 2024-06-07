@@ -74,7 +74,7 @@ class CustomRouter {
         return CustomPageRoute(builder: (final _) => const MyAccount());
       case "userProfile":
         return CustomPageRoute(
-            builder: (final _) => UserProfile(
+            builder: (final _) => UserProfileDialog(
                   user: settings.arguments as BabylonUser,
                 ));
       case "fullScreenPFP":
