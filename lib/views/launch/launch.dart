@@ -1,3 +1,5 @@
+import "package:babylon_app/legacy/views/login/login.dart";
+import "package:babylon_app/legacy/views/register/register1.dart";
 import "package:babylon_app/services/auth/auth_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:firebase_auth/firebase_auth.dart";
@@ -43,7 +45,11 @@ class Launch extends StatelessWidget {
             margin: const EdgeInsets.all(21),
             child: ElevatedButton(
               onPressed: () async {
-                Navigator.of(context).pushNamed("login");
+                Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+            );
+                // Navigator.of(context).push("login");
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor:
@@ -67,7 +73,11 @@ class Launch extends StatelessWidget {
             child: OutlinedButton(
               onPressed: () {
                 // Usa Navigator.push to navigate into RegisterScreen
-                Navigator.of(context).pushNamed("register");
+                  Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CreateAccountPage()),
+            );
+                // Navigator.of(context).pushNamed("register");
               },
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(350, 80), // Set the button size
@@ -126,6 +136,8 @@ class Launch extends StatelessWidget {
     return Container(
       height: height,
       child: FloatingActionButton(
+                    heroTag: UniqueKey(),
+
         onPressed: onPressed, // The social icon
         backgroundColor: Theme.of(context).colorScheme.background,
         elevation: 0,

@@ -96,6 +96,8 @@ class _ForumScreenState extends State<ForumScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+                    heroTag: UniqueKey(),
+
         child: Icon(Icons.add),
         onPressed: () {
           // TODO(EnzoL): Implement the "Create New Discussion" action.

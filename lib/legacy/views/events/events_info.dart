@@ -337,6 +337,8 @@ class EventInfoState extends State<EventInfoScreen> {
             Positioned(
               top: screenSize.height - bottomSheetHeight - 30,
               child: FloatingActionButton(
+                            heroTag: UniqueKey(),
+
                 backgroundColor: Colors.green,
                 child: Icon(Icons.close, color: Colors.white),
                 onPressed: () {

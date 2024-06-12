@@ -332,6 +332,8 @@ class _EventDetail extends State<EventDetail> {
             Positioned(
               top: screenSize.height - bottomSheetHeight - 30,
               child: FloatingActionButton(
+                            heroTag: UniqueKey(),
+
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 child: Icon(Icons.close,
                     color: Theme.of(context).colorScheme.background),

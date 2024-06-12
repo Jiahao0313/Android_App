@@ -480,6 +480,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen>
               bottom: 16,
               right: 16,
               child: FloatingActionButton(
+                            heroTag: UniqueKey(),
+
                 onPressed: () {
                   Navigator.push(
                       context,

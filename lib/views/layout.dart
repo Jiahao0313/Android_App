@@ -46,6 +46,8 @@ class _Layout extends State<Layout> {
                           updateSelectedMenuIndexCallback:
                               updateSelectedMenuIndex))
                 ]),
-            onGenerateRoute: CustomRouter.generatePostLoginRoutes));
+            // onGenerateRoute: CustomRouter.generatePostLoginRoutes
+            )
+            );
   }
 }

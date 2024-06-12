@@ -101,6 +101,8 @@ class _EventsScreenState extends State<EventsScreen>
     return Scaffold(
       // Custom drawer widget for navigation.
       floatingActionButton: FloatingActionButton(
+                    heroTag: UniqueKey(),
+
         onPressed: () async {
           await Navigator.push(
             context,

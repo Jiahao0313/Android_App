@@ -1,3 +1,5 @@
+import "package:babylon_app/views/launch/launch.dart";
+import "package:babylon_app/views/layout.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 
@@ -24,9 +26,16 @@ class _Splash extends State<Splash> {
       final User? currentUser = FirebaseAuth.instance.currentUser;
       if (!mounted) return;
       if (currentUser != null) {
-        Navigator.of(context).pushReplacementNamed("layout");
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Layout()));
+
+        // Navigator.of(context).pushReplacement(
+        //   MaterialPageRoute(builder: (final _) => const Launch()),
+        // );
+        // Navigator.of(context).pushReplacementNamed("layout");
       } else {
-        Navigator.of(context).pushReplacementNamed("launch");
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Launch()));
+
+        // Navigator.of(context).pushReplacementNamed("launch");
       }
     } catch (e) {
       rethrow;

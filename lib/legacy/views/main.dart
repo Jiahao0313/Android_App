@@ -186,6 +186,8 @@ class LogoScreen extends StatelessWidget {
     return Container(
       height: height,
       child: FloatingActionButton(
+                    heroTag: UniqueKey(),
+
         onPressed: onPressed, // The social icon
         backgroundColor: Colors.white,
         elevation: 0,
