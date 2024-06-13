@@ -2,6 +2,7 @@ import "package:babylon_app/legacy/views/login/login.dart";
 import "package:babylon_app/legacy/views/register/register1.dart";
 import "package:babylon_app/services/auth/auth_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
+import "package:babylon_app/views/layout.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 
@@ -106,12 +107,13 @@ class Launch extends StatelessWidget {
                             () async {
                           try {
                             final UserCredential loginUser =
-                                await AuthService.signInWithGoogle();
-                            await UserService.setUpConnectedBabylonUser(
+                              await AuthService.signInWithGoogle();
+                              await UserService.setUpConnectedBabylonUser(
                                 userUID: loginUser.user!.uid);
                             if (!context.mounted) return;
-                            Navigator.of(context)
-                                .pushReplacementNamed("layout");
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Layout()));
+                            // Navigator.of(context)
+                            //     .pushReplacementNamed("layout");
                           } catch (e) {
                             print(e.toString());
                           }
@@ -136,7 +138,7 @@ class Launch extends StatelessWidget {
     return Container(
       height: height,
       child: FloatingActionButton(
-                    heroTag: UniqueKey(),
+        heroTag: UniqueKey(),
 
         onPressed: onPressed, // The social icon
         backgroundColor: Theme.of(context).colorScheme.background,
