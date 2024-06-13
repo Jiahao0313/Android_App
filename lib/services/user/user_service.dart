@@ -532,8 +532,7 @@ class UserService {
     try {
       final BabylonUser? babylonUser = await getBabylonUser(userUID: userUID);
       if (babylonUser != null) {
-        await ConnectedBabylonUser.setConnectedBabylonUser(
-            babylonUser: babylonUser);
+        await ConnectedBabylonUser.setConnectedBabylonUser(babylonUser: babylonUser);
       }
     } catch (e) {
       rethrow;

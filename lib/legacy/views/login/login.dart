@@ -1,4 +1,6 @@
 import "package:babylon_app/services/auth/auth_service.dart";
+import "package:babylon_app/views/home/home.dart";
+import "package:babylon_app/views/layout.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:babylon_app/legacy/views/home.dart";
@@ -84,7 +86,7 @@ class LoginFormState extends State<LoginForm> {
             fillColor: Colors.white,
             labelText: "Email",
             border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+              OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
           ),
           controller: _email,
           keyboardType: TextInputType.emailAddress,
@@ -122,9 +124,14 @@ class LoginFormState extends State<LoginForm> {
                 if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (final context) => HomePage()),
+                  MaterialPageRoute(builder: (final context) => Layout()),
                   (final route) => false,
                 );
+                // Navigator.pushAndRemoveUntil(
+                //   context,
+                //   MaterialPageRoute(builder: (final context) => HomePage()),
+                //   (final route) => false,
+                // );
               }
             } catch (e) {
               setState(() {
