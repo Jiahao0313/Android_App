@@ -526,7 +526,8 @@ class UserService {
       rethrow;
     }
   }
-
+// after login or regester their is an error null is not a subtype of type string, 
+//because i think we cannot gives full information to the firebase.
   static Future<void> setUpConnectedBabylonUser(
       {required final String userUID}) async {
     try {

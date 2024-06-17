@@ -1,3 +1,4 @@
+import "package:babylon_app/legacy/views/login/login.dart";
 import "package:babylon_app/services/auth/auth_validator.dart";
 import "package:babylon_app/services/auth/auth_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
@@ -187,6 +188,11 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                       await UserService.fillUser(
                           user: currentUser, userInfo: userInfo);
                       if (!context.mounted) return;
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (context) => LoginPage()),
+                      // );
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
