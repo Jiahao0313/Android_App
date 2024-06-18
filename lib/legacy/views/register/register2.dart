@@ -1,5 +1,7 @@
+import "package:babylon_app/legacy/views/register/register3.dart";
 import "package:babylon_app/services/user/user_service.dart";
 import "package:babylon_app/legacy/views/home.dart";
+import "package:babylon_app/views/layout.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "dart:io";
@@ -85,26 +87,47 @@ class _RegisterPage2State extends State<RegisterPage2> {
                   if (_fileImage != null) {
                     await UserService.addPhoto(
                         user: currentUser, file: _fileImage!);
-                  } /*else {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (final context) => Layout()),
+                      // MaterialPageRoute(builder: (final context) => HomePage()),
+                      (final route) => false,
+                    );
+                  } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("Please upload an image")));
-                  }*/
+                  }
                 }
-                if (!mounted) return;
-
-                // disable register"s second view
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => RegisterPage3()),
-                // );
-
-                if (!context.mounted) return;
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (final context) => HomePage()),
-                  (final route) => false,
-                );
               },
+              // onPressed: () async {
+              //   final currentUser = FirebaseAuth.instance.currentUser;
+
+              //   if (currentUser != null) {
+              //     if (_fileImage != null) {
+              //       await UserService.addPhoto(
+              //           user: currentUser, file: _fileImage!);
+              //     }
+              //   else {
+              //        ScaffoldMessenger.of(context).showSnackBar(
+              //            SnackBar(content: Text("Please upload an image")));
+              //      }
+              //   }
+              //   if (!mounted) return;
+
+              //   // disable register"s second view
+              //   // Navigator.push(
+              //   //   context,
+              //   //   MaterialPageRoute(builder: (context) => RegisterPage3()),
+              //   // );
+
+              //   if (!context.mounted) return;
+              //   Navigator.pushAndRemoveUntil(
+              //     context,
+              //     MaterialPageRoute(builder: (final context) => Layout()),
+              //     // MaterialPageRoute(builder: (final context) => HomePage()),
+              //     (final route) => false,
+              //   );
+              // },
               child: const Text(
                 "Finish",
                 style: TextStyle(
@@ -114,32 +137,33 @@ class _RegisterPage2State extends State<RegisterPage2> {
                 ),
               ),
             ),
-            Container(
-              margin: EdgeInsets.symmetric(
-                  vertical:
-                      20), // Adjust space above and below the "Skip" button
-              child: TextButton(
-                onPressed: () {
-                  // disable 3rd register screen
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => RegisterPage3()),
-                  // );
+            // Container(
+            //   margin: EdgeInsets.symmetric(
+            //       vertical:
+            //           20), // Adjust space above and below the "Skip" button
+            //   child: TextButton(
+            //     onPressed: () {
+            //       // disable 3rd register screen
+            //       // Navigator.push(
+            //       //   context,
+            //       //   MaterialPageRoute(builder: (context) => RegisterPage3()),
+            //       // );
 
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (final context) => HomePage()),
-                    (final route) => false,
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  minimumSize: Size(365, 60), // Set the button size
-                  textStyle: const TextStyle(fontSize: 24, fontFamily: "Lato"),
-                  side: const BorderSide(width: 2.0, color: Colors.grey),
-                ),
-                child: const Text("Skip"),
-              ),
-            ),
+            //       Navigator.pushAndRemoveUntil(
+            //         context,
+            //         MaterialPageRoute(builder: (final context) => Layout()),
+            //         // MaterialPageRoute(builder: (final context) => HomePage()),
+            //         (final route) => false,
+            //       );
+            //     },
+            //     style: OutlinedButton.styleFrom(
+            //       minimumSize: Size(365, 60), // Set the button size
+            //       textStyle: const TextStyle(fontSize: 24, fontFamily: "Lato"),
+            //       side: const BorderSide(width: 2.0, color: Colors.grey),
+            //     ),
+            //     child: const Text("Skip"),
+            //   ),
+            // ),
           ],
         ),
       ),

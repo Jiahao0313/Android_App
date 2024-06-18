@@ -1,4 +1,5 @@
 import "package:babylon_app/routes/navigation_keys.dart";
+import "package:babylon_app/views/launch/launch.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 
@@ -132,12 +133,15 @@ class DrawerNavigation extends StatelessWidget {
               updateSelectedMenuIndexCallback(4);
               final shouldLogout = await showLogOutDialog(context);
               if (shouldLogout) {
+
                 await FirebaseAuth.instance.signOut();
+
                 if (!context.mounted) return;
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    "launch",
-                    (final Route<dynamic> route) =>
-                        route.settings.name == "launch");
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => Launch()),
+                    (Route<dynamic> route) => false,
+                  );  
+
               }
             },
           ),

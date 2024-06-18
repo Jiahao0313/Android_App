@@ -39,10 +39,10 @@ class AuthService {
     User? user;
     try {
       final UserCredential userCredential =
-          await auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+        await auth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
       user = userCredential.user;
       UserService.setUpConnectedBabylonUser(
           userUID: user!
