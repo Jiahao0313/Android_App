@@ -37,9 +37,10 @@ class _Splash extends State<Splash> {
 
         // Navigator.of(context).pushReplacementNamed("launch");
       }
-    } catch (e){
+    } catch (e) {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Launch()));
+
       // rethrow;
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Launch()));
     }
   }
 
