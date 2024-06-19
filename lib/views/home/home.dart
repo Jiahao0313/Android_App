@@ -1,5 +1,10 @@
+import "package:babylon_app/models/event.dart";
 import "package:babylon_app/routes/navigation_keys.dart";
+import "package:babylon_app/views/chats/chatting.dart";
+import "package:babylon_app/views/community/community.dart";
+import "package:babylon_app/views/events/events.dart";
 import "package:babylon_app/views/navigation/custom_app_bar.dart";
+import "package:babylon_app/views/news/news.dart";
 import "package:flutter/material.dart";
 
 class Home extends StatefulWidget {
@@ -60,10 +65,11 @@ class _Home extends State<Home> {
                           ]),
                           onTap: () {
                             widget.updateSelectedMenuIndexCallback(1);
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                                "community",
-                                (final Route<dynamic> route) =>
-                                    route.settings.name == "home");
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (final context) => Community()),
+                                (final Route<dynamic> route) => true,
+                            );
                           },
                         ),
                         InkWell(
@@ -81,10 +87,11 @@ class _Home extends State<Home> {
                           ]),
                           onTap: () {
                             widget.updateSelectedMenuIndexCallback(2);
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                                "events",
-                                (final Route<dynamic> route) =>
-                                    route.settings.name == "home");
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (final context) => Events()),
+                                (final Route<dynamic> route) => true,
+                            );
                           },
                         ),
                         InkWell(
@@ -104,11 +111,13 @@ class _Home extends State<Home> {
                             ]),
                             onTap: () {
                               widget.updateSelectedMenuIndexCallback(4);
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                  "home",
-                                  (final Route<dynamic> route) =>
-                                      route.settings.name == "home");
-                            }),
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (final context) => Chatting()),
+                                (final Route<dynamic> route) => true,
+                            );
+                          },
+                          ),
                       ]),
                   Row(
                       mainAxisSize: MainAxisSize.max,
@@ -150,10 +159,11 @@ class _Home extends State<Home> {
                           ]),
                           onTap: () {
                             widget.updateSelectedMenuIndexCallback(3);
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                                "news",
-                                (final Route<dynamic> route) =>
-                                    route.settings.name == "home");
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (final context) => News()),
+                                (final Route<dynamic> route) => true,
+                            );
                           },
                         ),
                         InkWell(

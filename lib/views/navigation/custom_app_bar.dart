@@ -1,4 +1,6 @@
+import "package:babylon_app/legacy/views/profile/my_profile.dart";
 import "package:babylon_app/models/connected_babylon_user.dart";
+import "package:babylon_app/views/profile/my_account.dart";
 import "package:flutter/material.dart";
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -48,6 +50,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       )
                     ],
                   ),
+                  onTap: (){
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (final context) => MyAccount()),
+                        (final route) => true,
+                    );
+                  },
                 ))
             : Container(
                 padding: EdgeInsets.only(right: 30),

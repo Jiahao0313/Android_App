@@ -44,7 +44,7 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
   }
 
   void dispose() {
-    _tabController.dispose();
+    // _tabController.dispose();
     searchController.dispose();
     super.dispose();
   }

@@ -41,7 +41,7 @@ class BottomNavigation extends StatelessWidget {
                   "news",
                   (final Route<dynamic> route) =>
                       route.settings.name == "home");
-              updateSelectedMenuIndexCallback(index);
+                      updateSelectedMenuIndexCallback(index);
               break;
             case 4:
               layoutKey.currentState!.openEndDrawer();
