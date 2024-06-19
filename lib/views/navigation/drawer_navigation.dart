@@ -137,11 +137,15 @@ class DrawerNavigation extends StatelessWidget {
                 await FirebaseAuth.instance.signOut();
 
                 if (!context.mounted) return;
+                // Navigator.of(context).pushNamedAndRemoveUntil(
+                //     "launch",
+                //     (final Route<dynamic> route) =>
+                //         route.settings.name == "launch");
+                if (!context.mounted) return;
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => Launch()),
                     (Route<dynamic> route) => false,
                   );  
-
               }
             },
           ),

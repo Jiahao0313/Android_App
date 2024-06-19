@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "766184958846-0j1c24nfp947lsr1c2vhm9p2ogp0ahkq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.babylonradio",
+            "certificate_hash": "95e0141f1f0a4be7cd2bdb17647acd359dc09d57"
+          }
+        },
+        {
+          "client_id": "766184958846-88nkrctd2r0barhe15jbfpvgu4l6sqh7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.babylonradio",
+            "certificate_hash": "0a54962956c3458c8adfceb7faad8c8b6320077c"
+          }
+        },
+        {
           "client_id": "766184958846-fkkk14jasmj698grq644rk2i4qdgbcle.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
