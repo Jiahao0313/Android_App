@@ -1,5 +1,11 @@
+import "package:babylon_app/legacy/views/radio/radio.dart";
 import "package:babylon_app/routes/navigation_keys.dart";
+import "package:babylon_app/views/community/community.dart";
+import "package:babylon_app/views/events/events.dart";
 import "package:babylon_app/views/launch/launch.dart";
+import "package:babylon_app/views/news/news.dart";
+import "package:babylon_app/views/offers/offers.dart";
+import "package:babylon_app/views/profile/my_account.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 
@@ -59,11 +65,11 @@ class DrawerNavigation extends StatelessWidget {
             title: const Text("Community"),
             onTap: () {
               updateSelectedMenuIndexCallback(1);
-              navigatorKey.currentState!.pushNamedAndRemoveUntil(
-                  "community",
-                  (final Route<dynamic> route) =>
-                      route.settings.name == "home");
               layoutKey.currentState!.closeEndDrawer();
+              navigatorKey.currentState!.pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (final context) => Community()),
+                  (final Route<dynamic> route) => true,
+              );
             },
           ),
           ListTile(
@@ -71,11 +77,11 @@ class DrawerNavigation extends StatelessWidget {
             title: const Text("News"),
             onTap: () {
               updateSelectedMenuIndexCallback(3);
-              navigatorKey.currentState!.pushNamedAndRemoveUntil(
-                  "news",
-                  (final Route<dynamic> route) =>
-                      route.settings.name == "home");
               layoutKey.currentState!.closeEndDrawer();
+              navigatorKey.currentState!.pushAndRemoveUntil(
+                MaterialPageRoute(builder: (final context) => News()),
+                (final Route<dynamic> route) => true,
+              );
             },
           ),
           ListTile(
@@ -83,11 +89,11 @@ class DrawerNavigation extends StatelessWidget {
             title: const Text("Events"),
             onTap: () {
               updateSelectedMenuIndexCallback(2);
-              navigatorKey.currentState!.pushNamedAndRemoveUntil(
-                  "events",
-                  (final Route<dynamic> route) =>
-                      route.settings.name == "home");
               layoutKey.currentState!.closeEndDrawer();
+              navigatorKey.currentState!.pushAndRemoveUntil(
+                MaterialPageRoute(builder: (final context) => Events()),
+                (final Route<dynamic> route) => true,
+              );
             },
           ),
           ListTile(
@@ -95,11 +101,11 @@ class DrawerNavigation extends StatelessWidget {
             title: const Text("Radio"),
             onTap: () {
               updateSelectedMenuIndexCallback(4);
-              navigatorKey.currentState!.pushNamedAndRemoveUntil(
-                  "radio",
-                  (final Route<dynamic> route) =>
-                      route.settings.name == "home");
               layoutKey.currentState!.closeEndDrawer();
+              navigatorKey.currentState!.pushAndRemoveUntil(
+                MaterialPageRoute(builder: (final context) => RadioScreen()),
+                (final Route<dynamic> route) => true,
+              );
             },
           ),
           ListTile(
@@ -107,11 +113,11 @@ class DrawerNavigation extends StatelessWidget {
             title: const Text("Offers"),
             onTap: () {
               updateSelectedMenuIndexCallback(4);
-              navigatorKey.currentState!.pushNamedAndRemoveUntil(
-                  "offers",
-                  (final Route<dynamic> route) =>
-                      route.settings.name == "home");
               layoutKey.currentState!.closeEndDrawer();
+              navigatorKey.currentState!.pushAndRemoveUntil(
+                MaterialPageRoute(builder: (final context) => Offers()),
+                (final Route<dynamic> route) => true,
+              );
             },
           ),
           ListTile(
@@ -119,11 +125,11 @@ class DrawerNavigation extends StatelessWidget {
             title: const Text("My account"),
             onTap: () {
               updateSelectedMenuIndexCallback(4);
-              navigatorKey.currentState!.pushNamedAndRemoveUntil(
-                  "myAccount",
-                  (final Route<dynamic> route) =>
-                      route.settings.name == "home");
               layoutKey.currentState!.closeEndDrawer();
+              navigatorKey.currentState!.pushAndRemoveUntil(
+                MaterialPageRoute(builder: (final context) => MyAccount()),
+                (final Route<dynamic> route) => true,
+              );              
             },
           ),
           ListTile(
@@ -137,11 +143,15 @@ class DrawerNavigation extends StatelessWidget {
                 await FirebaseAuth.instance.signOut();
 
                 if (!context.mounted) return;
+                // Navigator.of(context).pushNamedAndRemoveUntil(
+                //     "launch",
+                //     (final Route<dynamic> route) =>
+                //         route.settings.name == "launch");
+                if (!context.mounted) return;
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => Launch()),
                     (Route<dynamic> route) => false,
                   );  
-
               }
             },
           ),
