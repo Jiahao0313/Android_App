@@ -24,17 +24,13 @@ class Search extends StatefulWidget {
 }
 
 class _Search extends State<Search> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
   final scrollController = ScrollController();
   final TextEditingController searchController = TextEditingController();
   late List<BabylonUser> myFriends = [];
-  // late List<BabylonUser> recievedFriendRequests = [];
-  // late List<BabylonUser> sentFriendRequests = [];
   late List<BabylonUser> newUsers = [];
   late List<BabylonUser> searchResults = [];
   late bool isMyConnectionsDataLoading;
   late bool _isSearchedUsersShowing = false;
-  // late bool _isDialogOpen = false;
 
 
   @override
@@ -44,7 +40,6 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
   }
 
   void dispose() {
-    // _tabController.dispose();
     searchController.dispose();
     super.dispose();
   }
@@ -72,13 +67,86 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (final BuildContext context) {
-        return UserProfileDialog(user: babylonUser);
+        return Dialog(
+          child: Column(mainAxisSize: MainAxisSize.min,children: [
+              UserProfileDialog(user: babylonUser),
+                          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  UserService.sendConnectionRequest(
+                    requestUID: babylonUser.userUID,
+                  );
+                  UserService.setUpConnectedBabylonUser(
+                    userUID: ConnectedBabylonUser().userUID,
+                  );
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  shadowColor: MaterialStateProperty.all(Colors.transparent),
+                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  elevation: MaterialStateProperty.all(0),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children:[
+                    Icon(Icons.person_add_outlined, 
+                    color: Theme.of(context).colorScheme.primary),
+                    Text("Add Friend",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.primary
+                    ),),
+                  ]),
+              ),
+              
+              ElevatedButton(
+                onPressed: () async {
+                  final Chat? newChat = await ChatService.createChat(
+                    otherUser: babylonUser,
+                  );
+                  if (newChat != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (final context) => ChatView(
+                          chat: newChat,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                style: ButtonStyle(
+                  iconColor: MaterialStateProperty.all(Colors.orange),
+                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  shadowColor: MaterialStateProperty.all(Colors.transparent),
+                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  elevation: MaterialStateProperty.all(0),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const <Widget>[
+                    Icon(Icons.chat_outlined),
+                    Text("Start Chat",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.orange
+                      ),),
+                  ]
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 30,)
+          ],),
+        ); 
       },
     );
   }
 
 
-  void pressedRequestButton(BuildContext context, BabylonUser babylonUser) {
+  void pressedRequestButton(final BuildContext context, final BabylonUser babylonUser) {
     UserService.sendConnectionRequest(requestUID: babylonUser.userUID);
     setState(() {
       searchResults
@@ -88,7 +156,7 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
     });
   }
 
-  void pressedChatButton(BuildContext context, BabylonUser babylonUser) async {
+  void pressedChatButton(final BuildContext context, final BabylonUser babylonUser) async {
     final Chat? newChat = await ChatService.createChat(otherUser: babylonUser);
     if (newChat != null) {
       Navigator.push(
@@ -130,20 +198,6 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Widget _buildDiscoverPeople() {
-  //   return SingleChildScrollView(
-  //       child: Column(
-  //     mainAxisSize: MainAxisSize.min,
-  //     children: [
-  //       if (!isMyConnectionsDataLoading) ...{
-  //         _buildSearchBtn(),
-  //         // _buildNewUsers(),
-  //       } else
-  //         Center(child: Loading())
-  //     ],
-  //   ));
-  // }
-
   Widget _buttonOption(
     final String title,
     final IconData icon,
@@ -182,76 +236,40 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0)),
       elevation: 3.0,
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(
-                    builder: (final context) => 
-                        OtherProfile(babylonUser: person))
-                );
-              },
-              child: Padding(
+      child: GestureDetector(
+        onTap: () {
+          pressedProfileButton(context, person);
+        },
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
                 padding: EdgeInsets.all(8.0),
                 child: ImageLoader.loadProfilePicture(person.imagePath, 30),
               ),
-            ),
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: 10.0, right: 10.0, bottom: 10.0
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(person.fullName,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16.0
-                )),
-                SizedBox(height: 5),
-                Text(person.about ?? "",
-                    style: TextStyle(fontSize: 14.0))
-              ],
-            ),
-          ),
-        ),
-        // VerticalDivider(),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buttonOption(
-                  "View Profile",
-                  Icons.visibility,
-                  context,
-                  person,
-                  pressedProfileButton),
-
-              _buttonOption(
-                  person.connectionRequestsUIDs.any(
-                          (final userUID) =>
-                              userUID ==
-                              ConnectedBabylonUser()
-                                  .userUID)
-                      ? "Pending"
-                      : "Send Request",
-                  Icons.person_add,
-                  context,
-                  person,
-                  pressedRequestButton),
-
-              _buttonOption("Chat", Icons.chat, context,
-                  person, pressedChatButton),
-            ],
-          ),
-        )
-      ])),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: 10.0, right: 10.0, bottom: 10.0
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(person.fullName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0
+                      )),
+                      SizedBox(height: 5),
+                      Text(person.about ?? "",
+                          style: TextStyle(fontSize: 14.0))
+                    ],
+                  ),
+                ),
+              ),
+        ])),
+      )
     );
   }
 
