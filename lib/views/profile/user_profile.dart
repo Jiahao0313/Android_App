@@ -18,10 +18,13 @@ class UserProfileDialog extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     return Dialog(
+      insetPadding: EdgeInsets.all(8.0),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(16.0),
       ),
-      child: SingleChildScrollView(
+      child: Container(
+        width: MediaQuery.of(context).size.width*0.8,
+              child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -37,7 +40,7 @@ class UserProfileDialog extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 10),
             GestureDetector(
               onTap: () => Navigator.push(
                 context,
@@ -91,68 +94,10 @@ class UserProfileDialog extends StatelessWidget {
                 style: TextStyle(fontSize: 16),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: () {
-                    UserService.sendConnectionRequest(
-                      requestUID: user.userUID,
-                    );
-                    UserService.setUpConnectedBabylonUser(
-                      userUID: ConnectedBabylonUser().userUID,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.green,
-                    backgroundColor: Colors.white,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const <Widget>[
-                      Icon(Icons.person_add),
-                      Text("Add Friend",
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),),
-                    ]),
-                ),
-                
-                ElevatedButton(
-                  onPressed: () async {
-                    final Chat? newChat = await ChatService.createChat(
-                      otherUser: user,
-                    );
-                    if (newChat != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (final context) => ChatView(
-                            chat: newChat,
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.orange,
-                    backgroundColor: Colors.white,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const <Widget>[
-                      Icon(Icons.chat),
-                      Text("Start a Chat",
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),),
-                    ]),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
           ],
         ),
       ),
+      )
+
     );  }
 }
