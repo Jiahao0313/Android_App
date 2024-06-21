@@ -1,7 +1,7 @@
-import "package:babylon_app/legacy/views/login/login.dart";
 import "package:babylon_app/legacy/views/register/register1.dart";
 import "package:babylon_app/services/auth/auth_service.dart";
 import "package:babylon_app/services/user/user_service.dart";
+import "package:babylon_app/views/authentication/login_form.dart";
 import "package:babylon_app/views/layout.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";

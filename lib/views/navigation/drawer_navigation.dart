@@ -3,6 +3,7 @@ import "package:babylon_app/routes/navigation_keys.dart";
 import "package:babylon_app/views/community/community.dart";
 import "package:babylon_app/views/events/events.dart";
 import "package:babylon_app/views/launch/launch.dart";
+import "package:babylon_app/views/layout.dart";
 import "package:babylon_app/views/news/news.dart";
 import "package:babylon_app/views/offers/offers.dart";
 import "package:babylon_app/views/profile/my_account.dart";
@@ -52,12 +53,11 @@ class DrawerNavigation extends StatelessWidget {
             title: const Text("Home"),
             onTap: () {
               updateSelectedMenuIndexCallback(0);
-              navigatorKey.currentState!.pushNamedAndRemoveUntil(
-                  "home",
-                  arguments: updateSelectedMenuIndexCallback,
-                  (final Route<dynamic> route) =>
-                      route.settings.name == "home");
               layoutKey.currentState!.closeEndDrawer();
+              navigatorKey.currentState!.pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (final context) => Layout()),
+                  (final Route<dynamic> route) => true,
+              );
             },
           ),
           ListTile(
