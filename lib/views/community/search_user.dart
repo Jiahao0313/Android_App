@@ -303,7 +303,7 @@ class _Search extends State<Search> with SingleTickerProviderStateMixin {
                                                     },
                                                     controller: searchController,
                                                     decoration: InputDecoration(
-                                                        hintText: 'Search...',
+                                                        hintText: "Search...",
                                                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
                                                         // prefixIcon: Icon(Icons.search),
                                                     ),
