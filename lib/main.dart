@@ -32,5 +32,5 @@ class MyApp extends StatelessWidget {
       theme: CustomThemes.lightTheme,
       home: Splash(loadCurrentUserData: loadCurrentUserData),
     );
-  }
+  } 
 }
